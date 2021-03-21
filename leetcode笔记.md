@@ -179,9 +179,13 @@ class Solution {
         int max = 0;//最长子串长度
         int left = 0;//滑动窗口左下标，i相当于滑动窗口右下标
         for(int i = 0; i < s.length(); i ++){
-            if(map.containsKey(s.charAt(i))){//charAt() 方法用于返回指定索引处的字符。索引范围为从 0 到 length() - 1。
-                left = Math.max(left,map.get(s.charAt(i)) + 1);       //map.get():返回字符所对应的索引，当发现重复元素时，窗口左指针右移
-            }        //map.get('a')=0,因为map中只有第一个a的下标，然后更新left指针到原来left的的下一位
+            if(map.containsKey(s.charAt(i))){
+                //charAt() 方法用于返回指定索引处的字符。            
+                //索引范围为从 0 到 length() - 1。
+                left = Math.max(left,map.get(s.charAt(i)) + 1);      
+                //map.get():返回字符所对应的索引(原函数是返回KEY对应的值，这里值就是字符串的索                //引），当发现重复元素时，窗口左指针右移
+            }        
+           //map.get('a')=0,因为map中只有第一个a的下标，然后更新left指针到原来left的的下一位
             map.put(s.charAt(i),i);      //再更新map中a映射的下标
             max = Math.max(max,i-left+1);     //比较两个参数的大小
         }
@@ -242,7 +246,7 @@ class Solution {
 * 1 <= m + n <= 2000
 * -106 <= nums1[i], nums2[i] <= 106
 
-**进阶：**你能设计一个时间复杂度为 O(log (m+n)) 的算法解决此问题吗？
+**进阶：**   你能设计一个时间复杂度为 O(log (m+n)) 的算法解决此问题吗？
 
 ```java
 //采用归并排序的方式来解题
@@ -310,5 +314,97 @@ class Solution {
         }
     }
 }
+```
+
+#### [5. 最长回文子串](https://leetcode-cn.com/problems/longest-palindromic-substring/)
+
+给你一个字符串 `s`，找到 `s` 中最长的回文子串。
+
+**示例 1：**
+
+```
+输入：s = "babad"
+输出："bab"
+解释："aba" 同样是符合题意的答案。
+```
+
+**示例 2：**
+
+```
+输入：s = "cbbd"
+输出："bb"
+```
+
+
+**示例 3：**
+
+```
+输入：s = "a"
+输出："a"
+```
+
+
+**示例 4：**
+
+```
+输入：s = "ac"
+输出："a"
+```
+
+**提示：**
+
+* 1 <= s.length <= 1000
+* s 仅由数字和英文字母（大写和/或小写）组成
+
+从回文串的定义展开讨论：
+
+* 如果一个字符串的头尾两个字符都不相等，那么这个字符串一定不是回文串；
+* 如果一个字符串的头尾两个字符相等，才有必要继续判断下去。
+  * 如果里面的子串是回文，整体就是回文串；
+  * 如果里面的子串不是回文串，整体就不是回文串。
+
+```java
+public class Solution {
+
+    public String longestPalindrome(String s) {
+       
+        int len = s.length();
+        if (len < 2) {
+            return s;
+        }
+    
+        int maxLen = 1;
+        int begin = 0;
+
+        // dp[i][j] 表示 s[i, j] 是否是回文串
+        boolean[][] dp = new boolean[len][len];
+        char[] charArray = s.toCharArray();
+
+        for (int i = 0; i < len; i++) {
+            dp[i][i] = true;
+        }
+        for (int j = 1; j < len; j++) {
+            for (int i = 0; i < j; i++) {
+                if (charArray[i] != charArray[j]) {
+                    dp[i][j] = false;
+                } else {
+                    if (j - i < 3) {
+                        dp[i][j] = true;
+                    } else {
+                        dp[i][j] = dp[i + 1][j - 1];
+                    }
+                }
+
+       // 只要 dp[i][j] == true 成立，就表示子串 s[i..j] 是回文，此时记录回文长度和起始位置
+                if (dp[i][j] && j - i + 1 > maxLen) {
+                    maxLen = j - i + 1;
+                    begin = i;
+                }
+            }
+        }
+        return s.substring(begin, begin + maxLen);
+    }
+}
+
 ```
 
