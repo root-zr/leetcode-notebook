@@ -876,3 +876,329 @@ class Solution {
 }
 ```
 
+#### [12. 整数转罗马数字](https://leetcode-cn.com/problems/integer-to-roman/)
+
+罗马数字包含以下七种字符： `I`， `V`， `X`， `L`，`C`，`D` 和 `M`。
+
+```
+字符          数值
+I             1
+V             5
+X             10
+L             50
+C             100
+D             500
+M             1000
+```
+
+例如， 罗马数字 2 写做 II ，即为两个并列的 1。12 写做 XII ，即为 X + II 。 27 写做  XXVII, 即为 XX + V + II 。
+
+通常情况下，罗马数字中小的数字在大的数字的右边。但也存在特例，例如 4 不写做 IIII，而是 IV。数字 1 在数字 5 的左边，所表示的数等于大数 5 减小数 1 得到的数值 4 。同样地，数字 9 表示为 IX。这个特殊的规则只适用于以下六种情况：
+
+* I 可以放在 V (5) 和 X (10) 的左边，来表示 4 和 9。
+* X 可以放在 L (50) 和 C (100) 的左边，来表示 40 和 90。 
+* C 可以放在 D (500) 和 M (1000) 的左边，来表示 400 和 900。
+
+给定一个整数，将其转为罗马数字。输入确保在 1 到 3999 的范围内。
+
+**示例 1:**
+
+```
+输入: 3
+输出: "III"
+```
+
+
+**示例 2:**
+
+```
+输入: 4
+输出: "IV"
+```
+
+
+**示例 3:**
+
+```
+输入: 9
+输出: "IX"
+```
+
+
+**示例 4:**
+
+```
+输入: 58
+输出: "LVIII"
+解释: L = 50, V = 5, III = 3.
+```
+
+
+**示例 5:**
+
+```
+输入: 1994
+输出: "MCMXCIV"
+解释: M = 1000, CM = 900, XC = 90, IV = 4.
+```
+
+**提示：**
+
+* 1 <= num <= 3999
+
+```java
+public class Solution {
+
+    public String intToRoman(int num) {
+        int[] nums = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+        String[] romans = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+
+        StringBuilder stringBuilder = new StringBuilder();
+        int index = 0;
+        while (index < 13) {
+            // 特别注意：这里是等号
+            while (num >= nums[index]) {
+                stringBuilder.append(romans[index]);
+                num -= nums[index];
+            }
+            index++;
+        }
+        return stringBuilder.toString();
+    }
+}
+```
+
+#### [13. 罗马数字转整数](https://leetcode-cn.com/problems/roman-to-integer/)
+
+罗马数字包含以下七种字符: `I`， `V`， `X`， `L`，`C`，`D` 和 `M`。
+
+```
+字符          数值
+I             1
+V             5
+X             10
+L             50
+C             100
+D             500
+M             1000
+```
+
+
+例如， 罗马数字 2 写做 II ，即为两个并列的 1。12 写做 XII ，即为 X + II 。 27 写做  XXVII, 即为 XX + V + II 。
+
+通常情况下，罗马数字中小的数字在大的数字的右边。但也存在特例，例如 4 不写做 IIII，而是 IV。数字 1 在数字 5 的左边，所表示的数等于大数 5 减小数 1 得到的数值 4 。同样地，数字 9 表示为 IX。这个特殊的规则只适用于以下六种情况：
+
+* I 可以放在 V (5) 和 X (10) 的左边，来表示 4 和 9。
+* X 可以放在 L (50) 和 C (100) 的左边，来表示 40 和 90。 
+* C 可以放在 D (500) 和 M (1000) 的左边，来表示 400 和 900。
+
+ 给定一个罗马数字，将其转换成整数。输入确保在 1 到 3999 的范围内。
+
+**示例 1:**
+
+```
+输入: "III"
+输出: 3
+```
+
+
+**示例 2:**
+
+```
+输入: "IV"
+输出: 4
+```
+
+
+**示例 3:**
+
+```
+输入: "IX"
+输出: 9
+```
+
+
+**示例 4:**
+
+```
+输入: "LVIII"
+输出: 58
+解释: L = 50, V= 5, III = 3.
+```
+
+
+**示例 5:**
+
+```
+输入: "MCMXCIV"
+输出: 1994
+解释: M = 1000, CM = 900, XC = 90, IV = 4.
+```
+
+**提示：**
+
+* 1 <= s.length <= 15
+* s 仅含字符 ('I', 'V', 'X', 'L', 'C', 'D', 'M')
+* 题目数据保证 s 是一个有效的罗马数字，且表示整数在范围 [1, 3999] 内
+* 题目所给测试用例皆符合罗马数字书写规则，不会出现跨位等情况。
+* IL 和 IM 这样的例子并不符合题目要求，49 应该写作 XLIX，999 应该写作 CMXCIX 。
+* 关于罗马数字的详尽书写规则，可以参考 [罗马数字 - Mathematics](https://b2b.partcommunity.com/community/knowledge/zh_CN/detail/10753/罗马数字#knowledge_article)。
+
+```java
+class Solution {
+    public int romanToInt(String s) {
+        Map<String, Integer> map = new HashMap<>();
+        map.put("I", 1);
+        map.put("IV", 4);
+        map.put("V", 5);
+        map.put("IX", 9);
+        map.put("X", 10);
+        map.put("XL", 40);
+        map.put("L", 50);
+        map.put("XC", 90);
+        map.put("C", 100);
+        map.put("CD", 400);
+        map.put("D", 500);
+        map.put("CM", 900);
+        map.put("M", 1000);
+        
+        int ans = 0;
+        for(int i = 0;i < s.length();) {
+            if(i + 1 < s.length() && map.containsKey(s.substring(i, i+2))) {
+                ans += map.get(s.substring(i, i+2));
+                i += 2;
+            } else {
+                ans += map.get(String.valueOf(s.charAt(i)));
+                i ++;
+            }
+        }
+        return ans;
+    }
+}
+```
+
+#### [14. 最长公共前缀](https://leetcode-cn.com/problems/longest-common-prefix/)
+
+编写一个函数来查找字符串数组中的最长公共前缀。
+
+如果不存在公共前缀，返回空字符串 ""。 
+
+**示例 1：**
+
+```
+输入：strs = ["flower","flow","flight"]
+输出："fl"
+```
+
+
+**示例 2：**
+
+```
+输入：strs = ["dog","racecar","car"]
+输出：""
+解释：输入不存在公共前缀。
+```
+
+**提示：**
+
+* 0 <= strs.length <= 200
+* 0 <= strs[i].length <= 200
+* strs[i] 仅由小写英文字母组成
+
+```java
+class Solution {
+    public String longestCommonPrefix(String[] strs) {
+        if(strs.length == 0) 
+            return "";
+        String ans = strs[0];
+        for(int i =1;i<strs.length;i++) {
+            int j=0;
+            for(;j<ans.length() && j < strs[i].length();j++) {
+                if(ans.charAt(j) != strs[i].charAt(j))
+                    break;
+            }
+
+            //先1和2比较，找到公共前缀，再用两个的公共前缀和3去比较，以此类推
+            ans = ans.substring(0, j);
+            if(ans.equals(""))
+                return ans;
+        }
+        return ans;
+    }
+}
+
+```
+
+#### [15. 三数之和](https://leetcode-cn.com/problems/3sum/)
+
+给你一个包含 n 个整数的数组 nums，判断 nums 中是否存在三个元素 a，b，c ，使得 a + b + c = 0 ？请你找出所有和为 0 且不重复的三元组。
+
+**注意：**答案中不可以包含重复的三元组。
+
+**示例 1：**
+
+```
+输入：nums = [-1,0,1,2,-1,-4]
+输出：[[-1,-1,2],[-1,0,1]]
+```
+
+
+**示例 2：**
+
+```
+输入：nums = []
+输出：[]
+```
+
+
+**示例 3：**
+
+```
+输入：nums = [0]
+输出：[]
+```
+
+**提示：**
+
+* 0 <= nums.length <= 3000
+* $-105 <= nums[i] <= 10^5$
+
+```java
+public class Solution{
+    public List<List<Integer>> threeSum(int[] nums) {
+        List<List<Integer>> lists = new ArrayList<>();
+        //排序
+        Arrays.sort(nums);
+        //双指针
+        int len = nums.length;
+        for(int i = 0;i < len;++i) {
+            if(nums[i] > 0) return lists;
+
+            if(i > 0 && nums[i] == nums[i-1]) continue;
+
+            int curr = nums[i];
+            int L = i+1, R = len-1;
+            while (L < R) {
+                int tmp = curr + nums[L] + nums[R];
+                if(tmp == 0) {
+                    List<Integer> list = new ArrayList<>();
+                    list.add(curr);
+                    list.add(nums[L]);
+                    list.add(nums[R]);
+                    lists.add(list);
+                    while(L < R && nums[L+1] == nums[L]) ++L;
+                    while (L < R && nums[R-1] == nums[R]) --R;
+                    ++L;
+                    --R;
+                } else if(tmp < 0) {
+                    ++L;
+                } else {
+                    --R;
+                }
+            }
+        }
+        return lists;
+    }
+}
+```
+
