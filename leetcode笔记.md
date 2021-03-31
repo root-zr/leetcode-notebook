@@ -1284,39 +1284,112 @@ digits[i] 是范围 ['2', '9'] 的一个数字。
 
 ```java
 class Solution {
+    List<String> result = new ArrayList<>();
+    // 将所有映射添加到Map中
+    Map<Character, String> numToLetter = new HashMap<>() {{
+        put('2', "abc");
+        put('3', "def");
+        put('4', "ghi");
+        put('5', "jkl");
+        put('6', "mno");
+        put('7', "pqrs");
+        put('8', "tuv");
+        put('9', "wxyz");
+    }};
     public List<String> letterCombinations(String digits) {
-        List<String> combinations = new ArrayList<String>();
-        if (digits.length() == 0) {
-            return combinations;
+        if(digits.length() > 0) {
+            backtrack(0, digits, new StringBuilder());
         }
-        Map<Character, String> phoneMap = new HashMap<Character, String>() {{
-            put('2', "abc");
-            put('3', "def");
-            put('4', "ghi");
-            put('5', "jkl");
-            put('6', "mno");
-            put('7', "pqrs");
-            put('8', "tuv");
-            put('9', "wxyz");
-        }};
-        backtrack(combinations, phoneMap, digits, 0, new StringBuffer());
-        return combinations;
+        return result;
     }
 
-    public void backtrack(List<String> combinations,
-      Map<Character, String> phoneMap, String digits, int index, StringBuffer combination) {
-        if (index == digits.length()) {
-            combinations.add(combination.toString());
-        } else {
-            char digit = digits.charAt(index);
-            String letters = phoneMap.get(digit);
-            int lettersCount = letters.length();
-            for (int i = 0; i < lettersCount; i++) {
-                combination.append(letters.charAt(i));
-                backtrack(combinations, phoneMap, digits, index + 1, combination);
-                combination.deleteCharAt(index);
+    public void backtrack(int pos, String digits, StringBuilder sb) {
+        // 判断返回的条件：已经读取完所有digits的数字
+        if(pos == digits.length()) {
+            result.add(sb.toString());
+            return;
+        }
+        // 获取当前数字
+        char number = digits.charAt(pos);
+        // 从Map中读取数字映射的字母
+        String letters = numToLetter.get(number);
+        // 遍历每个字母，进行：添加、递归、删除
+        for(int i = 0; i < letters.length(); i++) {
+            sb.append(letters.charAt(i));
+            // 递归时pos应该+1，因为该读取下一位了
+            backtrack(pos+1, digits, sb);
+            sb.deleteCharAt(sb.length()-1);
+        }
+    }
+}
+```
+
+#### [18. 四数之和](https://leetcode-cn.com/problems/4sum/)
+
+给定一个包含 n 个整数的数组 nums 和一个目标值 target，判断 nums 中是否存在四个元素 a，b，c 和 d ，使得 a + b + c + d 的值与 target 相等？找出所有满足条件且不重复的四元组。
+
+**注意：**答案中不可以包含重复的四元组。
+
+**示例 1：**
+
+```
+输入：nums = [1,0,-1,0,-2,2], target = 0
+输出：[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]
+```
+
+
+**示例 2：**
+
+```
+输入：nums = [], target = 0
+输出：[]
+```
+
+**提示：**
+
+* 0 <= nums.length <= 200
+* -10^9^<= nums[i] <= 10^9^
+* -10^9^ <= target <= 10^9^
+
+```java
+class Solution {
+    public List<List<Integer>> fourSum(int[] nums, int target) {
+        List<List<Integer>> ans=new ArrayList<>();
+        if(nums.length < 4 || nums == null)
+            return ans;
+           
+        Arrays.sort(nums);
+
+        for(int i=0;i<nums.length-3;i++){
+            //枚举最小的数字
+            if(i>0&&nums[i]==nums[i-1]){continue;}//最小数字不可重复
+            if(nums[i]+nums[i+1]+nums[i+2]+nums[i+3]>target){break;}//只要和大于t那么后边都不用看了
+            if(nums[i]+nums[nums.length-3]+nums[nums.length-2]+nums[nums.length-1]<target){continue;}
+            //最大的可能和也不足t只能重新枚举最小数
+            for(int j=i+1;j<nums.length-2;j++){
+                //下面列举第二小的数
+                if(j>i+1&&nums[j]==nums[j-1]){continue;}//第二小的数字也不能重复
+                if(nums[i]+nums[j]+nums[j+1]+nums[j+2]>target){break;}//只要和大于t那么后边都不用看了
+                if(nums[i]+nums[j]+nums[nums.length-2]+nums[nums.length-1]<target){continue;}
+                //最大的可能和也不足t只能重新枚举第二小的数
+                int l=j+1;
+                int r=nums.length-1;
+                //l和r分别代表第3,4个数
+                while(l<r){
+                    int sum=nums[i]+nums[j]+nums[l]+nums[r];
+                    if(sum==target){
+                        ans.add(Arrays.asList(nums[i],nums[j],nums[l],nums[r]));
+                        while(l<r&&nums[l]==nums[l+1]){l++;}//去重第三个数                            
+                        while(l<r&&nums[r]==nums[r-1]){r--;}//去重第四个数
+                        l++;
+                        r--;
+                    }
+                    else if(sum>target){r--;}
+                    else{l++;}
+                }
             }
         }
+        return ans;     
     }
 }
 ```
