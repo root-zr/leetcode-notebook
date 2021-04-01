@@ -1394,3 +1394,250 @@ class Solution {
 }
 ```
 
+#### [19. 删除链表的倒数第 N 个结点](https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list/)
+
+给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。
+
+**进阶：**你能尝试使用一趟扫描实现吗？
+
+**示例 1：**
+
+![](E:\大三下\leetcode\leetcode\img\remove_ex1.jpg)
+
+```
+输入：head = [1,2,3,4,5], n = 2
+输出：[1,2,3,5]
+```
+
+
+**示例 2：**
+
+```
+输入：head = [1], n = 1
+输出：[]
+```
+
+
+**示例 3：**
+
+```
+输入：head = [1,2], n = 1
+输出：[1]
+```
+
+**提示：**
+
+* 链表中结点的数目为 sz
+* 1 <= sz <= 30
+* 0 <= Node.val <= 100
+* 1 <= n <= sz
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode index1 = head, index2 = head;
+        for(int i = 0; i < n; i++)  index2 = index2.next; //使得index1与index2之间间隔n-1个节点       
+        if(index2 == null) return head.next;   //说明删除的是头节点
+        while(index2.next != null){      //将index2移至最后一个节点
+            index2 = index2.next;
+            index1 = index1.next;
+        }
+        index1.next = index1.next.next;
+        return head;
+    }
+}
+```
+
+#### [20. 有效的括号](https://leetcode-cn.com/problems/valid-parentheses/)
+
+给定一个只包括 '('，')'，'{'，'}'，'['，']' 的字符串 s ，判断字符串是否有效。
+
+有效字符串需满足：
+
+1. 左括号必须用相同类型的右括号闭合。
+2. 左括号必须以正确的顺序闭合。
+
+**示例 1：**
+
+```
+输入：s = "()"
+输出：true
+```
+
+
+**示例 2：**
+
+```
+输入：s = "()[]{}"
+输出：true
+```
+
+
+**示例 3：**
+
+```
+输入：s = "(]"
+输出：false
+```
+
+
+**示例 4：**
+
+```
+输入：s = "([)]"
+输出：false
+```
+
+
+**示例 5：**
+
+```
+输入：s = "{[]}"
+输出：true
+```
+
+**提示：**
+
+* 1 <= s.length <= 10^4^
+* s 仅由括号 '()[]{}' 组成
+
+```java
+class Solution {
+    public boolean isValid(String s) {
+        int n = s.length();
+        if (n % 2 == 1) {
+            return false;
+        }
+
+        Map<Character, Character> pairs = new HashMap<Character, Character>() {{
+            put(')', '(');
+            put(']', '[');
+            put('}', '{');
+        }};
+
+        Stack stack = new Stack();
+    
+        for (int i = 0; i < n; i++) {
+            char ch = s.charAt(i);
+            if (pairs.containsKey(ch)) {
+                if (stack.isEmpty() || stack.peek() != pairs.get(ch)) {
+                    return false;
+                }
+                stack.pop();
+            } else {
+                stack.push(ch);
+            }
+        }
+        return stack.isEmpty();
+    }
+}
+```
+
+#### [21. 合并两个有序链表](https://leetcode-cn.com/problems/merge-two-sorted-lists/)
+
+将两个升序链表合并为一个新的 **升序** 链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。 
+
+**示例 1：**
+
+![](E:\大三下\leetcode\leetcode\img\merge_ex1.jpg)
+
+```
+输入：l1 = [1,2,4], l2 = [1,3,4]
+输出：[1,1,2,3,4,4]
+```
+
+**示例 2：**
+
+```
+输入：l1 = [], l2 = []
+输出：[]
+```
+
+
+**示例 3：**
+
+```
+输入：l1 = [], l2 = [0]
+输出：[0]
+```
+
+**提示：**
+
+* 两个链表的节点数目范围是 [0, 50]
+* -100 <= Node.val <= 100
+* l1 和 l2 均按 非递减顺序 排列
+
+```java
+//这道题用归并排序的方法时间复杂度是线性的，但是递归的方式思路很精妙，代码量也很少。递归就是程序内部维护了一个栈。这个题就是每次都把最小值压入栈，最后出栈的时候，将所有数连在一起就可以了。说白了，就是用一个栈维护了顺序。最后的连接，当然是小的连小的，所以l1 小，就连到 l1,l2 小就连到 l2，最后先返回的，就是最小的头结点。
+class Solution {
+
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+
+        if (l1 == null) return l2;
+        if (l2 == null) return l1;
+
+        ListNode dummy = new ListNode(0);
+        ListNode p = dummy;
+
+        while (l1 != null && l2 != null) {
+
+            if (l1.val < l2.val) {
+
+                p.next = l1;
+                l1 = l1.next;
+            } else {
+
+                p.next = l2;
+                l2 = l2.next;
+            }
+            p = p.next;
+        }
+
+        while (l1 != null) {
+
+            p.next = l1;
+            l1 = l1.next;
+            p = p.next;
+        }
+        while (l2 != null) {
+
+            p.next = l2;
+            l2 = l2.next;
+            p = p.next;
+        }
+        return dummy.next;
+    }
+}
+
+
+
+class Solution {
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        if(l1 == null) {
+            return l2;
+        }
+        if(l2 == null) {
+            return l1;
+        }
+
+        if(l1.val < l2.val) {
+            l1.next = mergeTwoLists(l1.next, l2);
+            return l1;
+        } else {
+            l2.next = mergeTwoLists(l1, l2.next);
+            return l2;
+        }
+    }
+}
+```
+
