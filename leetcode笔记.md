@@ -1641,3 +1641,142 @@ class Solution {
 }
 ```
 
+#### [22. 括号生成](https://leetcode-cn.com/problems/generate-parentheses/)
+
+数字 n 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且有效的括号组合。 
+
+**示例 1：**
+
+```
+输入：n = 3
+输出：["((()))","(()())","(())()","()(())","()()()"]
+```
+
+**示例 2：**
+
+```
+输入：n = 1
+输出：["()"]
+```
+
+**提示：**
+
+* 1 <= n <= 8
+
+```java
+class Solution {
+    List<String> res = new ArrayList<>();
+    public List<String> generateParenthesis(int n) {
+        if(n <= 0){
+            return res;
+        }
+        getParenthesis("",n,n);
+        return res;
+    }
+
+    private void getParenthesis(String str,int left, int right) {
+        if(left == 0 && right == 0 ){
+            res.add(str);
+            return;
+        }
+        if(left == right){
+            //剩余左右括号数相等，下一个只能用左括号
+            getParenthesis(str+"(",left-1,right);
+        }else if(left < right){
+            //剩余左括号小于右括号，下一个可以用左括号也可以用右括号
+            if(left > 0){
+                getParenthesis(str+"(",left-1,right);
+            }
+            getParenthesis(str+")",left,right-1);
+        }
+    }
+}
+```
+
+#### [23. 合并K个升序链表](https://leetcode-cn.com/problems/merge-k-sorted-lists/)
+
+给你一个链表数组，每个链表都已经按升序排列。
+
+请你将所有链表合并到一个升序链表中，返回合并后的链表。
+
+**示例 1：**
+
+```
+输入：lists = [[1,4,5],[1,3,4],[2,6]]
+输出：[1,1,2,3,4,4,5,6]
+解释：链表数组如下：
+[
+  1->4->5,
+  1->3->4,
+  2->6
+]
+将它们合并到一个有序链表中得到。
+1->1->2->3->4->4->5->6
+```
+
+**示例 2：**
+
+```
+输入：lists = []
+输出：[]
+```
+
+
+**示例 3：**
+
+```
+输入：lists = [[]]
+输出：[]
+```
+
+**提示：**
+
+* k == lists.length
+* 0 <= k <= 10^4^
+* 0 <= lists[i].length <= 500
+* -10^4^ <= lists[i ]  [ j ] <= 10^4^
+* lists[i] 按 升序 排列
+* lists[i].length 的总和不超过 10^4^
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode mergeKLists(ListNode[] lists) {
+        ListNode ans = null;
+        for (int i = 0; i < lists.length; ++i) {
+            ans = mergeTwoLists(ans, lists[i]);
+        }
+        return ans;
+    }
+
+    public ListNode mergeTwoLists(ListNode a, ListNode b) {
+        if (a == null || b == null) {
+            return a != null ? a : b;
+        }
+        ListNode head = new ListNode(0);
+        ListNode tail = head, aPtr = a, bPtr = b;
+        while (aPtr != null && bPtr != null) {
+            if (aPtr.val < bPtr.val) {
+                tail.next = aPtr;
+                aPtr = aPtr.next;
+            } else {
+                tail.next = bPtr;
+                bPtr = bPtr.next;
+            }
+            tail = tail.next;
+        }
+        tail.next = (aPtr != null ? aPtr : bPtr);
+        return head.next;
+    }
+}
+```
+
