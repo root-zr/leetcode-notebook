@@ -288,3 +288,193 @@ class Solution {
 }
 ```
 
+#### [剑指 Offer 09. 用两个栈实现队列](https://leetcode-cn.com/problems/yong-liang-ge-zhan-shi-xian-dui-lie-lcof/)
+
+用两个栈实现一个队列。队列的声明如下，请实现它的两个函数 appendTail 和 deleteHead ，分别完成在队列尾部插入整数和在队列头部删除整数的功能。(若队列中没有元素，deleteHead 操作返回 -1 )
+
+**示例 1：**
+
+```
+输入：
+["CQueue","appendTail","deleteHead","deleteHead"]
+[[],[3],[],[]]
+输出：[null,null,3,-1]
+```
+
+**示例 2：**
+
+```
+输入：
+["CQueue","deleteHead","appendTail","appendTail","deleteHead","deleteHead"]
+[[],[],[5],[2],[],[]]
+输出：[null,-1,null,null,5,2]
+```
+
+**提示：**
+
+    *   1 <= values <= 10000
+    *   最多会对 appendTail、deleteHead 进行 10000 次调用
+
+```java
+class CQueue {
+    Deque<Integer> stack1;
+    Deque<Integer> stack2;
+    
+    public CQueue() {
+        stack1 = new LinkedList<Integer>();
+        stack2 = new LinkedList<Integer>();
+    }
+    
+    public void appendTail(int value) {
+        stack1.push(value);
+    }
+    
+    public int deleteHead() {
+        // 如果第二个栈为空
+        if (stack2.isEmpty()) {
+            while (!stack1.isEmpty()) {
+                stack2.push(stack1.pop());
+            }
+        } 
+        if (stack2.isEmpty()) {
+            return -1;
+        } else {
+            int deleteItem = stack2.pop();
+            return deleteItem;
+        }
+    }
+}
+
+```
+
+#### [剑指 Offer 10- I. 斐波那契数列](https://leetcode-cn.com/problems/fei-bo-na-qi-shu-lie-lcof/)
+
+写一个函数，输入 n ，求斐波那契（Fibonacci）数列的第 n 项（即 F(N)）。斐波那契数列的定义如下：
+
+```
+F(0) = 0,   F(1) = 1
+F(N) = F(N - 1) + F(N - 2), 其中 N > 1.
+```
+
+
+斐波那契数列由 0 和 1 开始，之后的斐波那契数就是由之前的两数相加而得出。
+
+答案需要取模 1e9+7（1000000007），如计算初始结果为：1000000008，请返回 1。
+
+**示例 1：**
+
+```
+输入：n = 2
+输出：1
+```
+
+**示例 2：**
+
+```
+输入：n = 5
+输出：5
+```
+
+**提示：**
+
+    *   0 <= n <= 100
+
+```java
+class Solution {
+    public int fib(int n) {
+        int a = 0, b = 1, sum;
+        for(int i = 0; i < n; i++){
+            sum = (a + b) % 1000000007;
+            a = b;
+            b = sum;
+        }
+        return a;
+    }
+}
+
+```
+
+#### [剑指 Offer 10- II. 青蛙跳台阶问题](https://leetcode-cn.com/problems/qing-wa-tiao-tai-jie-wen-ti-lcof/)
+
+一只青蛙一次可以跳上1级台阶，也可以跳上2级台阶。求该青蛙跳上一个 n 级的台阶总共有多少种跳法。
+
+答案需要取模 1e9+7（1000000007），如计算初始结果为：1000000008，请返回 1。
+
+**示例 1：**
+
+```
+输入：n = 2
+输出：2
+```
+
+**示例 2：**
+
+```
+输入：n = 7
+输出：21
+```
+
+**示例 3：**
+
+```
+输入：n = 0
+输出：1
+```
+
+**提示：**
+
+    *   0 <= n <= 100
+
+```java
+class Solution {
+    public int numWays(int n) {
+        int a = 1; int b = 1; int sum = 0;
+       for(int i = 0; i < n; i ++){
+           sum = (a +b ) %1000000007;
+           a = b;
+           b = sum;
+        }
+
+        return a;
+    }
+}
+```
+
+#### [剑指 Offer 11. 旋转数组的最小数字](https://leetcode-cn.com/problems/xuan-zhuan-shu-zu-de-zui-xiao-shu-zi-lcof/)
+
+把一个数组最开始的若干个元素搬到数组的末尾，我们称之为数组的旋转。输入一个递增排序的数组的一个旋转，输出旋转数组的最小元素。例如，数组 [3,4,5,1,2] 为 [1,2,3,4,5] 的一个旋转，该数组的最小值为1。  
+
+**示例 1：**
+
+```
+输入：[3,4,5,1,2]
+输出：1
+```
+
+**示例 2：**
+
+```
+输入：[2,2,2,0,1]
+输出：0
+```
+
+```java
+class Solution {
+    public int minArray(int[] numbers) {
+        int low = 0;
+        int high = numbers.length - 1;
+        while (low < high) {
+            int pivot = low + (high - low) / 2;
+            if (numbers[pivot] < numbers[high]) {
+                high = pivot;
+            } else if (numbers[pivot] > numbers[high]) {
+                low = pivot + 1;
+            } else {
+                high -= 1;
+            }
+        }
+        return numbers[low];
+    }
+}
+```
+
