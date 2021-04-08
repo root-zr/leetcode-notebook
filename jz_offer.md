@@ -478,3 +478,164 @@ class Solution {
 }
 ```
 
+#### [剑指 Offer 12. 矩阵中的路径](https://leetcode-cn.com/problems/ju-zhen-zhong-de-lu-jing-lcof/)
+
+请设计一个函数，用来判断在一个矩阵中是否存在一条包含某字符串所有字符的路径。路径可以从矩阵中的任意一格开始，每一步可以在矩阵中向左、右、上、下移动一格。如果一条路径经过了矩阵的某一格，那么该路径不能再次进入该格子。例如，在下面的3×4的矩阵中包含一条字符串“bfce”的路径（路径中的字母用加粗标出）。
+
+[["a","**b**","c","e"],
+["s","**f**","**c**","s"],
+["a","d","**e**","e"]]
+
+但矩阵中不包含字符串“abfb”的路径，因为字符串的第一个字符b占据了矩阵中的第一行第二个格子之后，路径不能再次进入这个格子。
+
+**示例 1：**
+
+```
+输入：board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCCED"
+输出：true
+```
+
+**示例 2：**
+
+```
+输入：board = [["a","b"],["c","d"]], word = "abcd"
+输出：false
+```
+
+**提示：**
+
+* 1 <= board.length <= 200
+* 1 <= board[i].length <= 200
+
+```java
+class Solution {
+    int[] dx = {-1, 1, 0, 0};
+    int[] dy = {0, 0, -1, 1};
+    int m, n; 
+
+    public boolean exist(char[][] board, String word) {
+        m = board.length;
+        n = board[0].length;
+        char[] chars = word.toCharArray();
+        for(int i = 0; i < m; i++){
+            for(int j = 0; j < n; j++){
+                if(board[i][j] == chars[0]){
+                    board[i][j] = '/';
+                    if(dfs(i, j, 1, board, chars)){
+                        return true;
+                    }
+                    board[i][j] = chars[0];
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean dfs(int x, int y, int index, char[][] board, char[] chars){
+        if(index == chars.length){
+            return true;
+        }
+        
+        for(int i = 0; i < 4; i++){
+            int nx = x + dx[i], ny = y + dy[i];
+            if(nx >= 0 && nx < m && ny >= 0 && ny < n && board[nx][ny] == chars[index]){
+                board[nx][ny] = '/';
+                if(dfs(nx, ny, index + 1, board, chars)){
+                    return true;
+                }
+                board[nx][ny] = chars[index];
+            }
+        }
+        return false;
+    }
+}
+```
+
+```java
+class Solution {
+    public boolean exist(char[][] board, String word) {
+        char[] words = word.toCharArray();
+        for(int i = 0; i < board.length; i++) {
+            for(int j = 0; j < board[0].length; j++) {
+                if(dfs(board, words, i, j, 0)) return true;
+            }
+        }
+        return false;
+    }
+    boolean dfs(char[][] board, char[] word, int i, int j, int k) {
+        if(i >= board.length || i < 0 || j >= board[0].length || j < 0 || board[i][j] != word[k]) return false;
+        if(k == word.length - 1) return true;
+        board[i][j] = '\0';
+        boolean res = dfs(board, word, i + 1, j, k + 1) || dfs(board, word, i - 1, j, k + 1) || 
+                      dfs(board, word, i, j + 1, k + 1) || dfs(board, word, i , j - 1, k + 1);
+        board[i][j] = word[k];
+        return res;
+    }
+}
+```
+
+#### [剑指 Offer 13. 机器人的运动范围](https://leetcode-cn.com/problems/ji-qi-ren-de-yun-dong-fan-wei-lcof/)
+
+地上有一个m行n列的方格，从坐标 [0,0] 到坐标 [m-1,n-1] 。一个机器人从坐标 [0, 0] 的格子开始移动，它每次可以向左、右、上、下移动一格（不能移动到方格外），也不能进入行坐标和列坐标的数位之和大于k的格子。例如，当k为18时，机器人能够进入方格 [35, 37] ，因为3+5+3+7=18。但它不能进入方格 [35, 38]，因为3+5+3+8=19。请问该机器人能够到达多少个格子？
+
+**示例 1：**
+
+```
+输入：m = 2, n = 3, k = 1
+输出：3
+```
+
+**示例 2：**
+
+```
+输入：m = 3, n = 1, k = 0
+输出：1
+```
+
+**提示：**
+
+*  1 <= n,m <= 100
+* 0 <= k <= 20
+
+```java
+class Solution {
+    public int movingCount(int m, int n, int k) {
+        if (k == 0) {
+            return 1;
+        }
+        Queue<int[]> queue = new LinkedList<int[]>();
+        // 向右和向下的方向数组
+        int[] dx = {0, 1};
+        int[] dy = {1, 0};
+        boolean[][] vis = new boolean[m][n];
+        queue.offer(new int[]{0, 0});
+        vis[0][0] = true;
+        int ans = 1;
+        while (!queue.isEmpty()) {
+            int[] cell = queue.poll();
+            int x = cell[0], y = cell[1];
+            for (int i = 0; i < 2; ++i) {
+                int tx = dx[i] + x;
+                int ty = dy[i] + y;
+                if (tx < 0 || tx >= m || ty < 0 || ty >= n || vis[tx][ty] || get(tx) + get(ty) > k) {
+                    continue;
+                }
+                queue.offer(new int[]{tx, ty});
+                vis[tx][ty] = true;
+                ans++;
+            }
+        }
+        return ans;
+    }
+
+    private int get(int x) {
+        int res = 0;
+        while (x != 0) {
+            res += x % 10;
+            x /= 10;
+        }
+        return res;
+    }
+}
+```
+
