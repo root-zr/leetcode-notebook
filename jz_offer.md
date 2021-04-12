@@ -932,3 +932,303 @@ class Solution {
 }
 ```
 
+#### [剑指 Offer 18. 删除链表的节点](https://leetcode-cn.com/problems/shan-chu-lian-biao-de-jie-dian-lcof/)
+
+给定单向链表的头指针和一个要删除的节点的值，定义一个函数删除该节点。
+
+返回删除后的链表的头节点。
+
+**注意：**此题对比原题有改动
+
+**示例 1:**
+
+```
+输入: head = [4,5,1,9], val = 5
+输出: [4,1,9]
+解释: 给定你链表中值为 5 的第二个节点，那么在调用了你的函数之后，该链表应变为 4 -> 1 -> 9.
+```
+
+
+**示例 2:**
+
+```
+输入: head = [4,5,1,9], val = 1
+输出: [4,5,9]
+解释: 给定你链表中值为 1 的第三个节点，那么在调用了你的函数之后，该链表应变为 4 -> 5 -> 9.
+```
+
+**说明：**
+
+* 题目保证链表中节点的值互不相同
+* 若使用 C 或 C++ 语言，你不需要 free 或 delete 被删除的节点
+
+```java
+class Solution {
+    public ListNode deleteNode(ListNode head, int val) {
+        if (head == null) return null;
+        if (head.val == val) return head.next;
+        ListNode cur = head;
+        while (cur.next != null && cur.next.val != val)
+            cur = cur.next;
+        if (cur.next != null)
+            cur.next = cur.next.next;
+        return head;
+    }
+}
+```
+
+#### [剑指 Offer 19. 正则表达式匹配](https://leetcode-cn.com/problems/zheng-ze-biao-da-shi-pi-pei-lcof/)
+
+请实现一个函数用来匹配包含'. '和'*'的正则表达式。模式中的字符'.'表示任意一个字符，而'*'表示它前面的字符可以出现任意次（含0次）。在本题中，匹配是指字符串的所有字符匹配整个模式。例如，字符串"aaa"与模式"a.a"和"ab*ac*a"匹配，但与"aa.a"和"ab*a"均不匹配。
+
+**示例 1:**
+
+```
+输入:
+s = "aa"
+p = "a"
+输出: false
+解释: "a" 无法匹配 "aa" 整个字符串。
+```
+
+**示例 2:**
+
+```
+输入:
+s = "aa"
+p = "a*"
+输出: true
+解释: 因为 '*' 代表可以匹配零个或多个前面的那一个元素, 在这里前面的元素就是 'a'。因此，字符串 "aa" 可被视为 'a' 重复了一次。
+```
+
+**示例 3:**
+
+```
+输入:
+s = "ab"
+p = ".*"
+输出: true
+解释: ".*" 表示可匹配零个或多个（'*'）任意字符（'.'）。
+```
+
+**示例 4:**
+
+```
+输入:
+s = "aab"
+p = "c*a*b"
+输出: true
+解释: 因为 '*' 表示零个或多个，这里 'c' 为 0 个, 'a' 被重复一次。因此可以匹配字符串 "aab"。
+```
+
+**示例 5:**
+
+```
+输入:
+s = "mississippi"
+p = "mis*is*p*."
+输出: false
+```
+
+*  s 可能为空，且只包含从 a-z 的小写字母。
+* p 可能为空，且只包含从 a-z 的小写字母以及字符 . 和 *，无连续的 '*'。
+
+```java
+class Solution {
+    public boolean isMatch(String s, String p) {
+        int m = s.length();
+        int n = p.length();
+        boolean f[][] = new boolean[m + 1][n + 1];
+        f[0][0] = true;
+        //f[0][0]代表s和p均为空字符串，f[1][1]代表s和p的第一个字符（即在s和p中下标为0的字符）
+        for(int i = 0; i <= m ; ++i) {
+            for(int j = 1; j <= n; ++j) {
+                if(p.charAt(j - 1) == '*') {//p的第j个字符为*
+                    if(matches(s, p, i, j - 1)) {//匹配s的第i个字符和p的第j-1个字符
+                        f[i][j] = f[i - 1][j] || f[i][j - 2];
+                        //p中*前面的字符在s中出现多次或者在s中只出现1次
+                    }
+                    else {
+                        f[i][j] = f[i][j - 2];//p中*前面的在s中字符出现0次
+                    }
+                }
+                else {//p的第j个字符不为*
+                   if(matches(s, p, i, j)) {//匹配s的第i个字符和p的第j个字符
+                       f[i][j] = f[i - 1][j - 1];//匹配成功，状态转移；匹配不成功，默认是false
+                   } 
+                }
+            }
+        }
+        return f[m][n];
+    }
+
+    private boolean matches(String s, String p, int i, int j) {//注意在字符串中的下标变换
+        if(i == 0) { //代表是空字符，直接返回
+            return false;
+        }
+        if(p.charAt(j - 1) == '.') {
+            return true;
+        }
+        return s.charAt(i - 1) == p.charAt(j - 1);
+    }
+}
+```
+
+#### [剑指 Offer 20. 表示数值的字符串](https://leetcode-cn.com/problems/biao-shi-shu-zhi-de-zi-fu-chuan-lcof/)
+
+请实现一个函数用来判断字符串是否表示数值（包括整数和小数）。例如，字符串"+100"、"5e2"、"-123"、"3.1416"、"-1E-16"、"0123"都表示数值，但"12e"、"1a3.14"、"1.2.3"、"+-5"及"12e+5.4"都不是。
+
+```java
+class Solution {
+    public boolean isNumber(String s) {
+        int n = s.length();
+        int index = 0;
+        boolean hasNum = false, hasE = false;
+        boolean hasSign = false, hasDot = false;
+        while(index < n && s.charAt(index) == ' ')
+            index++;
+        while(index < n){
+            while(index < n && s.charAt(index) >= '0' && s.charAt(index) <= '9'){
+                index++;
+                hasNum = true;
+            }
+            if(index == n){
+                break;
+            }
+            char c = s.charAt(index);
+            if(c == 'e' || c == 'E'){
+                if(hasE || !hasNum){
+                    return false;
+                }
+                hasE = true;
+                hasNum = false; hasSign = false; hasDot = false;
+            }else if(c == '+' || c == '-'){
+                if(hasSign || hasNum || hasDot){
+                    return false;
+                }
+                hasSign = true;
+            }else if(c == '.'){
+                if(hasDot || hasE){
+                    return false;
+                }
+                hasDot = true;
+            }else if(c == ' '){
+                break;
+            }else{
+                return false;
+            }
+            index++;
+        }
+        while(index < n && s.charAt(index) == ' ')
+            index++;
+        return hasNum && index == n;
+    }
+}
+```
+
+#### [剑指 Offer 21. 调整数组顺序使奇数位于偶数前面](https://leetcode-cn.com/problems/diao-zheng-shu-zu-shun-xu-shi-qi-shu-wei-yu-ou-shu-qian-mian-lcof/)
+
+输入一个整数数组，实现一个函数来调整该数组中数字的顺序，使得所有奇数位于数组的前半部分，所有偶数位于数组的后半部分。
+
+**示例：**
+
+```
+输入：nums = [1,2,3,4]
+输出：[1,3,2,4] 
+注：[3,1,2,4] 也是正确的答案之一。
+```
+
+**提示：**
+
+*  0 <= nums.length <= 50000
+* 1 <= nums[i] <= 10000
+
+```java
+class Solution {
+    public int[] exchange(int[] nums) {
+        int left = 0, right = nums.length - 1;
+        while(left <= right){
+            while(left <= right && nums[left] % 2 == 1)
+                left++;
+            while(left <= right && nums[right] % 2 == 0)
+                right--;
+            if(left > right)
+                break;
+            int tmp = nums[left];
+            nums[left] = nums[right];
+            nums[right] = tmp;
+        }
+        return nums;
+    }
+}
+
+```
+
+#### [剑指 Offer 22. 链表中倒数第k个节点](https://leetcode-cn.com/problems/lian-biao-zhong-dao-shu-di-kge-jie-dian-lcof/)
+
+输入一个链表，输出该链表中倒数第k个节点。为了符合大多数人的习惯，本题从1开始计数，即链表的尾节点是倒数第1个节点。
+
+例如，一个链表有 6 个节点，从头节点开始，它们的值依次是 1、2、3、4、5、6。这个链表的倒数第 3 个节点是值为 4 的节点。
+
+**示例：**
+
+```
+给定一个链表: 1->2->3->4->5, 和 k = 2.
+
+返回链表 4->5.
+```
+
+```java
+class Solution {
+    public ListNode getKthFromEnd(ListNode head, int k) {
+        ListNode slow = head, fast = head;
+        for(int i = 0; i < k; i++){
+            fast = fast.next;
+        }
+        while(fast != null){
+            fast = fast.next;
+            slow = slow.next;
+        }
+        return slow;
+    }
+}
+```
+
+#### [剑指 Offer 24. 反转链表](https://leetcode-cn.com/problems/fan-zhuan-lian-biao-lcof/)
+
+反转一个单链表。
+
+**示例:**
+
+```
+输入: 1->2->3->4->5->NULL
+输出: 5->4->3->2->1->NULL
+```
+
+**进阶:**
+你可以迭代或递归地反转链表。你能否用两种方法解决这道题？
+
+```java
+class Solution {
+    public ListNode reverseList(ListNode head) {
+         //单链表为空或只有一个节点，直接返回原单链表
+        if (head == null || head.next == null){
+            return head;
+        }
+        //前一个节点指针
+        ListNode preNode = null;
+        //当前节点指针
+        ListNode curNode = head;
+        //下一个节点指针
+        ListNode nextNode = null;
+        while (curNode != null){
+            nextNode = curNode.next;//nextNode 指向下一个节点,保存当前节点后面的链表。
+            curNode.next=preNode;//将当前节点next域指向前一个节点   null<-1<-2<-3<-4
+            preNode = curNode;//preNode 指针向后移动。preNode指向当前节点。
+            curNode = nextNode;//curNode指针向后移动。下一个节点变成当前节点
+        }
+        return preNode;
+    }
+}
+```
+
