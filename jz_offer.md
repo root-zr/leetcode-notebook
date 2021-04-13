@@ -1232,3 +1232,236 @@ class Solution {
 }
 ```
 
+#### [剑指 Offer 25. 合并两个排序的链表](https://leetcode-cn.com/problems/he-bing-liang-ge-pai-xu-de-lian-biao-lcof/)
+
+输入两个递增排序的链表，合并这两个链表并使新链表中的节点仍然是递增排序的。
+
+**示例1：**
+
+```
+输入：1->2->4, 1->3->4
+输出：1->1->2->3->4->4
+```
+
+**限制：**
+
+0 <= 链表长度 <= 1000
+
+```java
+class Solution {
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        if(l1 == null) {
+            return l2;
+        }
+        if(l2 == null) {
+            return l1;
+        }
+
+        if(l1.val < l2.val) {
+            l1.next = mergeTwoLists(l1.next, l2);
+            return l1;
+        } else {
+            l2.next = mergeTwoLists(l1, l2.next);
+            return l2;
+        }
+    }
+}
+```
+
+#### [剑指 Offer 26. 树的子结构](https://leetcode-cn.com/problems/shu-de-zi-jie-gou-lcof/)
+
+输入两棵二叉树A和B，判断B是不是A的子结构。(约定空树不是任意一个树的子结构)
+
+B是A的子结构， 即 A中有出现和B相同的结构和节点值。
+
+例如:
+给定的树 A:
+
+         3
+        / \
+       4   5
+      / \
+     1   2
+
+给定的树 B：
+
+  
+
+```
+	 4 
+  /
+ 1
+```
+
+
+返回 true，因为 B 与 A 的一个子树拥有相同的结构和节点值。
+
+**示例 1：**
+
+```
+输入：A = [1,2,3], B = [3,1]
+输出：false
+```
+
+**示例 2：**
+
+```
+输入：A = [3,4,5,1,2], B = [4,1]
+输出：true
+```
+
+**限制：**
+
+0 <= 节点个数 <= 10000
+
+```java
+class Solution {
+    public boolean isSubStructure(TreeNode A, TreeNode B) {
+        return (A != null && B != null) && (recur(A, B) || isSubStructure(A.left, B) || isSubStructure(A.right, B));
+    }
+    boolean recur(TreeNode A, TreeNode B) {
+        if(B == null) return true;
+        if(A == null || A.val != B.val) return false;
+        return recur(A.left, B.left) && recur(A.right, B.right);
+    }
+}
+```
+
+```java
+class Solution {
+    public boolean isSubStructure(TreeNode A, TreeNode B) {
+        if(B == null) return false;
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(A);
+        while(!queue.isEmpty()){
+            TreeNode node = queue.poll();
+            if(node.val == B.val){
+                if(helper(node, B)){
+                    return true;
+                }
+            }
+            if(node.left != null){
+                queue.offer(node.left);
+            }
+            if(node.right != null){
+                queue.offer(node.right);
+            }
+        }
+        return false;
+    }
+
+    private boolean helper(TreeNode nodeA, TreeNode nodeB){
+        Queue<TreeNode> queueA = new LinkedList<>();
+        Queue<TreeNode> queueB = new LinkedList<>();
+        queueA.offer(nodeA);
+        queueB.offer(nodeB);
+
+        while(!queueB.isEmpty()){
+            nodeA = queueA.poll();
+            nodeB = queueB.poll();
+            if(nodeA == null || nodeA.val != nodeB.val){
+                return false;
+            }
+            if(nodeB.left != null){
+                queueA.offer(nodeA.left);
+                queueB.offer(nodeB.left);
+            }
+            if(nodeB.right != null){
+                queueA.offer(nodeA.right);
+                queueB.offer(nodeB.right);
+            }
+        }
+        return true;
+    }
+
+}
+```
+
+```java
+class Solution {
+    private TreeNode B;
+    public boolean isSubStructure(TreeNode A, TreeNode B) {
+        if(B == null) return false;
+        this.B = B;
+        return dfs(A);
+    }
+
+    private boolean dfs(TreeNode nodeA){
+        if(nodeA == null)
+            return false;
+        if(nodeA.val == B.val)
+            if(helper(nodeA, B))
+                return true;
+        return dfs(nodeA.left) || dfs(nodeA.right);
+    }
+
+    private boolean helper(TreeNode nodeA, TreeNode nodeB){
+        if(nodeB == null)
+            return true;
+        if(nodeA == null || nodeA.val != nodeB.val)
+            return false;
+        return helper(nodeA.left, nodeB.left) && helper(nodeA.right, nodeB.right);
+    }
+}
+```
+
+#### [剑指 Offer 27. 二叉树的镜像](https://leetcode-cn.com/problems/er-cha-shu-de-jing-xiang-lcof/)
+
+请完成一个函数，输入一个二叉树，该函数输出它的镜像。
+
+例如输入：
+
+    	  4
+        /   \
+      2     7
+     / \   / \
+    1   3 6   9
+
+镜像输出：
+
+    	  4
+        /   \
+      7     2
+     / \   / \
+    9   6 3   1
+**示例 1：**
+
+```
+输入：root = [4,2,7,1,3,6,9]
+输出：[4,7,2,9,6,3,1]
+```
+
+**限制：**
+
+0 <= 节点个数 <= 1000
+
+```java
+class Solution {
+    public TreeNode mirrorTree(TreeNode root) {
+        if(root == null) return null;
+        Stack<TreeNode> stack = new Stack<>() {{ add(root); }};
+        while(!stack.isEmpty()) {
+            TreeNode node = stack.pop();
+            if(node.left != null) stack.add(node.left);
+            if(node.right != null) stack.add(node.right);
+            TreeNode tmp = node.left;
+            node.left = node.right;
+            node.right = tmp;
+        }
+        return root;
+    }
+}
+```
+
+```java
+class Solution {
+    public TreeNode mirrorTree(TreeNode root) {
+        if(root == null) return null;
+        TreeNode tmp = root.left;
+        root.left = mirrorTree(root.right);
+        root.right = mirrorTree(tmp);
+        return root;
+    }
+}
+```
+
