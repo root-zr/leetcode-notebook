@@ -1794,3 +1794,115 @@ class Solution {
 }
 ```
 
+#### [剑指 Offer 33. 二叉搜索树的后序遍历序列](https://leetcode-cn.com/problems/er-cha-sou-suo-shu-de-hou-xu-bian-li-xu-lie-lcof/)
+
+输入一个整数数组，判断该数组是不是某二叉搜索树的后序遍历结果。如果是则返回 true，否则返回 false。假设输入的数组的任意两个数字都互不相同。
+
+ 参考以下这颗二叉搜索树：
+
+         5
+        / \
+       2   6
+      / \
+     1   3
+
+ **示例 1：**
+
+```
+输入: [1,6,3,2,5]
+输出: false
+```
+
+**示例 2：**
+
+```
+输入: [1,3,2,6,5]
+输出: true
+```
+
+**提示：**
+
+数组长度 <= 1000
+
+```java
+class Solution {
+    public boolean verifyPostorder(int[] postorder) {
+        return recur(postorder, 0, postorder.length - 1);
+    }
+    boolean recur(int[] postorder, int i, int j) {
+        if(i >= j) return true;
+        int p = i;
+        while(postorder[p] < postorder[j]) p++;
+        int m = p;
+        while(postorder[p] > postorder[j]) p++;
+        return p == j && recur(postorder, i, m - 1) && recur(postorder, m, j - 1);
+    }
+}
+
+```
+
+```java
+
+class Solution {
+    public boolean verifyPostorder(int[] postorder) {
+        Stack<Integer> stack = new Stack<>();
+        int root = Integer.MAX_VALUE;
+        for(int i = postorder.length - 1; i >= 0; i--) {
+            if(postorder[i] > root) return false;
+            while(!stack.isEmpty() && stack.peek() > postorder[i])
+            	root = stack.pop();
+            stack.add(postorder[i]);
+        }
+        return true;
+    }
+}
+```
+
+#### [剑指 Offer 34. 二叉树中和为某一值的路径](https://leetcode-cn.com/problems/er-cha-shu-zhong-he-wei-mou-yi-zhi-de-lu-jing-lcof/)
+
+输入一棵二叉树和一个整数，打印出二叉树中节点值的和为输入整数的所有路径。从树的根节点开始往下一直到叶节点所经过的节点形成一条路径。
+
+**示例:**
+给定如下二叉树，以及目标和 target = 22，
+
+              5
+             / \
+            4   8
+           /   / \
+          11  13  4
+         /  \    / \
+        7    2  5   1
+返回:
+
+```
+[
+   [5,4,11,2],
+   [5,8,4,5]
+]
+```
+
+**提示：**
+
+节点总数 <= 10000
+
+```java
+class Solution {
+    LinkedList<List<Integer>> res = new LinkedList<>();
+    LinkedList<Integer> path = new LinkedList<>(); 
+    public List<List<Integer>> pathSum(TreeNode root, int sum) {
+        recur(root, sum);
+        return res;
+    }
+    void recur(TreeNode root, int tar) {
+        if(root == null) return;
+        path.add(root.val);
+        tar -= root.val;
+        if(tar == 0 && root.left == null && root.right == null)
+            res.add(new LinkedList(path));
+        recur(root.left, tar);
+        recur(root.right, tar);
+        path.removeLast();
+    }
+}
+```
+
