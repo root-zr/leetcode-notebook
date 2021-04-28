@@ -2110,3 +2110,94 @@ public class Codec {
 
 ```
 
+#### [剑指 Offer 38. 字符串的排列](https://leetcode-cn.com/problems/zi-fu-chuan-de-pai-lie-lcof/)
+
+输入一个字符串，打印出该字符串中字符的所有排列。
+
+ 你可以以任意顺序返回这个字符串数组，但里面不能有重复元素。
+
+ **示例:**
+
+```
+输入：s = "abc"
+输出：["abc","acb","bac","bca","cab","cba"]
+```
+
+**限制：**
+
+1 <= s 的长度 <= 8
+
+```java
+class Solution {
+    List<String> res = new LinkedList<>();
+    char[] c;
+    public String[] permutation(String s) {
+        c = s.toCharArray();
+        dfs(0);
+        return res.toArray(new String[res.size()]);
+    }
+    void dfs(int x) {
+        if(x == c.length - 1) {
+            res.add(String.valueOf(c));      // 添加排列方案
+            return;
+        }
+        HashSet<Character> set = new HashSet<>();
+        for(int i = x; i < c.length; i++) {
+            if(set.contains(c[i])) continue; // 重复，因此剪枝
+            set.add(c[i]);
+            swap(i, x);                      // 交换，将 c[i] 固定在第 x 位
+            dfs(x + 1);                      // 开启固定第 x + 1 位字符
+            swap(i, x);                      // 恢复交换
+        }
+    }
+    void swap(int a, int b) {
+        char tmp = c[a];
+        c[a] = c[b];
+        c[b] = tmp;
+    }
+}
+```
+
+#### [剑指 Offer 39. 数组中出现次数超过一半的数字](https://leetcode-cn.com/problems/shu-zu-zhong-chu-xian-ci-shu-chao-guo-yi-ban-de-shu-zi-lcof/)
+
+数组中有一个数字出现的次数超过数组长度的一半，请找出这个数字。
+
+ 你可以假设数组是非空的，并且给定的数组总是存在多数元素。
+
+ **示例 1:**
+
+```
+输入: [1, 2, 3, 2, 2, 2, 5, 4, 2]
+输出: 2
+```
+
+**限制：**
+
+1 <= 数组长度 <= 50000
+
+```java
+class Solution {
+    public int majorityElement(int[] nums) {
+    
+        int key = nums[0];
+        int count = 1 ;
+
+        for(int i = 1 ; i < nums.length; i++){
+            if(key != nums[i] && count > 0){
+                count--;
+            }
+            else if(key != nums[i] && count == 0){
+                key = nums[i];
+            }
+
+            else{
+                count++;
+            }
+
+        }
+
+        return key;
+    }
+}
+```
+
