@@ -2201,3 +2201,128 @@ class Solution {
 }
 ```
 
+#### [剑指 Offer 40. 最小的k个数](https://leetcode-cn.com/problems/zui-xiao-de-kge-shu-lcof/)
+
+输入整数数组 arr ，找出其中最小的 k 个数。例如，输入4、5、1、6、2、7、3、8这8个数字，则最小的4个数字是1、2、3、4。
+
+ **示例 1：**
+
+```
+输入：arr = [3,2,1], k = 2
+输出：[1,2] 或者 [2,1]
+```
+
+**示例 2：**
+
+```
+输入：arr = [0,1,2,1], k = 1
+输出：[0]
+```
+
+**限制：**
+
+* 0 <= k <= arr.length <= 10000
+* 0 <= arr[i] <= 10000
+
+```java
+//堆
+class Solution {
+    public int[] getLeastNumbers(int[] arr, int k) {
+        int[] vec = new int[k];
+        if (k == 0) { // 排除 0 的情况
+            return vec;
+        }
+        PriorityQueue<Integer> queue = new PriorityQueue<Integer>(new Comparator<Integer>() {
+            public int compare(Integer num1, Integer num2) {
+                return num2 - num1;
+            }
+        });
+        for (int i = 0; i < k; ++i) {
+            queue.offer(arr[i]);
+        }
+        for (int i = k; i < arr.length; ++i) {
+            if (queue.peek() > arr[i]) {
+                queue.poll();
+                queue.offer(arr[i]);
+            }
+        }
+        for (int i = 0; i < k; ++i) {
+            vec[i] = queue.poll();
+        }
+        return vec;
+    }
+}
+```
+
+```java
+//快排的变形
+class Solution {
+	public int[] getLeastNumbers(int[] arr, int k) {
+		if (k == 0) {
+			return new int[0];
+		} else if (arr.length <= k) {
+			return arr;
+		}
+
+		// 原地不断划分数组
+		partitionArray(arr, 0, arr.length - 1, k);
+
+		// 数组的前 k 个数此时就是最小的 k 个数，将其存入结果
+		int[] res = new int[k];
+		for (int i = 0; i < k; i++) {
+			res[i] = arr[i];
+		}
+		return res;
+	}
+
+	void partitionArray(int[] arr, int lo, int hi, int k) {
+		// 做一次 partition 操作
+		int m = partition(arr, lo, hi);
+		// 此时数组前 m 个数，就是最小的 m 个数
+		if (k == m) {
+			// 正好找到最小的 k(m) 个数
+			return;
+		} else if (k < m) {
+			// 最小的 k 个数一定在前 m 个数中，递归划分
+			partitionArray(arr, lo, m - 1, k);
+		} else {
+			// 在右侧数组中寻找最小的 k-m 个数
+			partitionArray(arr, m + 1, hi, k);
+		}
+	}
+
+	public int partition(int[] list, int first, int last) {
+		int pivot = list[first];
+		int low = first + 1;
+		int high = last;
+
+		while (high > low) {
+
+			while (low <= high && list[low] <= pivot)
+				low++;
+
+			while (low <= high && list[high] > pivot)
+				high--;
+
+			if (high > low) {
+				int temp = list[high];
+				list[high] = list[low];
+				list[low] = temp;
+			}
+		}
+
+		while (high > first && list[high] >= pivot)
+			high--;
+
+		if (pivot > list[high]) {
+			list[first] = list[high];
+			list[high] = pivot;
+			return high;
+		} else {
+			return first;
+		}
+	}
+
+}
+```
+
