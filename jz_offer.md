@@ -2326,3 +2326,88 @@ class Solution {
 }
 ```
 
+
+
+
+
+
+
+#### [剑指 Offer 42. 连续子数组的最大和](https://leetcode-cn.com/problems/lian-xu-zi-shu-zu-de-zui-da-he-lcof/)
+
+输入一个整型数组，数组中的一个或连续多个整数组成一个子数组。求所有子数组的和的最大值。
+
+要求时间复杂度为O(n)。
+
+ **示例1:**
+
+```
+输入: nums = [-2,1,-3,4,-1,2,1,-5,4]
+输出: 6
+解释: 连续子数组 [4,-1,2,1] 的和最大，为 6。
+```
+
+**提示：**
+
+* 1 <= arr.length <= 10^5
+* -100 <= arr[i] <= 100
+
+```java
+class Solution {
+    public int maxSubArray(int[] nums) {
+        int max = nums[0];
+        int former = 0;//用于记录dp[i-1]的值，对于dp[0]而言，其前面的dp[-1]=0
+        int cur = nums[0];//用于记录dp[i]的值
+        for(int num:nums){
+            cur = num;
+            if(former>0) cur +=former;
+            if(cur>max) max = cur;
+            former=cur;
+        }
+        return max;
+    }
+}
+```
+
+#### [剑指 Offer 43. 1～n 整数中 1 出现的次数](https://leetcode-cn.com/problems/1nzheng-shu-zhong-1chu-xian-de-ci-shu-lcof/)
+
+输入一个整数 n ，求1～n这n个整数的十进制表示中1出现的次数。
+
+例如，输入12，1～12这些整数中包含1 的数字有1、10、11和12，1一共出现了5次。
+
+ **示例 1：**
+
+```
+输入：n = 12
+输出：5
+```
+
+**示例 2：**
+
+```
+输入：n = 13
+输出：6
+```
+
+**限制：**
+
+* 1 <= n < 2^31
+
+```java
+class Solution {
+    public int countDigitOne(int n) {
+        int digit = 1, res = 0;
+        int high = n / 10, cur = n % 10, low = 0;
+        while(high != 0 || cur != 0) {
+            if(cur == 0) res += high * digit;
+            else if(cur == 1) res += high * digit + low + 1;
+            else res += (high + 1) * digit;
+            low += cur * digit;
+            cur = high % 10;
+            high /= 10;
+            digit *= 10;
+        }
+        return res;
+    }
+}
+```
+
