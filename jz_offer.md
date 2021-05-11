@@ -2326,11 +2326,65 @@ class Solution {
 }
 ```
 
+#### [剑指 Offer 41. 数据流中的中位数](https://leetcode-cn.com/problems/shu-ju-liu-zhong-de-zhong-wei-shu-lcof/)
 
+如何得到一个数据流中的中位数？如果从数据流中读出奇数个数值，那么中位数就是所有数值排序之后位于中间的数值。如果从数据流中读出偶数个数值，那么中位数就是所有数值排序之后中间两个数的平均值。
 
+例如，
 
+[2,3,4] 的中位数是 3
 
+[2,3] 的中位数是 (2 + 3) / 2 = 2.5
 
+设计一个支持以下两种操作的数据结构：
+
+*    void addNum(int num) - 从数据流中添加一个整数到数据结构中。
+*    double findMedian() - 返回目前所有元素的中位数。
+
+**示例 1：**
+
+```
+输入：
+["MedianFinder","addNum","addNum","findMedian","addNum","findMedian"]
+[[],[1],[2],[],[3],[]]
+输出：[null,null,null,1.50000,null,2.00000]
+```
+
+**示例 2：**
+
+```
+输入：
+["MedianFinder","addNum","findMedian","addNum","findMedian"]
+[[],[2],[],[3],[]]
+输出：[null,null,2.00000,null,2.50000]
+```
+
+**限制：**
+
+* 最多会对 addNum、findMedian 进行 50000 次调用。
+
+```java
+class MedianFinder {
+    Queue<Integer> A, B;
+    public MedianFinder() {
+        A = new PriorityQueue<>(); // 小顶堆，保存较大的一半
+        B = new PriorityQueue<>((x, y) -> (y - x)); // 大顶堆，保存较小的一半
+    }
+    public void addNum(int num) {
+        if(A.size() != B.size()) {
+            A.add(num);
+            B.add(A.poll());
+        } else {
+            B.add(num);
+            A.add(B.poll());
+        }
+    }
+    public double findMedian() {
+        return A.size() != B.size() ? A.peek() : (A.peek() + B.peek()) / 2.0;
+    }
+}
+
+```
 
 #### [剑指 Offer 42. 连续子数组的最大和](https://leetcode-cn.com/problems/lian-xu-zi-shu-zu-de-zui-da-he-lcof/)
 
@@ -2392,6 +2446,21 @@ class Solution {
 
 * 1 <= n < 2^31
 
+###### 解题思路
+
+f(n))函数的意思是1～n这n个整数的十进制表示中1出现的次数，将n拆分为两部分，最高一位的数字high和其他位的数字last，分别判断情况后将结果相加，看例子更加简单。
+
+例子如n=1234，high=1, pow=1000, last=234
+
+可以将数字范围分成两部分1 - 999和1000 - 1234
+
+* 1 - 999这个范围1的个数是f(pow-1)
+* 1000~1234这个范围1的个数需要分为两部分：
+  * 千位是1的个数：千位为1的个数刚好就是234+1(last+1)，注意，这儿只看千位，不看其他位
+  * 其他位是1的个数：即是234中出现1的个数，为f(last)
+
+所以全部加起来是f(pow-1) + last + 1 + f(last);
+
 ```java
 class Solution {
     public int countDigitOne(int n) {
@@ -2407,6 +2476,70 @@ class Solution {
             digit *= 10;
         }
         return res;
+    }
+}
+```
+
+```java
+//递归
+class Solution {
+    public int countDigitOne(int n) {
+        return f(n);
+    }
+    
+    private int f(int n ) {
+        if (n <= 0)
+            return 0;
+        String s = String.valueOf(n);
+        int high = s.charAt(0) - '0';
+        int pow = (int) Math.pow(10, s.length()-1);
+        int last = n - high*pow;
+        if (high == 1) {
+            return f(pow-1) + last + 1 + f(last);
+        } else {
+            return pow + high*f(pow-1) + f(last);
+        }
+    }
+}
+
+```
+
+
+
+
+
+
+
+#### [剑指 Offer 64. 求1+2+…+n](https://leetcode-cn.com/problems/qiu-12n-lcof/)
+
+求 1+2+...+n ，要求不能使用乘除法、for、while、if、else、switch、case等关键字及条件判断语句（A?B:C）。
+
+**示例 1：**
+
+```
+输入: n = 3
+输出: 6
+```
+
+**示例 2：**
+
+```
+输入: n = 9
+输出: 45
+```
+
+**限制：**
+
+* 1 <= n <= 10000
+
+```java
+class Solution {
+    int res = 0;
+    public int sumNums(int n) {
+        boolean x = n > 1 && sumNums(n-1) > 0;
+        res += n;
+        return res;
+
     }
 }
 ```
