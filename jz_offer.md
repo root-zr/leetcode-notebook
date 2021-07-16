@@ -2548,6 +2548,82 @@ class Solution {
 
 
 
+#### [剑指 Offer 52. 两个链表的第一个公共节点](https://leetcode-cn.com/problems/liang-ge-lian-biao-de-di-yi-ge-gong-gong-jie-dian-lcof/)
+
+输入两个链表，找出它们的第一个公共节点。
+
+如下面的两个链表：
+
+<img src="E:\大三下\leetcode\leetcode\img_jz\160_statement.png" style="zoom: 50%;" />
+
+在节点 c1 开始相交。
+
+ **示例 1：**
+
+<img src="E:\大三下\leetcode\leetcode\img_jz\160_example_1.png" style="zoom:50%;" />
+
+```
+输入：intersectVal = 8, listA = [4,1,8,4,5], listB = [5,0,1,8,4,5], skipA = 2, skipB = 3
+输出：Reference of the node with value = 8
+输入解释：相交节点的值为 8 （注意，如果两个列表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [4,1,8,4,5]，链表 B 为 [5,0,1,8,4,5]。在 A 中，相交节点前有 2 个节点；在 B 中，相交节点前有 3 个节点。
+```
+
+**示例 2：**
+
+<img src="E:\大三下\leetcode\leetcode\img_jz\160_example_2.png" style="zoom:50%;" />
+
+```
+输入：intersectVal = 2, listA = [0,9,1,2,4], listB = [3,2,4], skipA = 3, skipB = 1
+输出：Reference of the node with value = 2
+输入解释：相交节点的值为 2 （注意，如果两个列表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [0,9,1,2,4]，链表 B 为 [3,2,4]。在 A 中，相交节点前有 3 个节点；在 B 中，相交节点前有 1 个节点。
+```
+
+**示例 3：**
+
+<img src="E:\大三下\leetcode\leetcode\img_jz\160_example_3.png" style="zoom:50%;" />
+
+```
+输入：intersectVal = 0, listA = [2,6,4], listB = [1,5], skipA = 3, skipB = 2
+输出：null
+输入解释：从各自的表头开始算起，链表 A 为 [2,6,4]，链表 B 为 [1,5]。由于这两个链表不相交，所以 intersectVal 必须为 0，而 skipA 和 skipB 可以是任意值。
+解释：这两个链表不相交，因此返回 null。
+```
+
+**注意：**
+
+* 如果两个链表没有交点，返回 null.
+* 在返回结果后，两个链表仍须保持原有的结构。
+* 可假定整个链表结构中没有循环。
+* 程序尽量满足 O(n) 时间复杂度，且仅用 O(1) 内存。
+
+```java
+public class Solution {
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        ListNode tmpA = headA;
+        ListNode tmpB = headB;
+     
+        //假如两个链表没有公共节点，就把NULL当作它们的公共节点，
+        //所以两个判断是tmpA != tmpB
+        while(tmpA != tmpB){
+            if(tmpA == null) 
+                tmpA = headB;
+            else
+                tmpA = tmpA.next;
+            if(tmpB == null) 
+                tmpB = headA;
+            else
+                tmpB = tmpB.next;
+        }
+        
+        
+        return tmpA;
+
+    }
+}
+```
+
+
+
 
 
 #### [剑指 Offer 55 - I. 二叉树的深度](https://leetcode-cn.com/problems/er-cha-shu-de-shen-du-lcof/)
@@ -2886,6 +2962,51 @@ class Solution {
             return lowestCommonAncestor(root.right, p, q);
         if(root.val > p.val && root.val > q.val)
             return lowestCommonAncestor(root.left, p, q);
+        return root;
+    }
+}
+```
+
+#### [剑指 Offer 68 - II. 二叉树的最近公共祖先](https://leetcode-cn.com/problems/er-cha-shu-de-zui-jin-gong-gong-zu-xian-lcof/)
+
+给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。
+
+百度百科中最近公共祖先的定义为：“对于有根树 T 的两个结点 p、q，最近公共祖先表示为一个结点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（一个节点也可以是它自己的祖先）。”
+
+例如，给定如下二叉树:  root = [3,5,1,6,2,0,8,null,null,7,4]
+
+![](E:\大三下\leetcode\leetcode\img_jz\binarytree.png)
+
+ **示例 1:**
+
+```
+输入: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1
+输出: 3
+解释: 节点 5 和节点 1 的最近公共祖先是节点 3。
+```
+
+
+**示例 2:**
+
+```
+输入: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 4
+输出: 5
+解释: 节点 5 和节点 4 的最近公共祖先是节点 5。因为根据定义最近公共祖先节点可以为节点本身。
+```
+
+**说明:**
+
+* 所有节点的值都是唯一的。
+* p、q 为不同节点且均存在于给定的二叉树中。
+
+```java
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        if(root == null || root == p || root == q) return root;
+        TreeNode left = lowestCommonAncestor(root.left, p, q);
+        TreeNode right = lowestCommonAncestor(root.right, p, q);
+        if(left == null) return right;
+        if(right == null) return left;
         return root;
     }
 }
