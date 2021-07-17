@@ -2668,9 +2668,108 @@ class Solution {
 }
 ```
 
+#### [剑指 Offer 53 - II. 0～n-1中缺失的数字](https://leetcode-cn.com/problems/que-shi-de-shu-zi-lcof/)
+
+一个长度为n-1的递增排序数组中的所有数字都是唯一的，并且每个数字都在范围0～n-1之内。在范围0～n-1内的n个数字中有且只有一个数字不在该数组中，请找出这个数字。
+
+ **示例 1:**
+
+```
+输入: [0,1,3]
+输出: 2
+```
 
 
+**示例 2:**
 
+```
+输入: [0,1,2,3,4,5,6,7,9]
+输出: 8
+```
+
+**限制：**
+
+* 1 <= 数组长度 <= 10000
+
+```java
+class Solution {
+    public int missingNumber(int[] nums) {
+        int left = 0, right = nums.length;
+
+        if(nums == null || nums.length == 0 )
+            return 0;
+
+        int mid = -1;
+        while(left < right){
+            mid = left + (right - left)/2 ;
+
+            if(nums[mid] != mid )
+                right = mid;
+            else
+                left = mid + 1;
+        }
+
+        if(mid == right-1)  //假如是[0,1,2],应该返回3
+           mid++;
+
+        return mid;
+    }
+}
+```
+
+#### [剑指 Offer 54. 二叉搜索树的第k大节点](https://leetcode-cn.com/problems/er-cha-sou-suo-shu-de-di-kda-jie-dian-lcof/)
+
+给定一棵二叉搜索树，请找出其中第k大的节点。
+
+ **示例 1:**
+
+```
+输入: root = [3,1,4,null,2], k = 1
+   3
+  / \
+ 1   4
+  \
+   2
+输出: 4
+```
+
+**示例 2:**
+
+```
+输入: root = [5,3,6,2,4,null,null,1], k = 3
+       5
+      / \
+     3   6
+    / \
+   2   4
+  /
+ 1
+输出: 4
+```
+
+**限制：**
+
+* 1 ≤ k ≤ 二叉搜索树元素个数
+
+```java
+class Solution {
+    int tmp,res;
+    public int kthLargest(TreeNode root, int k) {
+        //中序遍历二叉搜索树是顺序的，只要按照右，根，左遍历就是逆序了
+        tmp = k;
+        inorder(root);
+        return res;
+    }
+
+    public void inorder(TreeNode root){
+        if(root == null || tmp == 0) return ;
+        
+        inorder(root.right);    
+        if(--tmp == 0) res = root.val; 
+        inorder(root.left);
+    }
+}
+```
 
 #### [剑指 Offer 55 - I. 二叉树的深度](https://leetcode-cn.com/problems/er-cha-shu-de-shen-du-lcof/)
 
@@ -2700,6 +2799,65 @@ class Solution {
     }
 }
 ```
+
+#### [剑指 Offer 55 - II. 平衡二叉树](https://leetcode-cn.com/problems/ping-heng-er-cha-shu-lcof/)
+
+输入一棵二叉树的根节点，判断该树是不是平衡二叉树。如果某二叉树中任意节点的左右子树的深度相差不超过1，那么它就是一棵平衡二叉树。
+
+ **示例 1:**
+
+给定二叉树 [3,9,20,null,null,15,7]
+
+        3
+       / \
+      9  20
+        /  \
+       15   7
+
+返回 true 。
+
+**示例 2:**
+
+给定二叉树 [1,2,2,3,3,null,null,4,4]
+
+           1
+          / \
+         2   2
+        / \
+       3   3
+      / \
+     4   4
+
+  返回 false 。
+
+ **限制：**
+
+* 0 <= 树的结点个数 <= 10000
+
+```java
+class Solution {
+    
+    public boolean isBalanced(TreeNode root) {
+        
+        if(root == null) return true;
+
+        int l = deep(root.left);
+        int r = deep(root.right);
+        
+        return Math.abs( l - r ) <= 1 && isBalanced(root.left) && isBalanced(root.right); 
+        
+    }
+
+    public int deep(TreeNode root){
+        if(root == null) return 0;
+        return Math.max(deep(root.left),deep(root.right)) + 1; 
+    }
+}
+```
+
+
+
+
 
 
 
