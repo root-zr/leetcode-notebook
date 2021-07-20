@@ -2504,6 +2504,63 @@ class Solution {
 
 ```
 
+#### [剑指 Offer 44. 数字序列中某一位的数字](https://leetcode-cn.com/problems/shu-zi-xu-lie-zhong-mou-yi-wei-de-shu-zi-lcof/)
+
+数字以0123456789101112131415…的格式序列化到一个字符序列中。在这个序列中，第5位（从下标0开始计数）是5，第13位是1，第19位是4，等等。
+
+请写一个函数，求任意第n位对应的数字。
+
+ **示例 1：**
+
+```
+输入：n = 3
+输出：3
+```
+
+
+**示例 2：**
+
+```
+输入：n = 11
+输出：0
+```
+
+**限制：**
+
+* 0 <= n < 2^31
+
+```java
+class Solution {
+    public int findNthDigit(int n) {
+        
+        int digital = 1; //几位数
+        long start = 1; //n位数是从哪个数开始的(2位数是从10开始的)
+        long count = 9; //n位数总共有多少个数字(2位数有2*90个数字)
+
+        while(n > count){ //确定第n位对应是几位数
+            n -= count;
+            digital += 1;
+            start *= 10;
+            count = 9 * start * digital;
+        }
+
+        //确定是哪个数
+        long sum = start + (n - 1)/digital; //因为start是从1开始的，所以要用n-1整除
+
+        //确定在这个数的哪一位
+        return Long.toString(sum).charAt((n - 1) % digital) - '0';
+    }
+}
+```
+
+
+
+
+
+
+
+
+
 #### [剑指 Offer 50. 第一个只出现一次的字符](https://leetcode-cn.com/problems/di-yi-ge-zhi-chu-xian-yi-ci-de-zi-fu-lcof/)
 
 在字符串 s 中找出第一个只出现一次的字符。如果没有，返回一个单空格。 s 只包含小写字母。
