@@ -2553,6 +2553,134 @@ class Solution {
 }
 ```
 
+#### [剑指 Offer 45. 把数组排成最小的数](https://leetcode-cn.com/problems/ba-shu-zu-pai-cheng-zui-xiao-de-shu-lcof/)
+
+输入一个非负整数数组，把数组里所有数字拼接起来排成一个数，打印能拼接出的所有数字中最小的一个。
+
+ **示例 1:**
+
+```
+输入: [10,2]
+输出: "102"
+```
+
+**示例 2:**
+
+```
+输入: [3,30,34,5,9]
+输出: "3033459"
+```
+
+**提示:**
+
+* 0 < nums.length <= 100
+
+**说明:**
+
+* 输出结果可能非常大，所以你需要返回一个字符串而不是整数
+* 拼接起来的数字可能会有前导 0，最后结果不需要去掉前导 0
+
+```java
+class Solution {
+    public String minNumber(int[] nums) {
+        //把int数组转换成字符串的形式，用字符串进行比较
+        String[] str = new String[nums.length];
+        for(int i = 0 ; i < str.length; i++){
+            str[i] = String.valueOf(nums[i]);
+        }
+
+        //字符串排序
+        quickSort(str,0,str.length-1);
+
+        //拼接排序好的字符串
+        StringBuilder res = new StringBuilder();
+        for(int i = 0 ; i < str.length; i++){
+            res.append(str[i]);
+        }
+
+        return res.toString();
+    }
+
+    //用快排
+    public void quickSort(String[] strs, int low, int high) {
+        if (low < high) {
+            int pivotIndex = partition(strs, low, high);
+            quickSort(strs, low, pivotIndex - 1);
+            quickSort(strs, pivotIndex + 1, high);
+        }
+    }
+
+    public int partition(String[] strs, int l, int r) {
+        //数组的第一个数为基准元素
+        String pivot = strs[l];
+        int low = l + 1;
+        int high = r;
+        while (low < high) {
+            
+            while (low <= high && (strs[high] + pivot).compareTo(pivot + strs[high]) >= 0)
+                high--;
+            while (low <= high && (strs[low] + pivot).compareTo(pivot + strs[low]) <= 0)
+                low++;
+            
+            if(low < high){
+                String tmp = strs[high];
+                strs[high] = strs[low];
+                strs[low] = tmp;
+            }
+        }
+        
+        while(high > l && (strs[high] + pivot).compareTo(pivot + strs[high]) >= 0)
+            high--;
+        if((strs[high] + pivot).compareTo(pivot + strs[high]) < 0){
+            strs[l] = strs[high];
+            strs[high] = pivot;
+            return high;
+        }
+        else{
+            return l;
+        }
+    }
+
+}
+```
+
+#### [剑指 Offer 46. 把数字翻译成字符串](https://leetcode-cn.com/problems/ba-shu-zi-fan-yi-cheng-zi-fu-chuan-lcof/)
+
+给定一个数字，我们按照如下规则把它翻译为字符串：0 翻译成 “a” ，1 翻译成 “b”，……，11 翻译成 “l”，……，25 翻译成 “z”。一个数字可能有多个翻译。请编程实现一个函数，用来计算一个数字有多少种不同的翻译方法。
+
+ **示例 1:**
+
+```
+输入: 12258
+输出: 5
+解释: 12258有5种不同的翻译，分别是"bccfi", "bwfi", "bczi", "mcfi"和"mzi"
+```
+
+**提示：**
+
+* 0 <= num < 231
+
+```java
+class Solution {
+    public int translateNum(int num) {
+        //相当于青蛙跳台阶的变式，如果num的一个长度为2的子串i在10-25之间，
+        //表示有两种表示成字母的方法（分开表示或合在一起表示）
+
+       String str = String.valueOf(num);
+
+        int a = 1, b = 1; //a表示k-2, b 表示k-1
+        for(int i = 2; i <= str.length(); i++){
+            String tmp = str.substring(i-2,i); //不包括下标为i的子串
+            int sum = (tmp.compareTo("10") >= 0 &&  tmp.compareTo("25")<= 0) ? a+b : b;
+            a = b;
+            b = sum;
+        }
+
+        return b;
+    }
+}
+```
+
 
 
 
