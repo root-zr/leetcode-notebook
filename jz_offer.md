@@ -2724,9 +2724,107 @@ class Solution {
 }
 ```
 
+#### [剑指 Offer 48. 最长不含重复字符的子字符串](https://leetcode-cn.com/problems/zui-chang-bu-han-zhong-fu-zi-fu-de-zi-zi-fu-chuan-lcof/)
+
+请从字符串中找出一个最长的不包含重复字符的子字符串，计算该最长子字符串的长度。
+
+ **示例 1:**
+
+```
+输入: "abcabcbb"
+输出: 3 
+解释: 因为无重复字符的最长子串是 "abc"，所以其长度为 3。
+```
 
 
+**示例 2:**
 
+```
+输入: "bbbbb"
+输出: 1
+解释: 因为无重复字符的最长子串是 "b"，所以其长度为 1。
+```
+
+
+**示例 3:**
+
+```
+输入: "pwwkew"
+输出: 3
+解释: 因为无重复字符的最长子串是 "wke"，所以其长度为 3。
+     请注意，你的答案必须是 子串 的长度，"pwke" 是一个子序列，不是子串。
+```
+
+**提示：**
+
+* s.length <= 40000
+
+```java
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        HashMap<Character,Integer> map = new HashMap<>();
+      
+        int res = 0, left = 0;
+        for(int i = 0 ; i < s.length(); i++){
+            if(map.containsKey(s.charAt(i))){
+               left = Math.max(left, map.get(s.charAt(i)) + 1 );   //防止出现"abba"的情形
+               
+            }
+
+            map.put(s.charAt(i),i);
+            res = Math.max(res, i - left + 1);      
+        }
+
+        return  res;
+    }
+}
+```
+
+#### [剑指 Offer 49. 丑数](https://leetcode-cn.com/problems/chou-shu-lcof/)
+
+我们把只包含质因子 2、3 和 5 的数称作丑数（Ugly Number）。求按从小到大的顺序的第 n 个丑数。
+
+ **示例:**
+
+```
+输入: n = 10
+输出: 12
+解释: 1, 2, 3, 4, 5, 6, 8, 9, 10, 12 是前 10 个丑数。
+```
+
+
+**说明:**  
+
+* 1 是丑数。
+* n 不超过1690。
+
+```java
+class Solution {
+    public int nthUglyNumber(int n) {
+        //新丑数在原丑数的基础上*2/3/5得到
+
+        int[] arr = new int[n]; //存放前n个丑数
+
+        int[] pos = new int[3]; // 对应2,3,5
+        arr[0] = 1;
+        for(int i = 1; i < n; i++){
+            int a = arr[pos[0]] * 2; 
+            int b = arr[pos[1]] * 3;
+            int c = arr[pos[2]] * 5;
+
+            int minNum = Math.min(Math.min(a,b),c);
+
+            if(a == minNum) pos[0]++; //6 = 2*3,a和c同时要更新
+            if(b == minNum) pos[1]++;
+            if(c == minNum) pos[2]++;
+
+            arr[i] = minNum;
+        }
+
+        return arr[n-1];
+    }
+}
+```
 
 #### [剑指 Offer 50. 第一个只出现一次的字符](https://leetcode-cn.com/problems/di-yi-ge-zhi-chu-xian-yi-ci-de-zi-fu-lcof/)
 
@@ -2768,7 +2866,74 @@ class Solution {
 }
 ```
 
+#### [剑指 Offer 51. 数组中的逆序对](https://leetcode-cn.com/problems/shu-zu-zhong-de-ni-xu-dui-lcof/)
 
+在数组中的两个数字，如果前面一个数字大于后面的数字，则这两个数字组成一个逆序对。输入一个数组，求出这个数组中的逆序对的总数。
+
+ **示例 1:**
+
+```
+输入: [7,5,6,4]
+输出: 5
+```
+
+**限制：**
+
+0 <= 数组长度 <= 50000
+
+```java
+class Solution {
+    public int reversePairs(int[] nums) {
+        if(nums.length < 2) return 0;
+        int[] tmp = new int[nums.length];
+
+        return mergeSort(nums,0,nums.length-1,tmp);
+    }
+
+    public int mergeSort(int[] nums,int left, int right, int[] tmp){
+        if(left >= right) return 0 ;
+        int mid = left + (right - left)/2;
+
+        int leftNum =  mergeSort(nums,left,mid,tmp);
+        int rightNum = mergeSort(nums,mid+1,right,tmp);
+       
+        if(nums[mid]<= nums[mid+1]) return leftNum + rightNum;
+        int crossNum = mergeSortCross(nums,left,mid,right,tmp);
+
+        return leftNum + rightNum + crossNum;
+    }
+
+    public int mergeSortCross(int[] nums,int left,int mid, int right, int[] tmp){
+        for(int i = left; i<= right; i++){
+            tmp[i] = nums[i];
+        }
+
+        int i = left;
+        int j = mid + 1;
+        int count = 0;
+
+        for(int k = left; k <= right ; k++){ //同时做排序和逆序的统计
+            if(i > mid){
+                nums[k] = tmp[j]; //这里顺便排好序，防止重复计数
+                j++;
+            }else if(j > right){
+                nums[k] = tmp[i];
+                i++;
+            }else if(tmp[i]<= tmp[j]){
+                nums[k] = tmp[i]; 
+                i++;
+            }else{
+                nums[k] = tmp[j];
+                j++;
+                count += mid - i + 1; //如果i逆序了，那么i,mid都应该是逆序的，因为数组是递增的
+            }
+        }
+
+        return count;
+
+    }
+}
+```
 
 #### [剑指 Offer 52. 两个链表的第一个公共节点](https://leetcode-cn.com/problems/liang-ge-lian-biao-de-di-yi-ge-gong-gong-jie-dian-lcof/)
 
