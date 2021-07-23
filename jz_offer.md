@@ -3820,10 +3820,6 @@ class Solution {
 }
 ```
 
-
-
-
-
 #### [剑指 Offer 64. 求1+2+…+n](https://leetcode-cn.com/problems/qiu-12n-lcof/)
 
 求 1+2+...+n ，要求不能使用乘除法、for、while、if、else、switch、case等关键字及条件判断语句（A?B:C）。
@@ -3886,6 +3882,43 @@ class Solution {
     }
 }
 
+```
+
+#### [剑指 Offer 66. 构建乘积数组](https://leetcode-cn.com/problems/gou-jian-cheng-ji-shu-zu-lcof/)
+
+给定一个数组 A[0,1,…,n-1]，请构建一个数组 B[0,1,…,n-1]，其中 B[i] 的值是数组 A 中除了下标 i 以外的元素的积, 即 B[i]=A[0]×A[1]×…×A[i-1]×A[i+1]×…×A[n-1]。不能使用除法。
+
+ **示例:**
+
+```
+输入: [1,2,3,4,5]
+输出: [120,60,40,30,24]
+```
+
+**提示：**
+
+* 所有元素乘积之和不会溢出 32 位整数
+* a.length <= 100000
+
+```java
+class Solution {
+    public int[] constructArr(int[] a) {
+        //在i的时候避开*a[i],先乘左边，再去乘右边
+        int[] res = new int[a.length];
+
+        for(int i = 0 , p = 1; i < a.length ; i ++){
+            res[i] = p;
+            p *= a[i];
+        }
+
+        for(int i = a.length -1 ,p = 1; i >=0 ; i--){
+            res[i] *= p;
+            p *= a[i];
+        }
+
+        return res;
+    }
+}
 ```
 
 
