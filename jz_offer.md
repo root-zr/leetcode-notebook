@@ -3645,6 +3645,137 @@ class MaxQueue {
 }
 ```
 
+#### [剑指 Offer 60. n个骰子的点数](https://leetcode-cn.com/problems/nge-tou-zi-de-dian-shu-lcof/)
+
+把n个骰子扔在地上，所有骰子朝上一面的点数之和为s。输入n，打印出s的所有可能的值出现的概率。
+
+ 你需要用一个浮点数数组返回答案，其中第 i 个元素代表这 n 个骰子所能掷出的点数集合中第 i 小的那个的概率。
+
+ **示例 1:**
+
+```
+输入: 1
+输出: [0.16667,0.16667,0.16667,0.16667,0.16667,0.16667]
+```
+
+
+**示例 2:**
+
+```
+输入: 2
+输出: [0.02778,0.05556,0.08333,0.11111,0.13889,0.16667,0.13889,0.11111,0.08333,0.05556,0.02778]
+```
+
+**限制：**
+
+* 1 <= n <= 11
+
+```java
+class Solution {
+    public double[] dicesProbability(int n) {
+        double[] res = new double[1 + n * 5];
+        int[][] dp = new int[n + 1 ][6 * n + 1];
+
+        double all = Math.pow(6,n);
+        dp[0][0] = 1;
+        for(int i = 1 ; i <= n; i++){
+            for(int j = 1; j <= 6*n; j++){
+                for(int k = 1; k <= Math.min(j,6); k++)
+                    dp[i][j] += dp[i - 1][j - k];
+            }
+        }
+
+        for(int i = n ; i <= 6 * n ; i++){
+            res[i - n ] = dp[n][i] / all;
+        }
+
+        return res;
+    }
+}
+```
+
+#### [剑指 Offer 61. 扑克牌中的顺子](https://leetcode-cn.com/problems/bu-ke-pai-zhong-de-shun-zi-lcof/)
+
+从扑克牌中随机抽5张牌，判断是不是一个顺子，即这5张牌是不是连续的。2～10为数字本身，A为1，J为11，Q为12，K为13，而大、小王为 0 ，可以看成任意数字。A 不能视为 14。
+
+ **示例 1:**
+
+```
+输入: [1,2,3,4,5]
+输出: True
+```
+
+**示例 2:**
+
+```
+输入: [0,0,1,2,5]
+输出: True
+```
+
+**限制：**
+
+* 数组长度为 5 
+* 数组的数取值为 [0, 13] .
+
+```java
+class Solution {
+    public boolean isStraight(int[] nums) {
+
+        int minNum = 13;
+        int maxNum = nums[0];
+       
+        HashSet<Integer> set = new HashSet<>();
+
+        for(int i = 0 ; i < nums.length; i++){
+            if(nums[i] == 0 ) continue;
+            if(minNum > nums[i]) minNum = nums[i];
+            if(maxNum < nums[i]) maxNum = nums[i];
+            if(!set.add(nums[i])) return false;
+        }
+           
+        if(maxNum - minNum < 5) return true;
+        else return false;      
+    }
+
+}
+```
+
+#### [剑指 Offer 62. 圆圈中最后剩下的数字](https://leetcode-cn.com/problems/yuan-quan-zhong-zui-hou-sheng-xia-de-shu-zi-lcof/)
+
+0,1,···,n-1这n个数字排成一个圆圈，从数字0开始，每次从这个圆圈里删除第m个数字（删除后从下一个数字开始计数）。求出这个圆圈里剩下的最后一个数字。
+
+例如，0、1、2、3、4这5个数字组成一个圆圈，从数字0开始每次删除第3个数字，则删除的前4个数字依次是2、0、4、1，因此最后剩下的数字是3。
+
+ **示例 1：**
+
+```
+输入: n = 5, m = 3
+输出: 3
+```
+
+**示例 2：**
+
+```
+输入: n = 10, m = 17
+输出: 2
+```
+
+**限制：**
+
+* 1 <= n <= 10^5
+* 1 <= m <= 10^6
+
+```java
+class Solution {
+    public int lastRemaining(int n, int m) {
+        if(n == 1 ) return 0;
+        return (lastRemaining(n -1, m) + m) % n;
+    }
+}
+```
+
+
+
 
 
 #### [剑指 Offer 64. 求1+2+…+n](https://leetcode-cn.com/problems/qiu-12n-lcof/)
