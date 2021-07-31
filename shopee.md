@@ -330,3 +330,170 @@ public class Main {
 }
 ```
 
+### 建物流中转站
+
+Shopee物流会有很多个中转站。在选址的过程中，会选择离用户最近的地方建一个物流中转站。    
+
+ 假设给你一个二维平面网格，每个格子是房子则为1，或者是空地则为0。找到一个空地修建一个物流中转站，使得这个物流中转站到所有的房子的距离之和最小。 能修建，则返回最小的距离和。如果无法修建，则返回 -1。      
+
+若范围限制在100*100以内的网格，如何计算出最小的距离和？        
+
+当平面网格非常大的情况下，如何避免不必要的计算？           
+
+**输入描述:**
+
+```
+4
+0 1 1 0
+1 1 0 1
+0 0 1 0
+0 0 0 0
+
+先输入方阵阶数，然后逐行输入房子和空地的数据，以空格分隔。
+```
+
+##### **输出描述:**
+
+```
+8
+
+能修建，则返回最小的距离和。如果无法修建，则返回 -1。
+```
+
+**示例1**
+
+```
+输入
+4
+0 1 1 0
+1 1 0 1
+0 0 1 0
+0 0 0 0
+输出
+8
+```
+
+**示例2**
+
+```
+输入
+4
+1 1 1 1
+1 1 1 1
+1 1 1 1
+1 1 1 1
+输出
+-1
+```
+
+```java
+//直接暴力破解
+import java.util.ArrayList;
+import java.util.Scanner;
+public class Main{
+    public static void main(String[] args){
+        Scanner sc = new Scanner(System.in);
+        
+        int n = sc.nextInt();
+        int[][] matrix = new int[n][n];
+        ArrayList<int[][]> al = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                matrix[i][j] = sc.nextInt();
+                if(matrix[i][j]==1){
+                    int[][] xy = new int[1][2];
+                    xy[0][0]=i;
+                    xy[0][1]=j;
+                    al.add(xy);
+                }
+            }
+        }
+        
+        int res = Integer.MAX_VALUE;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                int temp=0;
+                if(matrix[i][j]==0){
+                    for (int k = 0; k < al.size(); k++) {
+                        temp+=Math.abs(al.get(k)[0][0]-i)+Math.abs(al.get(k)[0][1]-j);
+                    }
+                    res = res>temp?temp:res;
+                }
+            }
+        }
+        System.out.println(res==Integer.MAX_VALUE?-1:res);
+        
+    }
+}
+```
+
+### Shopee的Orange Day
+
+Shopee每个月都有属于大家的节日，每到这个时候，大家都会穿着橙色的T恤，吃着水果蛋糕，做着游戏。瞧，今天又是Orange Day了，吃货小虾同学早早的来到现场，看看有没有什么吃的，刚刚走进去就发现我们的前台mm愁眉苦脸的看着挂满礼物的发财树，细看发现，发财树的树枝因为承重不均，东倒西歪。是时候展现真正的技术啦，小虾同学，马上走上去，让前台mm把挂礼物的方案拿出来，前台mm拿出一大叠方案，小虾同学顿时傻眼了，但是他马上想到了一个方法，写一个程序判断每种方案的承重误差，把不合格的都干掉就行了。经过分析，把发财树抽象为一颗树。只要发财树的从顶部到各个叶子的各个路径上面的最大最小重量的差值在方案的误差范围内，就可以正常承重。
+
+![](E:\大三下\leetcode\leetcode\img\313965_1560322338006_AB33537227D69FD077466CE827873748.png)
+
+输入第一行表示数据样例数T，表示接下来会有T个相同格式的样例输入
+
+每个样例输入如下
+
+输入的第一行输入 n,（2 ≤ n ≤ 100000，节点的编号为0到n-1,0为根节点）组成，
+
+第二行有 n 个数，表示每个节点挂的礼物的重量 w（1<= w<= 1000）
+下面是n-1行，每行有两个整数，第一个数表示父节点的编号，第二个数表示子节点的编号
+
+输出最大差值。
+
+```java
+public class ChristmasTree {
+    static int sum = 0;
+    static int max = Integer.MIN_VALUE;
+    static class Node{
+        int val;
+        List<Node> children;
+        Node(int val){
+            this.val = val;
+            children = new ArrayList<>();
+        }
+        public void addChild(Node node){
+            children.add(node);
+        }
+    }
+ 
+    public static void dfs(Node node){
+        sum += node.val;
+        if(node.children.size()==0){
+            max = Math.max(max,sum);
+        }else{
+            for(int i=0;i<node.children.size();i++){
+                dfs(node.children.get(i));
+            }
+        }
+        sum-=node.val;
+ 
+    }
+ 
+    public static void main(String[] args) {
+        System.out.println("请输入节点总数：");
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        Node[] nodes = new Node[n];
+        System.out.println("请输入每个结点的重量：");
+        for(int i=0;i<n;i++){
+            int val = scanner.nextInt();
+            nodes[i] = new Node(val);
+        }
+ 
+        //构建树
+        System.out.println("请输入父子节点编号：");
+        for(int i=0;i<n-1;i++){
+            int parentNum = scanner.nextInt();
+            int childNum = scanner.nextInt();
+            nodes[parentNum].addChild(nodes[childNum]);
+        }
+        dfs(nodes[0]);
+        System.out.println("最大重量为："+max);
+    }
+}
+```
+
