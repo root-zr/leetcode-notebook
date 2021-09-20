@@ -1,8 +1,6 @@
 # test
 
 #### Description
-第一个仓库
-
 #### Software Architecture
 Software architecture description
 
