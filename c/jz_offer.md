@@ -702,7 +702,7 @@ int hammingWeight(uint32_t n) {
       时间复杂度 O($log_2n$)： 二分的时间复杂度为对数级别。
       空间复杂度 O(1) ： res, b 等变量占用常数大小额外空间。
 
-![](E:\大三下\leetcode\leetcode\img_jz\2021-04-09 150907.jpg)
+![](img_jz/2021-04-09 150907.jpg)
 
 ```c
 double myPow(double x, int n){
@@ -793,38 +793,39 @@ int* printNumbers(int n, int* returnSize){
 
 **示例 1:**
 
-```
-输入: head = [4,5,1,9], val = 5
-输出: [4,1,9]
-解释: 给定你链表中值为 5 的第二个节点，那么在调用了你的函数之后，该链表应变为 4 -> 1 -> 9.
-```
+> 输入: head = [4,5,1,9], val = 5
+> 输出: [4,1,9]
+> 解释: 给定你链表中值为 5 的第二个节点，那么在调用了你的函数之后，该链表应变为 4 -> 1 -> 9.
 
 
 **示例 2:**
 
-```
-输入: head = [4,5,1,9], val = 1
-输出: [4,5,9]
-解释: 给定你链表中值为 1 的第三个节点，那么在调用了你的函数之后，该链表应变为 4 -> 5 -> 9.
-```
+> 输入: head = [4,5,1,9], val = 1
+> 输出: [4,5,9]
+> 解释: 给定你链表中值为 1 的第三个节点，那么在调用了你的函数之后，该链表应变为 4 -> 5 -> 9.
 
 **说明：**
 
 * 题目保证链表中节点的值互不相同
 * 若使用 C 或 C++ 语言，你不需要 free 或 delete 被删除的节点
 
-```java
-class Solution {
-    public ListNode deleteNode(ListNode head, int val) {
-        if (head == null) return null;
-        if (head.val == val) return head.next;
-        ListNode cur = head;
-        while (cur.next != null && cur.next.val != val)
-            cur = cur.next;
-        if (cur.next != null)
-            cur.next = cur.next.next;
-        return head;
+```c
+struct ListNode* deleteNode(struct ListNode* head, int val){
+    if(head == NULL) return head;
+    if(head->val == val) return head->next;
+    
+    struct ListNode*tmp = head;
+    struct ListNode*pre = head;
+
+    while(tmp != NULL ) {
+        if(tmp->val == val){
+            pre->next = tmp->next;
+        }
+        pre = tmp;
+        tmp = tmp->next;
     }
+
+    return head;
 }
 ```
 
@@ -834,94 +835,80 @@ class Solution {
 
 **示例 1:**
 
-```
-输入:
-s = "aa"
-p = "a"
-输出: false
-解释: "a" 无法匹配 "aa" 整个字符串。
-```
+> 输入:
+> s = "aa"
+> p = "a"
+> 输出: false
+> 解释: "a" 无法匹配 "aa" 整个字符串。
 
 **示例 2:**
 
-```
-输入:
-s = "aa"
-p = "a*"
-输出: true
-解释: 因为 '*' 代表可以匹配零个或多个前面的那一个元素, 在这里前面的元素就是 'a'。因此，字符串 "aa" 可被视为 'a' 重复了一次。
-```
+> 输入:
+> s = "aa"
+> p = "a*"
+> 输出: true
+> 解释: 因为 '*' 代表可以匹配零个或多个前面的那一个元素, 在这里前面的元素就是 'a'。因此，字符串 "aa" 可被视为 'a' 重复了一次。
 
 **示例 3:**
 
-```
-输入:
-s = "ab"
-p = ".*"
-输出: true
-解释: ".*" 表示可匹配零个或多个（'*'）任意字符（'.'）。
-```
+> 输入:
+> s = "ab"
+> p = ".*"
+> 输出: true
+> 解释: ".*" 表示可匹配零个或多个（'*'）任意字符（'.'）。
 
 **示例 4:**
 
-```
-输入:
-s = "aab"
-p = "c*a*b"
-输出: true
-解释: 因为 '*' 表示零个或多个，这里 'c' 为 0 个, 'a' 被重复一次。因此可以匹配字符串 "aab"。
-```
+> 输入:
+> s = "aab"
+> p = "c*a*b"
+> 输出: true
+> 解释: 因为 '*' 表示零个或多个，这里 'c' 为 0 个, 'a' 被重复一次。因此可以匹配字符串 "aab"。
 
 **示例 5:**
 
-```
-输入:
-s = "mississippi"
-p = "mis*is*p*."
-输出: false
-```
+> 输入:
+> s = "mississippi"
+> p = "mis*is*p*."
+> 输出: false
 
 *  s 可能为空，且只包含从 a-z 的小写字母。
 * p 可能为空，且只包含从 a-z 的小写字母以及字符 . 和 *，无连续的 '*'。
 
-```java
-class Solution {
-    public boolean isMatch(String s, String p) {
-        int m = s.length();
-        int n = p.length();
-        boolean f[][] = new boolean[m + 1][n + 1];
-        f[0][0] = true;
-        //f[0][0]代表s和p均为空字符串，f[1][1]代表s和p的第一个字符（即在s和p中下标为0的字符）
-        for(int i = 0; i <= m ; ++i) {
-            for(int j = 1; j <= n; ++j) {
-                if(p.charAt(j - 1) == '*') {//p的第j个字符为*
-                    if(matches(s, p, i, j - 1)) {//匹配s的第i个字符和p的第j-1个字符
-                        f[i][j] = f[i - 1][j] || f[i][j - 2];
-                        //p中*前面的字符在s中出现多次或者在s中只出现1次
-                    }
-                    else {
-                        f[i][j] = f[i][j - 2];//p中*前面的在s中字符出现0次
+```c
+bool isMatch(char* s, char* p){
+    int lenOfS = strlen(s);
+    int lenOfP = strlen(p);
+
+    bool dp[lenOfS +1 ][lenOfP +1];
+
+    memset(dp,false,(lenOfS +1)* (lenOfP + 1)*sizeof(bool));
+    
+    dp[0][0] = true;
+    for( int i = 0 ; i <= lenOfS; i++ ) {
+        for(int j = 0 ; j <= lenOfP; j++ ) {
+           if (j == 0) {
+                dp[i][j] = (i == 0 ? true : false);
+            }
+            else {
+                if (p[j - 1] != '*') {
+                    if (i > 0 && (s[i - 1] == p[j - 1] || p[j - 1] == '.')) {
+                        dp[i][j] = dp[i - 1][j - 1];
                     }
                 }
-                else {//p的第j个字符不为*
-                   if(matches(s, p, i, j)) {//匹配s的第i个字符和p的第j个字符
-                       f[i][j] = f[i - 1][j - 1];//匹配成功，状态转移；匹配不成功，默认是false
-                   } 
+                else { // 当p[j] == '*'时，由于'*'跟在一个字符后面，所以j必然大于等于2；
+                    dp[i][j] = dp[i][j - 2];
+                    if (i > 0 && (s[i - 1] == p[j - 2] || p[j - 2] == '.')) {
+                        dp[i][j] |= dp[i - 1][j];
+                    }
                 }
             }
+
+                  
         }
-        return f[m][n];
     }
 
-    private boolean matches(String s, String p, int i, int j) {//注意在字符串中的下标变换
-        if(i == 0) { //代表是空字符，直接返回
-            return false;
-        }
-        if(p.charAt(j - 1) == '.') {
-            return true;
-        }
-        return s.charAt(i - 1) == p.charAt(j - 1);
-    }
+    return dp[lenOfS][lenOfP];
 }
 ```
 
@@ -983,34 +970,37 @@ class Solution {
 
 **示例：**
 
-```
-输入：nums = [1,2,3,4]
-输出：[1,3,2,4] 
-注：[3,1,2,4] 也是正确的答案之一。
-```
+> 输入：nums = [1,2,3,4]
+> 输出：[1,3,2,4] 
+> 注：[3,1,2,4] 也是正确的答案之一。
 
 **提示：**
 
 *  0 <= nums.length <= 50000
 * 1 <= nums[i] <= 10000
 
-```java
-class Solution {
-    public int[] exchange(int[] nums) {
-        int left = 0, right = nums.length - 1;
-        while(left <= right){
-            while(left <= right && nums[left] % 2 == 1)
-                left++;
-            while(left <= right && nums[right] % 2 == 0)
-                right--;
-            if(left > right)
-                break;
-            int tmp = nums[left];
-            nums[left] = nums[right];
-            nums[right] = tmp;
+```c
+int* exchange(int* nums, int numsSize, int* returnSize){
+    int l = 0;
+    int r = numsSize - 1;
+
+    while (l < r) {
+        while (l < r && nums[l] % 2 == 1) {
+            l++;
         }
-        return nums;
+
+        while (l < r && nums[r] % 2 == 0) {
+            r--;
+        }
+
+        int tmp = nums[l];
+        nums[l] = nums[r];
+        nums[r] = tmp;
     }
+
+    *returnSize = numsSize;
+
+    return nums;
 }
 
 ```
@@ -1023,25 +1013,30 @@ class Solution {
 
 **示例：**
 
-```
-给定一个链表: 1->2->3->4->5, 和 k = 2.
+> 给定一个链表: 1->2->3->4->5, 和 k = 2.
+>
+> 返回链表 4->5.
 
-返回链表 4->5.
-```
-
-```java
-class Solution {
-    public ListNode getKthFromEnd(ListNode head, int k) {
-        ListNode slow = head, fast = head;
-        for(int i = 0; i < k; i++){
-            fast = fast.next;
-        }
-        while(fast != null){
-            fast = fast.next;
-            slow = slow.next;
-        }
-        return slow;
+```c
+struct ListNode* getKthFromEnd(struct ListNode* head, int k){
+   
+    if (head == NULL) {
+        return head;
     }
+   
+    struct ListNode *quick = head;
+    struct ListNode *slow = head;
+
+    for (int i = 0; i < k; i++) {
+        quick = quick->next;
+    }
+   
+    while (quick != NULL) {
+        quick = quick->next;
+        slow = slow->next;
+    }
+
+    return slow;
 }
 ```
 
@@ -1051,35 +1046,26 @@ class Solution {
 
 **示例:**
 
-```
-输入: 1->2->3->4->5->NULL
-输出: 5->4->3->2->1->NULL
-```
+> 输入: 1->2->3->4->5->NULL
+> 输出: 5->4->3->2->1->NULL
 
 **进阶:**
 你可以迭代或递归地反转链表。你能否用两种方法解决这道题？
 
 ```java
-class Solution {
-    public ListNode reverseList(ListNode head) {
-         //单链表为空或只有一个节点，直接返回原单链表
-        if (head == null || head.next == null){
-            return head;
-        }
-        //前一个节点指针
-        ListNode preNode = null;
-        //当前节点指针
-        ListNode curNode = head;
-        //下一个节点指针
-        ListNode nextNode = null;
-        while (curNode != null){
-            nextNode = curNode.next;//nextNode 指向下一个节点,保存当前节点后面的链表。
-            curNode.next=preNode;//将当前节点next域指向前一个节点   null<-1<-2<-3<-4
-            preNode = curNode;//preNode 指针向后移动。preNode指向当前节点。
-            curNode = nextNode;//curNode指针向后移动。下一个节点变成当前节点
-        }
-        return preNode;
+struct ListNode* reverseList(struct ListNode* head)
+{
+    struct ListNode *cur = head;
+    struct ListNode *pre = NULL;
+
+    while (cur != NULL) {
+        struct ListNode *tmp = cur->next;
+        cur->next = pre;
+        pre = cur;
+        cur = tmp;
     }
+
+    return pre;
 }
 ```
 
@@ -1089,33 +1075,49 @@ class Solution {
 
 **示例1：**
 
-```
-输入：1->2->4, 1->3->4
-输出：1->1->2->3->4->4
-```
+> 输入：1->2->4, 1->3->4
+> 输出：1->1->2->3->4->4
 
 **限制：**
 
 0 <= 链表长度 <= 1000
 
-```java
-class Solution {
-    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
-        if(l1 == null) {
-            return l2;
-        }
-        if(l2 == null) {
-            return l1;
+```c
+struct ListNode* mergeTwoLists(struct ListNode* l1, struct ListNode* l2)
+{
+    
+    if (l1 == NULL) {
+        return l2;
+    }
+
+    if (l2 == NULL) {
+        return l1;
+    }
+
+    struct ListNode *dummy = (struct ListNode *)malloc(sizeof(struct ListNode));;
+    struct ListNode *cur = dummy;
+
+    while (l1 != NULL && l2 != NULL) {
+        if (l1->val < l2->val) {
+            cur->next = l1;
+            l1 = l1->next;
+            
+        } else {
+            cur->next = l2;
+            l2 = l2->next;
         }
 
-        if(l1.val < l2.val) {
-            l1.next = mergeTwoLists(l1.next, l2);
-            return l1;
-        } else {
-            l2.next = mergeTwoLists(l1, l2.next);
-            return l2;
-        }
+        cur = cur->next;
     }
+
+    if (l1 == NULL && l2 != NULL) {     
+        cur->next = l2;
+    } 
+    if (l2 == NULL && l1 != NULL) {
+        cur->next = l1;
+    }
+       
+    return dummy->next;
 }
 ```
 
@@ -1128,131 +1130,58 @@ B是A的子结构， 即 A中有出现和B相同的结构和节点值。
 例如:
 给定的树 A:
 
-         3
-        / \
-       4   5
-      / \
-     1   2
+> ​      3
+> ​     / \
+>
+>    4   5
+>   / \
+>  1   2
 
 给定的树 B：
 
-  
 
-```
-	 4 
-  /
- 1
-```
+
+> ​    4 
+>
+>   /
+>  1
 
 
 返回 true，因为 B 与 A 的一个子树拥有相同的结构和节点值。
 
 **示例 1：**
 
-```
-输入：A = [1,2,3], B = [3,1]
-输出：false
-```
+> 输入：A = [1,2,3], B = [3,1]
+> 输出：false
 
 **示例 2：**
 
-```
-输入：A = [3,4,5,1,2], B = [4,1]
-输出：true
-```
+> 输入：A = [3,4,5,1,2], B = [4,1]
+> 输出：true
 
 **限制：**
 
 0 <= 节点个数 <= 10000
 
-```java
-class Solution {
-    public boolean isSubStructure(TreeNode A, TreeNode B) {
-        return (A != null && B != null) && (recur(A, B) || isSubStructure(A.left, B) || isSubStructure(A.right, B));
-    }
-    boolean recur(TreeNode A, TreeNode B) {
-        if(B == null) return true;
-        if(A == null || A.val != B.val) return false;
-        return recur(A.left, B.left) && recur(A.right, B.right);
-    }
-}
-```
-
-```java
-class Solution {
-    public boolean isSubStructure(TreeNode A, TreeNode B) {
-        if(B == null) return false;
-        Queue<TreeNode> queue = new LinkedList<>();
-        queue.offer(A);
-        while(!queue.isEmpty()){
-            TreeNode node = queue.poll();
-            if(node.val == B.val){
-                if(helper(node, B)){
-                    return true;
-                }
-            }
-            if(node.left != null){
-                queue.offer(node.left);
-            }
-            if(node.right != null){
-                queue.offer(node.right);
-            }
-        }
-        return false;
-    }
-
-    private boolean helper(TreeNode nodeA, TreeNode nodeB){
-        Queue<TreeNode> queueA = new LinkedList<>();
-        Queue<TreeNode> queueB = new LinkedList<>();
-        queueA.offer(nodeA);
-        queueB.offer(nodeB);
-
-        while(!queueB.isEmpty()){
-            nodeA = queueA.poll();
-            nodeB = queueB.poll();
-            if(nodeA == null || nodeA.val != nodeB.val){
-                return false;
-            }
-            if(nodeB.left != null){
-                queueA.offer(nodeA.left);
-                queueB.offer(nodeB.left);
-            }
-            if(nodeB.right != null){
-                queueA.offer(nodeA.right);
-                queueB.offer(nodeB.right);
-            }
-        }
+```c
+bool Recur(struct TreeNode *A, struct TreeNode *B)
+{
+    if( B == NULL) {
         return true;
     }
 
+    if (A == NULL || A->val != B->val) {
+        return false;
+    }
+
+    return Recur(A->left,B->left) && Recur(A->right, B->right);
 }
-```
-
-```java
-class Solution {
-    private TreeNode B;
-    public boolean isSubStructure(TreeNode A, TreeNode B) {
-        if(B == null) return false;
-        this.B = B;
-        return dfs(A);
+bool isSubStructure(struct TreeNode* A, struct TreeNode* B){
+    if (A == NULL || B == NULL) {
+        return false;
     }
 
-    private boolean dfs(TreeNode nodeA){
-        if(nodeA == null)
-            return false;
-        if(nodeA.val == B.val)
-            if(helper(nodeA, B))
-                return true;
-        return dfs(nodeA.left) || dfs(nodeA.right);
-    }
-
-    private boolean helper(TreeNode nodeA, TreeNode nodeB){
-        if(nodeB == null)
-            return true;
-        if(nodeA == null || nodeA.val != nodeB.val)
-            return false;
-        return helper(nodeA.left, nodeB.left) && helper(nodeA.right, nodeB.right);
-    }
+    return Recur(A, B) || isSubStructure(A->left,B) ||isSubStructure(A->right,B);
 }
 ```
 
