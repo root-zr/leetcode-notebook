@@ -916,51 +916,51 @@ bool isMatch(char* s, char* p){
 
 请实现一个函数用来判断字符串是否表示数值（包括整数和小数）。例如，字符串"+100"、"5e2"、"-123"、"3.1416"、"-1E-16"、"0123"都表示数值，但"12e"、"1a3.14"、"1.2.3"、"+-5"及"12e+5.4"都不是。
 
-```java
-class Solution {
-    public boolean isNumber(String s) {
-        int n = s.length();
-        int index = 0;
-        boolean hasNum = false, hasE = false;
-        boolean hasSign = false, hasDot = false;
-        while(index < n && s.charAt(index) == ' ')
+```c
+bool isNumber(char* s){
+  
+    int n = strlen(s);
+    int index = 0;
+    bool hasNum = false, hasE = false;
+    bool hasSign = false, hasDot = false;
+    while(index < n && s[index] == ' ')
+        index++;
+    while(index < n){
+        while(index < n && s[index] >= '0' && s[index] <= '9'){
             index++;
-        while(index < n){
-            while(index < n && s.charAt(index) >= '0' && s.charAt(index) <= '9'){
-                index++;
-                hasNum = true;
-            }
-            if(index == n){
-                break;
-            }
-            char c = s.charAt(index);
-            if(c == 'e' || c == 'E'){
-                if(hasE || !hasNum){
-                    return false;
-                }
-                hasE = true;
-                hasNum = false; hasSign = false; hasDot = false;
-            }else if(c == '+' || c == '-'){
-                if(hasSign || hasNum || hasDot){
-                    return false;
-                }
-                hasSign = true;
-            }else if(c == '.'){
-                if(hasDot || hasE){
-                    return false;
-                }
-                hasDot = true;
-            }else if(c == ' '){
-                break;
-            }else{
+            hasNum = true;
+        }
+        if(index == n){
+            break;
+        }
+        char c = s[index];
+        if(c == 'e' || c == 'E'){
+            if(hasE || !hasNum){
                 return false;
             }
-            index++;
+            hasE = true;
+            hasNum = false; hasSign = false; hasDot = false;
+        }else if(c == '+' || c == '-'){
+            if(hasSign || hasNum || hasDot){
+                return false;
+            }
+            hasSign = true;
+        }else if(c == '.'){
+            if(hasDot || hasE){
+                return false;
+            }
+            hasDot = true;
+        }else if(c == ' '){
+            break;
+        }else{
+            return false;
         }
-        while(index < n && s.charAt(index) == ' ')
-            index++;
-        return hasNum && index == n;
+        index++;
     }
+    while(index < n && s[index] == ' ')
+        index++;
+    return hasNum && index == n;
+
 }
 ```
 
@@ -1191,57 +1191,76 @@ bool isSubStructure(struct TreeNode* A, struct TreeNode* B){
 
 例如输入：
 
-    	  4
-        /   \
-      2     7
-     / \   / \
-    1   3 6   9
+> ​      4
+> ​    /   \
+>
+>   2     7
+>  / \   / \
+> 1   3 6   9
 
 镜像输出：
 
-    	  4
-        /   \
-      7     2
-     / \   / \
-    9   6 3   1
+> ​      4
+> ​    /   \
+>
+>   7     2
+>  / \   / \
+> 9   6 3   1
+
 **示例 1：**
 
-```
-输入：root = [4,2,7,1,3,6,9]
-输出：[4,7,2,9,6,3,1]
-```
+> 输入：root = [4,2,7,1,3,6,9]
+> 输出：[4,7,2,9,6,3,1]
 
 **限制：**
 
 0 <= 节点个数 <= 1000
 
-```java
-class Solution {
-    public TreeNode mirrorTree(TreeNode root) {
-        if(root == null) return null;
-        Stack<TreeNode> stack = new Stack<>() {{ add(root); }};
-        while(!stack.isEmpty()) {
-            TreeNode node = stack.pop();
-            if(node.left != null) stack.add(node.left);
-            if(node.right != null) stack.add(node.right);
-            TreeNode tmp = node.left;
-            node.left = node.right;
-            node.right = tmp;
-        }
+```c
+#define MAX_SIZE 1000
+
+struct TreeNode* mirrorTree(struct TreeNode* root){
+    if (root == NULL) {
         return root;
     }
+
+    struct TreeNode * stack[MAX_SIZE];
+    stack[0] = root;
+    int size = 1;
+
+    while (size > 0) {
+        struct TreeNode *node = stack[size - 1];
+        size--;
+
+        if (node->left != NULL) {
+            stack[size++] = node->left;
+        }
+
+        if (node->right != NULL) {
+            stack[size++] = node->right;
+        }
+       
+        struct TreeNode *tmp = node->left;
+        node->left = node->right;
+        node->right = tmp;
+    }
+   
+
+    return root;
 }
 ```
 
-```java
-class Solution {
-    public TreeNode mirrorTree(TreeNode root) {
-        if(root == null) return null;
-        TreeNode tmp = root.left;
-        root.left = mirrorTree(root.right);
-        root.right = mirrorTree(tmp);
+```c
+struct TreeNode* mirrorTree(struct TreeNode* root){
+    if (root == NULL) {
         return root;
     }
+
+    struct TreeNode *tmp = root->left;
+    root->left = mirrorTree(root->right);
+    root->right = mirrorTree(tmp);
+
+    return root;
 }
 ```
 
@@ -1251,50 +1270,58 @@ class Solution {
 
 例如，二叉树 [1,2,2,3,4,4,3] 是对称的。
 
-    	1
-       / \
-      2   2
-     / \ / \
-    3  4 4  3
+> ​    1
+>
+>    / \
+>   2   2
+>  / \ / \
+> 3  4 4  3
 
 但是下面这个 [1,2,2,null,3,null,3] 则不是镜像对称的:
 
-       1
-      / \
-      2   2
-       \   \
-       3    3
+>    1
+>   / \
+>   2   2
+>    \   \
+>    3    3
+
 **示例 1：**
 
-```
-输入：root = [1,2,2,3,4,4,3]
-输出：true
-```
+> 输入：root = [1,2,2,3,4,4,3]
+> 输出：true
 
 
 **示例 2：**
 
-```
-输入：root = [1,2,2,null,3,null,3]
-输出：false
-```
+> 输入：root = [1,2,2,null,3,null,3]
+> 输出：false
 
 **限制：**
 
 * 0 <= 节点个数 <= 1000
 
-```java
-class Solution {
-    public boolean isSymmetric(TreeNode root) {
-        return root == null ? true : recur(root.left, root.right);
+```c
+bool Recur(struct TreeNode *A, struct TreeNode *B)
+{
+    if (A == NULL && B == NULL) {
+        return true;
     }
-    boolean recur(TreeNode L, TreeNode R) {
-        if(L == null && R == null) return true;
-        if(L == null || R == null || L.val != R.val) return false;
-        return recur(L.left, R.right) && recur(L.right, R.left);
+
+    if (A == NULL || B == NULL || A->val != B->val) {
+        return false;
     }
+
+    return Recur(A->left,B->right) && Recur(A->right,B->left);
 }
 
+
+bool isSymmetric(struct TreeNode* root){
+    if (root == NULL) {
+        return true;
+    }
+
+    return Recur(root->left,root->right);
+}
 ```
 
 #### [剑指 Offer 29. 顺时针打印矩阵](https://leetcode-cn.com/problems/shun-shi-zhen-da-yin-ju-zhen-lcof/)
@@ -1303,42 +1330,61 @@ class Solution {
 
 **示例 1：**
 
-```
-输入：matrix = [[1,2,3],[4,5,6],[7,8,9]]
-输出：[1,2,3,6,9,8,7,4,5]
-```
+> 输入：matrix = [[1,2,3],[4,5,6],[7,8,9]]
+> 输出：[1,2,3,6,9,8,7,4,5]
 
 
 **示例 2：**
 
-```
-输入：matrix = [[1,2,3,4],[5,6,7,8],[9,10,11,12]]
-输出：[1,2,3,4,8,12,11,10,9,5,6,7]
-```
+> 输入：matrix = [[1,2,3,4],[5,6,7,8],[9,10,11,12]]
+> 输出：[1,2,3,4,8,12,11,10,9,5,6,7]
 
 **限制：**
 
 *   0 <= matrix.length <= 100
 *   0 <= matrix[i].length <= 100
 
-```java
-class Solution {
-    public int[] spiralOrder(int[][] matrix) {
-        if(matrix.length == 0) return new int[0];
-        int l = 0, r = matrix[0].length - 1, t = 0, b = matrix.length - 1, x = 0;
-        int[] res = new int[(r + 1) * (b + 1)];
-        while(true) {
-            for(int i = l; i <= r; i++) res[x++] = matrix[t][i]; // left to right.
-            if(++t > b) break;
-            for(int i = t; i <= b; i++) res[x++] = matrix[i][r]; // top to bottom.
-            if(l > --r) break;
-            for(int i = r; i >= l; i--) res[x++] = matrix[b][i]; // right to left.
-            if(t > --b) break;
-            for(int i = b; i >= t; i--) res[x++] = matrix[i][l]; // bottom to top.
-            if(++l > r) break;
-        }
-        return res;
+```c
+int* spiralOrder(int** matrix, int matrixSize, int* matrixColSize, int* returnSize){
+    
+    if (matrixSize == 0 || *matrixColSize == 0 ) {
+        *returnSize = 0;
+        return NULL;
     }
+    int l = 0, r = *matrixColSize - 1, up = 0, down = matrixSize - 1;
+
+    *returnSize = matrixSize * (*matrixColSize);
+    int *res = (int *)malloc((*returnSize) * sizeof(int));
+    int index = 0;
+
+    while (index < *returnSize) {
+        
+        for (int i = l; i <= r && index < *returnSize; i++) {
+            res[index] = matrix[up][i];
+            index++;
+        }
+        up++;
+
+        for (int i = up; i <= down && index < *returnSize; i++) {
+            res[index] = matrix[i][r];
+            index++;
+        }
+        r--;
+    
+        for (int i = r; i >= l && index < *returnSize; i--) {
+            res[index] = matrix[down][i];
+            index++;
+        }
+        down--;
+
+        for (int i = down; i >= up && index < *returnSize; i--) {
+            res[index] = matrix[i][l];
+            index++;
+        }
+        l++;
+    }
+
+   return res;
 }
 
 ```
@@ -1349,43 +1395,83 @@ class Solution {
 
 **示例:**
 
-```
-MinStack minStack = new MinStack();
-minStack.push(-2);
-minStack.push(0);
-minStack.push(-3);
-minStack.min();   --> 返回 -3.
-minStack.pop();
-minStack.top();      --> 返回 0.
-minStack.min();   --> 返回 -2.
-```
+> MinStack minStack = new MinStack();
+> minStack.push(-2);
+> minStack.push(0);
+> minStack.push(-3);
+> minStack.min();   --> 返回 -3.
+> minStack.pop();
+> minStack.top();      --> 返回 0.
+> minStack.min();   --> 返回 -2.
 
 **提示：**
 
 各函数的调用总次数不超过 20000 次
 
-```java
-class MinStack {
-    Stack<Integer> A, B;
-    public MinStack() {
-        A = new Stack<>();
-        B = new Stack<>();
+```c
+#include<limits.h>
+
+#define MAX_SIZE 20000
+
+typedef struct {
+    int arr[MAX_SIZE];
+    int top;
+    int minNums[MAX_SIZE];
+    int minTop;
+} MinStack;
+
+/** initialize your data structure here. */
+
+MinStack* minStackCreate() {
+    MinStack *minStack = (MinStack *)malloc(sizeof(MinStack));
+    minStack->top = 0; 
+    minStack->minTop = 0;
+    //minStack->minNum = INT_MIN;
+    return minStack;
+}
+
+void minStackPush(MinStack* obj, int x) {
+    
+    obj->arr[obj->top] = x;
+    obj->top++;
+
+    if (obj->minTop == 0 || x <= obj->minNums[obj->minTop -1]) {
+        obj->minNums[obj->minTop] = x;
+        obj->minTop++;
     }
-    public void push(int x) {
-        A.add(x);
-        if(B.empty() || B.peek() >= x)
-            B.add(x);
+}
+
+void minStackPop(MinStack* obj) {
+
+    if (obj->top <= 0) {
+       return;
     }
-    public void pop() {
-        if(A.pop().equals(B.peek()))
-            B.pop();
+
+    if (obj->minTop > 0 && obj->arr[obj->top -1] == obj->minNums[obj->minTop - 1]) {
+        obj->minTop--;
     }
-    public int top() {
-        return A.peek();
+
+    obj->top--;
+}
+
+int minStackTop(MinStack* obj) {
+    if (obj->top <= 0) {
+       return 0;  
     }
-    public int min() {
-        return B.peek();
+
+    return obj->arr[obj->top - 1];
+}
+
+int minStackMin(MinStack* obj) {
+    if (obj->minTop <= 0) {
+        return 0;
     }
+
+    return obj->minNums[obj->minTop - 1];
+}
+
+void minStackFree(MinStack* obj) {
+    free(obj);
 }
 
 ```
@@ -1396,21 +1482,17 @@ class MinStack {
 
 **示例 1：**
 
-```
-输入：pushed = [1,2,3,4,5], popped = [4,5,3,2,1]
-输出：true
-解释：我们可以按以下顺序执行：
-push(1), push(2), push(3), push(4), pop() -> 4,
-push(5), pop() -> 5, pop() -> 3, pop() -> 2, pop() -> 1
-```
+> 输入：pushed = [1,2,3,4,5], popped = [4,5,3,2,1]
+> 输出：true
+> 解释：我们可以按以下顺序执行：
+> push(1), push(2), push(3), push(4), pop() -> 4,
+> push(5), pop() -> 5, pop() -> 3, pop() -> 2, pop() -> 1
 
 **示例 2：**
 
-```
-输入：pushed = [1,2,3,4,5], popped = [4,3,5,1,2]
-输出：false
-解释：1 不能在 2 之前弹出。
-```
+> 输入：pushed = [1,2,3,4,5], popped = [4,3,5,1,2]
+> 输出：false
+> 解释：1 不能在 2 之前弹出。
 
 **提示：**
 
@@ -1418,20 +1500,29 @@ push(5), pop() -> 5, pop() -> 3, pop() -> 2, pop() -> 1
 * 0 <= pushed[i], popped[i] < 1000
 * pushed 是 popped 的排列。
 
-```java
-class Solution {
-    public boolean validateStackSequences(int[] pushed, int[] popped) {
-        Stack<Integer> stack = new Stack<>();
-        int i = 0;
-        for(int num : pushed) {
-            stack.push(num); // num 入栈
-            while(!stack.isEmpty() && stack.peek() == popped[i]) { // 循环判断与出栈
-                stack.pop();
-                i++;
-            }
-        }
-        return stack.isEmpty();
+```c
+#define MAX_SIZE 1000
+bool validateStackSequences(int* pushed, int pushedSize, int* popped, int poppedSize){
+    if (pushedSize == 0) {
+        return true;
     }
+    
+    int *stack[MAX_SIZE];
+    int size = 0; 
+    int index = 0;
+
+    for (int i = 0; i < poppedSize; i++) {
+        stack[size] = pushed[i];
+        size++;
+
+        while (size > 0 && stack[size - 1] == popped[index]) {
+            size--;
+            index++;
+        }
+    }
+
+  
+    return size == 0 ? true : false;
 }
 ```
 
@@ -1442,11 +1533,12 @@ class Solution {
 例如:
 给定二叉树: [3,9,20,null,null,15,7],
 
-        3
-       / \
-      9  20
-        /  \
-       15   7
+> ​    3
+>
+>    / \
+>   9  20
+>     /  \
+>    15   7
 
 返回：
 
@@ -1456,23 +1548,42 @@ class Solution {
 
 节点总数 <= 1000
 
-```java
-class Solution {
-    public int[] levelOrder(TreeNode root) {
-        if(root == null) return new int[0];
-        Queue<TreeNode> queue = new LinkedList<>(){{ add(root); }};
-        ArrayList<Integer> ans = new ArrayList<>();
-        while(!queue.isEmpty()) {
-            TreeNode node = queue.poll();
-            ans.add(node.val);
-            if(node.left != null) queue.add(node.left);
-            if(node.right != null) queue.add(node.right);
-        }
-        int[] res = new int[ans.size()];
-        for(int i = 0; i < ans.size(); i++)
-            res[i] = ans.get(i);
-        return res;
+```c
+#define MAX_SIZE 1000
+
+int* levelOrder(struct TreeNode* root, int* returnSize){
+    if (root == NULL) {
+        *returnSize = 0;
+        return (int *)malloc(0 * sizeof(int));
     }
+    struct TreeNode *queue[MAX_SIZE];
+    int first = 0, tail = 0;
+
+    int *res = (int *)malloc(MAX_SIZE * sizeof(int));
+    int index = 0;
+
+    queue[tail++] = root;
+
+    while (first < tail) {
+        struct TreeNode *node = queue[first]; 
+        first++;
+
+        res[index++] = node->val;
+
+       if (node->left != NULL) {
+            queue[tail++] = node->left;  
+       }
+
+       if (node->right != NULL) {
+           queue[tail++] = node->right;
+       }
+
+    }
+
+    *returnSize = index;
+
+    return res;
+    
 }
 ```
 
@@ -1483,44 +1594,86 @@ class Solution {
  例如:
 给定二叉树: [3,9,20,null,null,15,7],
 
-        3
-       / \
-      9  20
-        /  \
-       15   7
+> ​    3
+>
+>    / \
+>   9  20
+>     /  \
+>    15   7
 
 返回其层次遍历结果：
 
-```
-[
-  [3],
-  [9,20],
-  [15,7]
-]
-```
+> [
+>   [3],
+>   [9,20],
+>   [15,7]
+> ]
 
 **提示：**
 
 节点总数 <= 1000
 
-```java
-class Solution {
-    public List<List<Integer>> levelOrder(TreeNode root) {
-        Queue<TreeNode> queue = new LinkedList<>();
-        List<List<Integer>> res = new ArrayList<>();
-        if(root != null) queue.add(root);
-        while(!queue.isEmpty()) {
-            List<Integer> tmp = new ArrayList<>();
-            for(int i = queue.size(); i > 0; i--) { //这里一定要从高到低，不然队列的元素数量变化就会出错
-                TreeNode node = queue.poll();
-                tmp.add(node.val);
-                if(node.left != null) queue.add(node.left);
-                if(node.right != null) queue.add(node.right);
-            }
-            res.add(tmp);
-        }
-        return res;
+```c
+#define MAX_SIZE 10000
+
+int** levelOrder(struct TreeNode* root, int* returnSize, int** returnColumnSizes){
+    if (root == NULL) {
+        *returnSize = 0;
+        return NULL;
     }
+    struct TreeNode *queue[MAX_SIZE];
+    int first = 0, tail = 0;
+
+    int **res = (int **)malloc(MAX_SIZE * sizeof(int*));
+
+    if (res == NULL) {
+        return NULL;
+    }
+    memset(res, 0, sizeof(int*) * MAX_SIZE);
+
+    *returnColumnSizes = (int*)malloc(sizeof(int) * MAX_SIZE);
+    // 和这条语句等价 returnColumnSizes[0] = (int*)malloc(sizeof(int) * MAX_SIZE);
+    if (*returnColumnSizes == NULL) {
+        return NULL;
+    }
+    memset(*returnColumnSizes, 0, sizeof(int) * MAX_SIZE);
+
+    int index = 0;
+    queue[tail++] = root;
+
+    while (first < tail) {
+        int len = tail - first;
+        (*returnColumnSizes)[index] = len;
+        //  returnColumnSizes[0][index] = len;
+        int *arr = (int *)malloc(len * sizeof(int));
+        if (arr == NULL) {
+            return NULL;
+        }
+        memset(arr, 0, sizeof(int) * len);
+
+        int indexOfArr = 0;
+        for (int i = 0; i < len; i++) {
+            struct TreeNode *node = queue[first]; 
+            first++;
+
+            arr[indexOfArr++] = node->val;
+
+            if (node->left != NULL) {
+                queue[tail++] = node->left;  
+            }
+
+            if (node->right != NULL) {
+                queue[tail++] = node->right;
+            }
+        }
+     
+        res[index] = arr;
+        index++;
+    }
+
+    *returnSize = index;
+
+    return res;
 }
 
 ```
@@ -1532,45 +1685,90 @@ class Solution {
  例如:
 给定二叉树: [3,9,20,null,null,15,7],
 
-        3
-       / \
-      9  20
-        /  \
-       15   7
+> ​    3
+>
+>    / \
+>   9  20
+>     /  \
+>    15   7
 
 返回其层次遍历结果：
 
-```
-[
-  [3],
-  [20,9],
-  [15,7]
-]
-```
+> [
+>   [3],
+>   [20,9],
+>   [15,7]
+> ]
 
 **提示：**
 
 节点总数 <= 1000
 
-```java
-class Solution {
-    public List<List<Integer>> levelOrder(TreeNode root) {
-        Queue<TreeNode> queue = new LinkedList<>();
-        List<List<Integer>> res = new ArrayList<>();
-        if(root != null) queue.add(root);
-        while(!queue.isEmpty()) {
-            LinkedList<Integer> tmp = new LinkedList<>();
-            for(int i = queue.size(); i > 0; i--) {
-                TreeNode node = queue.poll();
-                if(res.size() % 2 == 0) tmp.addLast(node.val); // 偶数层 -> 队列头部
-                else tmp.addFirst(node.val); // 奇数层 -> 队列尾部
-                if(node.left != null) queue.add(node.left);
-                if(node.right != null) queue.add(node.right);
-            }
-            res.add(tmp);
-        }
-        return res;
+```c
+#define MAX_SIZE 10000
+
+int** levelOrder(struct TreeNode* root, int* returnSize, int** returnColumnSizes){
+    if (root == NULL) {
+        *returnSize = 0;
+        return NULL;
     }
+    struct TreeNode *queue[MAX_SIZE];
+    int first = 0, tail = 0;
+
+    int **res = (int **)malloc(MAX_SIZE * sizeof(int*));
+
+    if (res == NULL) {
+        return NULL;
+    }
+    memset(res, 0, sizeof(int*) * MAX_SIZE);
+
+    *returnColumnSizes = (int*)malloc(sizeof(int) * MAX_SIZE);
+    if (*returnColumnSizes == NULL) {
+        return NULL;
+    }
+    memset(*returnColumnSizes, 0, sizeof(int) * MAX_SIZE);
+
+    int index = 0;
+    queue[tail++] = root;
+
+    while (first < tail) {
+        int len = tail - first;
+        (*returnColumnSizes)[index] = len;
+        int *arr = (int *)malloc(len * sizeof(int));
+        if (arr == NULL) {
+            return NULL;
+        }
+        memset(arr, 0, sizeof(int) * len);
+
+        int indexOfArr = 0;
+        for (int i = 0; i < len; i++) {
+            struct TreeNode *node = queue[first]; 
+            first++;
+
+            if (index % 2 == 0) {
+                arr[indexOfArr++] = node->val;
+            } else {
+                arr[len - indexOfArr - 1] = node->val;
+                indexOfArr++;
+            }
+           
+
+            if (node->left != NULL) {
+                queue[tail++] = node->left;  
+            }
+
+            if (node->right != NULL) {
+                queue[tail++] = node->right;
+            }
+        }
+     
+        res[index] = arr;
+        index++;
+    }
+
+    *returnSize = index;
+
+    return res;
 }
 ```
 
@@ -1580,61 +1778,56 @@ class Solution {
 
  参考以下这颗二叉搜索树：
 
-         5
-        / \
-       2   6
-      / \
-     1   3
+> ​     5
+> ​    / \
+>
+>    2   6
+>   / \
+>  1   3
 
  **示例 1：**
 
-```
-输入: [1,6,3,2,5]
-输出: false
-```
+> 输入: [1,6,3,2,5]
+> 输出: false
 
 **示例 2：**
 
-```
-输入: [1,3,2,6,5]
-输出: true
-```
+> 输入: [1,3,2,6,5]
+> 输出: true
 
 **提示：**
 
 数组长度 <= 1000
 
-```java
-class Solution {
-    public boolean verifyPostorder(int[] postorder) {
-        return recur(postorder, 0, postorder.length - 1);
-    }
-    boolean recur(int[] postorder, int i, int j) {
-        if(i >= j) return true;
-        int p = i;
-        while(postorder[p] < postorder[j]) p++;
-        int m = p;
-        while(postorder[p] > postorder[j]) p++;
-        return p == j && recur(postorder, i, m - 1) && recur(postorder, m, j - 1);
-    }
-}
-
-```
-
-```java
-
-class Solution {
-    public boolean verifyPostorder(int[] postorder) {
-        Stack<Integer> stack = new Stack<>();
-        int root = Integer.MAX_VALUE;
-        for(int i = postorder.length - 1; i >= 0; i--) {
-            if(postorder[i] > root) return false;
-            while(!stack.isEmpty() && stack.peek() > postorder[i])
-            	root = stack.pop();
-            stack.add(postorder[i]);
-        }
+```c
+bool Recur(int *postorder, int l, int r)
+{
+    if (l >= r) {
         return true;
     }
+
+    int i = l;
+    while (i <= r && postorder[i] < postorder[r]) {
+        i++;
+    }
+
+    int firstRight = i;
+
+    while (i <= r && postorder[i] > postorder[r]) {
+        i++;
+    }
+
+    return i == r && Recur(postorder, l, firstRight - 1) && Recur(postorder, firstRight, r - 1);
+
+}
+
+bool verifyPostorder(int* postorder, int postorderSize){
+    //后续遍历的特点是最后一个元素一定是根节点。
+    //二叉搜索树左子节点都小于根，右子节点都大于根。
+    if (postorderSize == 0) {
+        return true;
+    }
+    return Recur(postorder,0 , postorderSize - 1);
 }
 ```
 
@@ -1645,44 +1838,84 @@ class Solution {
 **示例:**
 给定如下二叉树，以及目标和 target = 22，
 
-              5
-             / \
-            4   8
-           /   / \
-          11  13  4
-         /  \    / \
-        7    2  5   1
+> ​       5
+> ​      / \
+> ​    4   8
+>
+>    /   / \
+>   11  13  4
+>  /  \    / \
+> 7    2  5   1
+
 返回:
 
-```
-[
-   [5,4,11,2],
-   [5,8,4,5]
-]
-```
+> [
+>    [5,4,11,2],
+>    [5,8,4,5]
+> ]
 
 **提示：**
 
 节点总数 <= 10000
 
-```java
-class Solution {
-    LinkedList<List<Integer>> res = new LinkedList<>();
-    LinkedList<Integer> path = new LinkedList<>(); 
-    public List<List<Integer>> pathSum(TreeNode root, int sum) {
-        recur(root, sum);
-        return res;
+```c
+#define MAX_SIZE 5000
+
+int** g_res;
+int g_resSize;
+
+int* g_path;
+int g_pathSize;
+
+void Recur(struct TreeNode *root, int target, int **returnColumnSizes)
+{
+    if (root == NULL) return;
+
+    g_path[g_pathSize++] = root->val;
+    target -= root->val;
+
+    if (target == 0 && root->left == NULL && root->right == NULL) {
+        int* tmp = malloc(sizeof(int) * g_pathSize);
+        memcpy(tmp, g_path, sizeof(int) * g_pathSize);
+        g_res[g_resSize] = tmp; 
+        (*returnColumnSizes)[g_resSize] = g_pathSize;
+        g_resSize++;
+        //注意这里不能return，因为后面要g_pathSize--
     }
-    void recur(TreeNode root, int tar) {
-        if(root == null) return;
-        path.add(root.val);
-        tar -= root.val;
-        if(tar == 0 && root.left == null && root.right == null)
-            res.add(new LinkedList(path));
-        recur(root.left, tar);
-        recur(root.right, tar);
-        path.removeLast();
+
+    Recur(root->left,target, returnColumnSizes);
+    Recur(root->right,target, returnColumnSizes);
+  
+    g_pathSize--;
+}
+
+
+int** pathSum(struct TreeNode* root, int target, int* returnSize, int** returnColumnSizes){
+    g_res = (int **)malloc(MAX_SIZE * sizeof(int *));
+    if (g_res == NULL) {
+        return NULL;
     }
+    memset(g_res, 0, MAX_SIZE * sizeof(int *));
+    g_resSize = 0;
+
+    *returnColumnSizes = (int *)malloc(MAX_SIZE * sizeof(int));
+    if (*returnColumnSizes == NULL) {
+        return NULL;
+    } 
+    memset(*returnColumnSizes, 0, MAX_SIZE * sizeof(int));
+
+    g_path = (int *)malloc(MAX_SIZE * sizeof(int));
+    if (g_path == NULL) {
+        return NULL;
+    } 
+    memset(g_path, 0, MAX_SIZE * sizeof(int));
+    g_pathSize = 0;
+
+    Recur(root, target, returnColumnSizes);
+
+    *returnSize = g_resSize;
+   
+    return g_res;
 }
 ```
 
@@ -1692,7 +1925,7 @@ class Solution {
 
  **示例 1：**
 
-![](E:\大三下\leetcode\leetcode\img_jz\e1.png)
+![](img_jz/e1.png)
 
 ```
 输入：head = [[7,null],[13,0],[11,4],[10,2],[1,0]]
@@ -1701,7 +1934,7 @@ class Solution {
 
 **示例 2：**
 
-![](E:\大三下\leetcode\leetcode\img_jz\e2.png)
+![](img_jz/e2.png)
 
 ```
 输入：head = [[1,1],[2,1]]
@@ -1710,7 +1943,7 @@ class Solution {
 
 **示例 3：**
 
-![](E:\大三下\leetcode\leetcode\img_jz\e3.png)
+![](img_jz/e3.png)
 
 ```
 输入：head = [[3,null],[3,0],[3,null]]
@@ -1795,13 +2028,13 @@ class Solution {
 
  为了让您更好地理解问题，以下面的二叉搜索树为例：
 
- <img src="E:\大三下\leetcode\leetcode\img_jz\bstdlloriginalbst.png" style="zoom:50%;" />
+ <img src="img_jz/bstdlloriginalbst.png" style="zoom:50%;" />
 
 我们希望将这个二叉搜索树转化为双向循环链表。链表中的每个节点都有一个前驱和后继指针。对于双向循环链表，第一个节点的前驱是最后一个节点，最后一个节点的后继是第一个节点。
 
 下图展示了上面的二叉搜索树转化成的链表。“head” 表示指向链表中有最小元素的节点。
 
-![](E:\大三下\leetcode\leetcode\img_jz\bstdllreturndll.png)
+![](img_jz/bstdllreturndll.png)
 
 特别地，我们希望可以就地完成转换操作。当转化完成以后，树中节点的左指针需要指向前驱，树中节点的右指针需要指向后继。还需要返回链表中的第一个节点的指针。
 
