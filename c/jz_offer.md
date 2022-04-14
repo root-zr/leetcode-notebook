@@ -1927,36 +1927,28 @@ int** pathSum(struct TreeNode* root, int target, int* returnSize, int** returnCo
 
 ![](img_jz/e1.png)
 
-```
-输入：head = [[7,null],[13,0],[11,4],[10,2],[1,0]]
-输出：[[7,null],[13,0],[11,4],[10,2],[1,0]]
-```
+> 输入：head = [[7,null],[13,0],[11,4],[10,2],[1,0]]
+> 输出：[[7,null],[13,0],[11,4],[10,2],[1,0]]
 
 **示例 2：**
 
 ![](img_jz/e2.png)
 
-```
-输入：head = [[1,1],[2,1]]
-输出：[[1,1],[2,1]]
-```
+> 输入：head = [[1,1],[2,1]]
+> 输出：[[1,1],[2,1]]
 
 **示例 3：**
 
 ![](img_jz/e3.png)
 
-```
-输入：head = [[3,null],[3,0],[3,null]]
-输出：[[3,null],[3,0],[3,null]]
-```
+> 输入：head = [[3,null],[3,0],[3,null]]
+> 输出：[[3,null],[3,0],[3,null]]
 
 **示例 4：**
 
-```
-输入：head = []
-输出：[]
-解释：给定的链表为空（空指针），因此返回 null。
-```
+> 输入：head = []
+> 输出：[]
+> 解释：给定的链表为空（空指针），因此返回 null。
 
 **提示：**
 
@@ -1964,62 +1956,49 @@ int** pathSum(struct TreeNode* root, int target, int* returnSize, int** returnCo
 * Node.random 为空（null）或指向链表中的节点。
 * 节点数目不超过 1000 。
 
-```java
-class Solution {
-    public Node copyRandomList(Node head) {
-        if(head == null) return null;
-        Node cur = head;
-        Map<Node, Node> map = new HashMap<>();
-        // 3. 复制各节点，并建立 “原节点 -> 新节点” 的 Map 映射
-        while(cur != null) {
-            map.put(cur, new Node(cur.val));
-            cur = cur.next;
-        }
-        cur = head;
-        // 4. 构建新链表的 next 和 random 指向
-        while(cur != null) {
-            map.get(cur).next = map.get(cur.next);
-            map.get(cur).random = map.get(cur.random);
-            cur = cur.next;
-        }
-        // 5. 返回新链表的头节点
-        return map.get(head);
-    }
-}
-```
+这题leetcode没有提供C语言的环境，不过C++的实现和C语言基本一致。
 
-```java
+```c++
 class Solution {
-    public Node copyRandomList(Node head) {
-        if(head == null) return null;
-        Node cur = head;
-        // 1. 复制各节点，并构建拼接链表
-        while(cur != null) {
-            Node tmp = new Node(cur.val);
-            tmp.next = cur.next;
-            cur.next = tmp;
-            cur = tmp.next;
+public:
+    Node* copyRandomList(Node* head) {
+        if (head == NULL) return head;
+
+        Node *cur = head;
+
+        //1.复制各节点，并构建拼接链表
+        while (cur != NULL) {
+            Node *tmp = new Node(cur->val);
+            tmp->next = cur->next;
+            cur->next = tmp;
+            cur = tmp->next;
         }
-        // 2. 构建各新节点的 random 指向
+
+        //2.连接random指针
         cur = head;
-        while(cur != null) {
-            if(cur.random != null)
-                cur.next.random = cur.random.next;
-            cur = cur.next.next;
+        while (cur != NULL) {
+            if (cur->random != NULL) {
+                cur->next->random = cur->random->next;
+            }
+            cur = cur->next->next;
         }
-        // 3. 拆分两链表
-        cur = head.next;
-        Node pre = head, res = head.next;
-        while(cur.next != null) {
-            pre.next = pre.next.next;
-            cur.next = cur.next.next;
-            pre = pre.next;
-            cur = cur.next;
+
+        //3.拆分两链表
+        cur = head->next;
+        Node *pre = head;
+        Node *res = head->next;
+        while (cur->next != NULL) {
+            pre->next = pre->next->next;
+            cur->next = cur->next->next;
+            pre = pre->next;
+            cur = cur->next;
         }
-        pre.next = null; // 单独处理原链表尾节点
-        return res;      // 返回新链表头节点
+
+        pre->next = NULL;
+        return res;
+
     }
-}
+};
 ```
 
 #### [剑指 Offer 36. 二叉搜索树与双向链表](https://leetcode-cn.com/problems/er-cha-sou-suo-shu-yu-shuang-xiang-lian-biao-lcof/)
@@ -2038,26 +2017,41 @@ class Solution {
 
 特别地，我们希望可以就地完成转换操作。当转化完成以后，树中节点的左指针需要指向前驱，树中节点的右指针需要指向后继。还需要返回链表中的第一个节点的指针。
 
-```java
+```c++
 class Solution {
-    Node pre, head;
-    public Node treeToDoublyList(Node root) {
-        if(root == null) return null;
+public:
+    Node *pre = NULL;
+    Node *head = NULL;
+    void dfs(Node *root) {
+        if (root == NULL) {
+            return;
+        }
+
+        dfs(root->left);
+       
+        if (pre != NULL){
+            pre->right = root;
+        } else {
+            head = root;
+        }
+        root->left = pre;
+        pre = root;
+
+        dfs(root->right);
+
+    }
+
+    Node* treeToDoublyList(Node* root) {
+        if (root == NULL) {
+            return root;
+        }
         dfs(root);
-        head.left = pre;
-        pre.right = head;
+        head->left = pre;
+        pre->right = head;
+
         return head;
     }
-    void dfs(Node cur) {
-        if(cur == null) return;
-        dfs(cur.left);
-        if(pre != null) pre.right = cur;
-        else head = cur;
-        cur.left = pre;
-        pre = cur;
-        dfs(cur.right);
-    }
-}
+};
 ```
 
 #### [剑指 Offer 37. 序列化二叉树](https://leetcode-cn.com/problems/xu-lie-hua-er-cha-shu-lcof/)
@@ -2068,59 +2062,117 @@ class Solution {
 
 你可以将以下二叉树：
 
-```
-    1
-   / \
-  2   3
-     / \
-    4   5
+> ​    1
+>
+>    / \
+>   2   3
+>      / \
+>     4   5
+>
+> 序列化为 "[1,2,3,null,null,4,5]"
 
-序列化为 "[1,2,3,null,null,4,5]"
-```
-
-```java
-public class Codec {
-    public String serialize(TreeNode root) {
-        if(root == null) return "[]";
-        StringBuilder res = new StringBuilder("[");
-        Queue<TreeNode> queue = new LinkedList<>() {{ add(root); }};
-        while(!queue.isEmpty()) {
-            TreeNode node = queue.poll();
-            if(node != null) {
-                res.append(node.val + ",");
-                queue.add(node.left);
-                queue.add(node.right);
-            }
-            else res.append("null,");
-        }
-        res.deleteCharAt(res.length() - 1);
-        res.append("]");
-        return res.toString();
+```c
+#define MAX_SIZE 100000
+#define CHAR_SIZE 5 
+char* serialize(struct TreeNode* root) {
+    if (root == NULL) {
+        return NULL;
     }
 
-    public TreeNode deserialize(String data) {
-        if(data.equals("[]")) return null;
-        String[] vals = data.substring(1, data.length() - 1).split(",");
-        TreeNode root = new TreeNode(Integer.parseInt(vals[0]));
-        Queue<TreeNode> queue = new LinkedList<>() {{ add(root); }};
-        int i = 1;
-        while(!queue.isEmpty()) {
-            TreeNode node = queue.poll();
-            if(!vals[i].equals("null")) {
-                node.left = new TreeNode(Integer.parseInt(vals[i]));
-                queue.add(node.left);
-            }
-            i++;
-            if(!vals[i].equals("null")) {
-                node.right = new TreeNode(Integer.parseInt(vals[i]));
-                queue.add(node.right);
-            }
-            i++;
-        }
-        return root;
+    char *res = (char *)malloc(MAX_SIZE * sizeof(char));
+    if (res == NULL) {
+        return NULL;
     }
+    memset(res, 0, MAX_SIZE * sizeof(char));
+    int resSize = 0;
+
+    struct TreeNode *queue[MAX_SIZE];
+    int head = 0;
+    int tail = 0;
+    queue[tail++] = root;
+ 
+    while (head < tail) {
+        struct TreeNode *node = queue[head++];
+
+        if (node == NULL) {
+            strcat(res,"null,");
+        } else {
+            char tmp[CHAR_SIZE] = {0};
+            sprintf(tmp, "%d", node->val);
+            strcat(res, tmp);
+            strcat(res, ",");
+            queue[tail++] = node->left;
+            queue[tail++] = node->right;
+        }
+       
+    }
+
+    int len = strlen(res);
+    res[len - 1] = '\0';
+   
+    return res;
+
 }
 
+/** Decodes your encoded data to tree. */
+struct TreeNode* deserialize(char* data) {
+    if (data == NULL) {
+        return NULL;
+    }
+
+    struct TreeNode *root = (struct TreeNode *)malloc(sizeof(struct TreeNode));
+    if (root == NULL) {
+        return NULL;
+    }
+    
+    char *d=",";
+    char *p;
+        
+    p = strtok(data,d);
+    root->val = atoi(p);
+
+    struct TreeNode *queue[MAX_SIZE];
+    int head = 0;
+    int tail = 0;
+    queue[tail++] = root;
+    
+    while (head < tail) {
+        struct TreeNode *node = queue[head++];
+         
+        if (p != NULL) {
+            p = strtok(NULL,d);
+        }
+        if (strcmp(p,"null") == 0) {
+            node->left = NULL;
+        } else {
+            struct TreeNode *left = (struct TreeNode *)malloc(sizeof(struct TreeNode));
+            if (left == NULL) {
+                return NULL;
+            }
+            left->val = atoi(p);
+            queue[tail++] = left;
+            node->left = left;
+        } 
+
+        if (p != NULL) {
+            p = strtok(NULL,d);
+        }
+        if (strcmp(p,"null") == 0) {
+            node->right = NULL;
+        } else {
+            struct TreeNode *right = (struct TreeNode *)malloc(sizeof(struct TreeNode));
+            if (right == NULL) {
+                return NULL;
+            }
+            right->val = atoi(p);
+            queue[tail++] = right;
+            node->right = right;
+        } 
+        
+    }
+
+    return root;
+}
 ```
 
 #### [剑指 Offer 38. 字符串的排列](https://leetcode-cn.com/problems/zi-fu-chuan-de-pai-lie-lcof/)
@@ -2131,43 +2183,73 @@ public class Codec {
 
  **示例:**
 
-```
-输入：s = "abc"
-输出：["abc","acb","bac","bca","cab","cba"]
-```
+> 输入：s = "abc"
+> 输出：["abc","acb","bac","bca","cab","cba"]
 
 **限制：**
 
 1 <= s 的长度 <= 8
 
-```java
-class Solution {
-    List<String> res = new LinkedList<>();
-    char[] c;
-    public String[] permutation(String s) {
-        c = s.toCharArray();
-        dfs(0);
-        return res.toArray(new String[res.size()]);
-    }
-    void dfs(int x) {
-        if(x == c.length - 1) {
-            res.add(String.valueOf(c));      // 添加排列方案
-            return;
-        }
-        HashSet<Character> set = new HashSet<>();
-        for(int i = x; i < c.length; i++) {
-            if(set.contains(c[i])) continue; // 重复，因此剪枝
-            set.add(c[i]);
-            swap(i, x);                      // 交换，将 c[i] 固定在第 x 位
-            dfs(x + 1);                      // 开启固定第 x + 1 位字符
-            swap(i, x);                      // 恢复交换
+```c
+#define MAX_SIZE 8*7*6*5*4*3*2*1
+#define MAX_CHAR_SIZE 8
+
+char **g_res;
+int g_resSize;
+
+bool IsDuplicate(char *s, int start, int end)
+{
+    for (int i = start; i < end; i++) {
+        if (s[i] == s[end]){
+            return true;
         }
     }
-    void swap(int a, int b) {
-        char tmp = c[a];
-        c[a] = c[b];
-        c[b] = tmp;
+    return false;
+}
+
+void Swap(char *s,int i,int index)
+{
+    int tmp = s[i];
+    s[i] = s[index];
+    s[index] = tmp;
+}
+
+void Dfs(char *s,int index) 
+{
+    int len = strlen(s);
+    if (index == len - 1) {
+        char  *tmp = (char *)malloc( sizeof(char) * (len + 1));
+        strcpy(tmp,s);
+        g_res[g_resSize++] = tmp;
+        return;
     }
+
+   
+    for (int i = index; i < len; i++) {
+        if (IsDuplicate(s,index,i)) {
+            continue;
+        }
+        
+        Swap(s, i, index);
+        Dfs(s, index + 1);
+        Swap(s, i, index);
+    }
+   
+
+} 
+char** permutation(char* s, int* returnSize){
+    g_res = (char **)malloc(MAX_SIZE * sizeof(char *));
+    if (g_res == NULL) {
+        return NULL;
+    }
+    memset(g_res, 0, MAX_SIZE *sizeof(char *));
+    g_resSize = 0;
+
+    Dfs(s, 0);
+
+    *returnSize = g_resSize;
+    return g_res;
+
 }
 ```
 
@@ -2179,38 +2261,30 @@ class Solution {
 
  **示例 1:**
 
-```
-输入: [1, 2, 3, 2, 2, 2, 5, 4, 2]
-输出: 2
-```
+> 输入: [1, 2, 3, 2, 2, 2, 5, 4, 2]
+> 输出: 2
 
 **限制：**
 
 1 <= 数组长度 <= 50000
 
-```java
-class Solution {
-    public int majorityElement(int[] nums) {
-    
-        int key = nums[0];
-        int count = 1 ;
-
-        for(int i = 1 ; i < nums.length; i++){
-            if(key != nums[i] && count > 0){
-                count--;
-            }
-            else if(key != nums[i] && count == 0){
-                key = nums[i];
-            }
-
-            else{
-                count++;
-            }
-
+```c
+int majorityElement(int* nums, int numsSize){
+    int count = 1;
+    int num = nums[0];
+    for (int i = 1; i < numsSize; i++) {
+        if (count > 0 && num != nums[i]) {
+            count--;
+        } else if (num != nums[i]) {
+            num = nums[i];
+            count = 1;
+        } else {
+            count++;
         }
-
-        return key;
     }
+
+    return num;
+
 }
 ```
 
@@ -2220,122 +2294,75 @@ class Solution {
 
  **示例 1：**
 
-```
-输入：arr = [3,2,1], k = 2
-输出：[1,2] 或者 [2,1]
-```
+> 输入：arr = [3,2,1], k = 2
+> 输出：[1,2] 或者 [2,1]
 
 **示例 2：**
 
-```
-输入：arr = [0,1,2,1], k = 1
-输出：[0]
-```
+> 输入：arr = [0,1,2,1], k = 1
+> 输出：[0]
 
 **限制：**
 
 * 0 <= k <= arr.length <= 10000
 * 0 <= arr[i] <= 10000
 
-```java
-//堆
-class Solution {
-    public int[] getLeastNumbers(int[] arr, int k) {
-        int[] vec = new int[k];
-        if (k == 0) { // 排除 0 的情况
-            return vec;
+```c
+int Partition(int *arr, int a, int b)
+{   
+    int pivot = arr[a];
+    int l = a + 1;
+    int r = b;
+    while (l < r) {
+        while (l < r && arr[l] <= pivot) {
+            l++;
         }
-        PriorityQueue<Integer> queue = new PriorityQueue<Integer>(new Comparator<Integer>() {
-            public int compare(Integer num1, Integer num2) {
-                return num2 - num1;
-            }
-        });
-        for (int i = 0; i < k; ++i) {
-            queue.offer(arr[i]);
+        while (l < r && arr[r] > pivot) {
+            r--;
         }
-        for (int i = k; i < arr.length; ++i) {
-            if (queue.peek() > arr[i]) {
-                queue.poll();
-                queue.offer(arr[i]);
-            }
+
+        if (l < r) {
+            int tmp = arr[l];
+            arr[l] = arr[r];
+            arr[r] = tmp;
         }
-        for (int i = 0; i < k; ++i) {
-            vec[i] = queue.poll();
-        }
-        return vec;
     }
+
+    while (r > a && arr[r] >= pivot) {
+        r--;
+    }
+
+    if (pivot > arr[r]) {
+        arr[a] = arr[r];
+        arr[r] = pivot;
+        return r;
+    } else {
+        return a;
+    }
+    
 }
-```
 
-```java
-//快排的变形
-class Solution {
-	public int[] getLeastNumbers(int[] arr, int k) {
-		if (k == 0) {
-			return new int[0];
-		} else if (arr.length <= k) {
-			return arr;
-		}
+void QuickSort(int *arr, int l, int r, int k)
+{
+    int pivot = Partition(arr, l, r);
 
-		// 原地不断划分数组
-		partitionArray(arr, 0, arr.length - 1, k);
+    if (pivot == k) {
+        return;
+    } else if (pivot > k) {
+        QuickSort(arr, l, pivot - 1, k);
+    } else {
+        QuickSort(arr, pivot + 1, r, k);
+    }
 
-		// 数组的前 k 个数此时就是最小的 k 个数，将其存入结果
-		int[] res = new int[k];
-		for (int i = 0; i < k; i++) {
-			res[i] = arr[i];
-		}
-		return res;
-	}
-
-	void partitionArray(int[] arr, int lo, int hi, int k) {
-		// 做一次 partition 操作
-		int m = partition(arr, lo, hi);
-		// 此时数组前 m 个数，就是最小的 m 个数
-		if (k == m) {
-			// 正好找到最小的 k(m) 个数
-			return;
-		} else if (k < m) {
-			// 最小的 k 个数一定在前 m 个数中，递归划分
-			partitionArray(arr, lo, m - 1, k);
-		} else {
-			// 在右侧数组中寻找最小的 k-m 个数
-			partitionArray(arr, m + 1, hi, k);
-		}
-	}
-
-	public int partition(int[] list, int first, int last) {
-		int pivot = list[first];
-		int low = first + 1;
-		int high = last;
-
-		while (high > low) {
-
-			while (low <= high && list[low] <= pivot)
-				low++;
-
-			while (low <= high && list[high] > pivot)
-				high--;
-
-			if (high > low) {
-				int temp = list[high];
-				list[high] = list[low];
-				list[low] = temp;
-			}
-		}
-
-		while (high > first && list[high] >= pivot)
-			high--;
-
-		if (pivot > list[high]) {
-			list[first] = list[high];
-			list[high] = pivot;
-			return high;
-		} else {
-			return first;
-		}
-	}
-
+}
+int* getLeastNumbers(int* arr, int arrSize, int k, int* returnSize){
+    if (arrSize == 0 || arrSize <= k) {
+        *returnSize = arrSize;
+        return arr;
+    } 
+    QuickSort(arr, 0, arrSize - 1, k);
+    *returnSize =  k;
+    return arr;
 }
 ```
 
@@ -2356,25 +2383,23 @@ class Solution {
 
 **示例 1：**
 
-```
-输入：
-["MedianFinder","addNum","addNum","findMedian","addNum","findMedian"]
-[[],[1],[2],[],[3],[]]
-输出：[null,null,null,1.50000,null,2.00000]
-```
+> 输入：
+> ["MedianFinder","addNum","addNum","findMedian","addNum","findMedian"]
+> [[],[1],[2],[],[3],[]]
+> 输出：[null,null,null,1.50000,null,2.00000]
 
 **示例 2：**
 
-```
-输入：
-["MedianFinder","addNum","findMedian","addNum","findMedian"]
-[[],[2],[],[3],[]]
-输出：[null,null,2.00000,null,2.50000]
-```
+> 输入：
+> ["MedianFinder","addNum","findMedian","addNum","findMedian"]
+> [[],[2],[],[3],[]]
+> 输出：[null,null,2.00000,null,2.50000]
 
 **限制：**
 
 * 最多会对 addNum、findMedian 进行 50000 次调用。
+
+这题如果用C语言可以先构造堆这种数据结构，然后按照下面的方法来做。
 
 ```java
 class MedianFinder {
@@ -2407,31 +2432,31 @@ class MedianFinder {
 
  **示例1:**
 
-```
-输入: nums = [-2,1,-3,4,-1,2,1,-5,4]
-输出: 6
-解释: 连续子数组 [4,-1,2,1] 的和最大，为 6。
-```
+> 输入: nums = [-2,1,-3,4,-1,2,1,-5,4]
+> 输出: 6
+> 解释: 连续子数组 [4,-1,2,1] 的和最大，为 6。
 
 **提示：**
 
 * 1 <= arr.length <= 10^5
 * -100 <= arr[i] <= 100
 
-```java
-class Solution {
-    public int maxSubArray(int[] nums) {
-        int max = nums[0];
-        int former = 0;//用于记录dp[i-1]的值，对于dp[0]而言，其前面的dp[-1]=0
-        int cur = nums[0];//用于记录dp[i]的值
-        for(int num:nums){
-            cur = num;
-            if(former>0) cur +=former;
-            if(cur>max) max = cur;
-            former=cur;
+```c
+#define MAX(a, b) (a) > (b) ? (a):(b)
+int maxSubArray(int* nums, int numsSize){
+    
+    int dp[numsSize];
+    dp[0] = nums[0];
+    int res = nums[0];
+
+    for (int i = 1; i < numsSize; i++) {
+        dp[i] = MAX(dp[i - 1] + nums[i],nums[i]);
+        if (res < dp[i]) {
+            res = dp[i];
         }
-        return max;
-    }
+    }  
+
+    return res;  
 }
 ```
 
@@ -2443,17 +2468,13 @@ class Solution {
 
  **示例 1：**
 
-```
-输入：n = 12
-输出：5
-```
+> 输入：n = 12
+> 输出：5
 
 **示例 2：**
 
-```
-输入：n = 13
-输出：6
-```
+> 输入：n = 13
+> 输出：6
 
 **限制：**
 
@@ -2461,7 +2482,7 @@ class Solution {
 
 ###### 解题思路
 
-f(n))函数的意思是1～n这n个整数的十进制表示中1出现的次数，将n拆分为两部分，最高一位的数字high和其他位的数字last，分别判断情况后将结果相加，看例子更加简单。
+f(n)函数的意思是1～n这n个整数的十进制表示中1出现的次数，将n拆分为两部分，最高一位的数字high和其他位的数字last，分别判断情况后将结果相加，看例子更加简单。
 
 例子如n=1234，high=1, pow=1000, last=234
 
@@ -2474,47 +2495,34 @@ f(n))函数的意思是1～n这n个整数的十进制表示中1出现的次数�
 
 所以全部加起来是f(pow-1) + last + 1 + f(last);
 
-```java
-class Solution {
-    public int countDigitOne(int n) {
-        int digit = 1, res = 0;
-        int high = n / 10, cur = n % 10, low = 0;
-        while(high != 0 || cur != 0) {
-            if(cur == 0) res += high * digit;
-            else if(cur == 1) res += high * digit + low + 1;
-            else res += (high + 1) * digit;
-            low += cur * digit;
-            cur = high % 10;
-            high /= 10;
-            digit *= 10;
-        }
-        return res;
-    }
-}
-```
+```c
+#include <math.h>
 
-```java
-//递归
-class Solution {
-    public int countDigitOne(int n) {
-        return f(n);
+#define CHAR_SIZE 16
+
+int Count(int num)
+{
+    if (num <= 0) {
+        return 0;
     }
-    
-    private int f(int n ) {
-        if (n <= 0)
-            return 0;
-        String s = String.valueOf(n);
-        int high = s.charAt(0) - '0';
-        int pow = (int) Math.pow(10, s.length()-1);
-        int last = n - high*pow;
-        if (high == 1) {
-            return f(pow-1) + last + 1 + f(last);
-        } else {
-            return pow + high*f(pow-1) + f(last);
-        }
+
+    char s[CHAR_SIZE];
+    sprintf(s, "%d",num);       
+      
+    int high = s[0] - '0';
+    int po = (int)pow(10, strlen(s) - 1);
+    int last = num - high * po;
+  
+    if (high == 1) {
+        return Count(po-1) + last + 1 + Count(last);
+    } else {
+        return po + high * Count(po-1) + Count(last);
     }
 }
 
+int countDigitOne(int n){
+    return Count(n);
+}
 ```
 
 #### [剑指 Offer 44. 数字序列中某一位的数字](https://leetcode-cn.com/problems/shu-zi-xu-lie-zhong-mou-yi-wei-de-shu-zi-lcof/)
@@ -2525,44 +2533,42 @@ class Solution {
 
  **示例 1：**
 
-```
-输入：n = 3
-输出：3
-```
+> 输入：n = 3
+> 输出：3
 
 
 **示例 2：**
 
-```
-输入：n = 11
-输出：0
-```
+> 输入：n = 11
+> 输出：0
 
 **限制：**
 
 * 0 <= n < 2^31
 
-```java
-class Solution {
-    public int findNthDigit(int n) {
-        
-        int digital = 1; //几位数
-        long start = 1; //n位数是从哪个数开始的(2位数是从10开始的)
-        long count = 9; //n位数总共有多少个数字(2位数有2*90个数字)
+```c
+#define CHAR_SIZE 100
+int findNthDigit(int n)
+{
+    int digital = 1; //几位数
+    long long start = 1; //n位数是从哪个数开始的(2位数是从10开始的)
+    long long count = 9; //n位数总共有多少个数字(2位数有2*90个数字)
 
-        while(n > count){ //确定第n位对应是几位数
-            n -= count;
-            digital += 1;
-            start *= 10;
-            count = 9 * start * digital;
-        }
-
-        //确定是哪个数
-        long sum = start + (n - 1)/digital; //因为start是从1开始的，所以要用n-1整除
-
-        //确定在这个数的哪一位
-        return Long.toString(sum).charAt((n - 1) % digital) - '0';
+    while(n > count){ //确定第n位对应是几位数
+        n -= count;
+        digital += 1;
+        start *= 10;
+        count = 9 * start * digital;
     }
+
+    //确定是哪个数
+    long long sum = start + (n - 1)/digital; //因为start是从1开始的，所以要用n-1整除
+    
+    char s[CHAR_SIZE] = {0};
+    sprintf(s, "%ld",sum);
+    //确定在这个数的哪一位
+    int idnex = (n - 1) % digital;
+    return s[idnex] - '0';
 }
 ```
 
@@ -2572,17 +2578,13 @@ class Solution {
 
  **示例 1:**
 
-```
-输入: [10,2]
-输出: "102"
-```
+> 输入: [10,2]
+> 输出: "102"
 
 **示例 2:**
 
-```
-输入: [3,30,34,5,9]
-输出: "3033459"
-```
+> 输入: [3,30,34,5,9]
+> 输出: "3033459"
 
 **提示:**
 
@@ -2593,67 +2595,41 @@ class Solution {
 * 输出结果可能非常大，所以你需要返回一个字符串而不是整数
 * 拼接起来的数字可能会有前导 0，最后结果不需要去掉前导 0
 
-```java
-class Solution {
-    public String minNumber(int[] nums) {
-        //把int数组转换成字符串的形式，用字符串进行比较
-        String[] str = new String[nums.length];
-        for(int i = 0 ; i < str.length; i++){
-            str[i] = String.valueOf(nums[i]);
-        }
+```c
+#define MAX_SIZE 100
+#define RES_SIZE 2000
 
-        //字符串排序
-        quickSort(str,0,str.length-1);
+int Cmp(const void *a, const void *b)
+{
+    char s1[MAX_SIZE];
+    sprintf(s1,"%d%d", *(int *)a, *(int *)b);
+     
+    char s2[MAX_SIZE];
+    sprintf(s2,"%d%d", *(int *)b, *(int *)a);
+  
+    return strcmp(s1,s2);
+}
 
-        //拼接排序好的字符串
-        StringBuilder res = new StringBuilder();
-        for(int i = 0 ; i < str.length; i++){
-            res.append(str[i]);
-        }
-
-        return res.toString();
+char* minNumber(int* nums, int numsSize){
+    char *res = (char *)malloc(RES_SIZE * sizeof(char));
+    if (res == NULL) {
+        return NULL;
     }
+    memset(res, 0, RES_SIZE * sizeof(char));
+    int size = 0;
 
-    //用快排
-    public void quickSort(String[] strs, int low, int high) {
-        if (low < high) {
-            int pivotIndex = partition(strs, low, high);
-            quickSort(strs, low, pivotIndex - 1);
-            quickSort(strs, pivotIndex + 1, high);
+    qsort(nums,numsSize,sizeof(int),Cmp);
+
+    for (int i = 0; i < numsSize; i++) {
+        char *tmp = (char *)malloc(MAX_SIZE * sizeof(char));
+        sprintf(tmp, "%d",nums[i]);
+        for (int j = 0; j < strlen(tmp); j++) {
+            res[size++] = tmp[j];
         }
+        free(tmp);
     }
-
-    public int partition(String[] strs, int l, int r) {
-        //数组的第一个数为基准元素
-        String pivot = strs[l];
-        int low = l + 1;
-        int high = r;
-        while (low < high) {
-            
-            while (low <= high && (strs[high] + pivot).compareTo(pivot + strs[high]) >= 0)
-                high--;
-            while (low <= high && (strs[low] + pivot).compareTo(pivot + strs[low]) <= 0)
-                low++;
-            
-            if(low < high){
-                String tmp = strs[high];
-                strs[high] = strs[low];
-                strs[low] = tmp;
-            }
-        }
-        
-        while(high > l && (strs[high] + pivot).compareTo(pivot + strs[high]) >= 0)
-            high--;
-        if((strs[high] + pivot).compareTo(pivot + strs[high]) < 0){
-            strs[l] = strs[high];
-            strs[high] = pivot;
-            return high;
-        }
-        else{
-            return l;
-        }
-    }
-
+    res[size] = '\0';
+    return res;
 }
 ```
 
@@ -2673,24 +2649,33 @@ class Solution {
 
 * 0 <= num < 231
 
-```java
-class Solution {
-    public int translateNum(int num) {
-        //相当于青蛙跳台阶的变式，如果num的一个长度为2的子串i在10-25之间，
-        //表示有两种表示成字母的方法（分开表示或合在一起表示）
+```c
+#define MAX_NUM_LEN 15
+int translateNum(int num){
+    char s[MAX_NUM_LEN];
+    sprintf(s, "%d", num);
 
-       String str = String.valueOf(num);
-
-        int a = 1, b = 1; //a表示k-2, b 表示k-1
-        for(int i = 2; i <= str.length(); i++){
-            String tmp = str.substring(i-2,i); //不包括下标为i的子串
-            int sum = (tmp.compareTo("10") >= 0 &&  tmp.compareTo("25")<= 0) ? a+b : b;
-            a = b;
-            b = sum;
-        }
-
-        return b;
+    int dp[MAX_NUM_LEN];
+    memset(dp, 0, MAX_NUM_LEN * sizeof(int));
+    dp[0] = 1;
+    if (s[0] - '0' == 1 || (s[0] - '0' == 2 && s[1] <= '5')) {
+        dp[1] = 2;
+    } else {
+        dp[1] = 1;
     }
+
+    int len = strlen(s);
+    for (int i = 2; i < len; i++) {
+        if (s[i - 1] - '0' == 1) {
+            dp[i] = dp[i - 1] + dp[i - 2];
+        } else if (s[i - 1] - '0' == 2 && s[i] <= '5') {
+            dp[i] = dp[i - 1] + dp[i - 2];
+        } else {
+            dp[i] = dp[i - 1];
+        }
+    }
+
+    return dp[len - 1];
 }
 ```
 
@@ -2700,40 +2685,40 @@ class Solution {
 
  **示例 1:**
 
-```
-输入: 
-[
-  [1,3,1],
-  [1,5,1],
-  [4,2,1]
-]
-输出: 12
-解释: 路径 1→3→5→2→1 可以拿到最多价值的礼物
-```
+> 输入: 
+> [
+>   [1,3,1],
+>   [1,5,1],
+>   [4,2,1]
+> ]
+> 输出: 12
+> 解释: 路径 1→3→5→2→1 可以拿到最多价值的礼物
 
 **提示：**
 
 * 0 < grid.length <= 200
 * 0 < grid[0].length <= 200
 
-```java
-class Solution {
-    
-    public int maxValue(int[][] grid) {
-        int[][] dp = new int[grid.length + 1 ][grid[0].length + 1];
-        
-        for(int i = 1 ; i < dp.length; i++ ){
-            for(int j = 1 ; j < dp[0].length; j++){
-                if(i == 1 && j == 1)  dp[i][j] = grid[0][0];
-                else dp[i][j] =  Math.max(dp[i-1][j], dp[i][j-1]) + grid[i-1][j-1];
-            }
-        }
+```c
+#define MAX(a,b) ((a) > (b) ? (a):(b))
 
-        return dp[grid.length][grid[0].length];
-      
+int maxValue(int** grid, int gridSize, int* gridColSize){
+    int dp[gridSize][gridColSize[0]];
+    memset(dp, 0, gridSize * gridColSize[0] * sizeof(int));
+    dp[0][0] = grid[0][0];
+    for (int i = 1; i < gridSize; i++) {        
+        dp[i][0] = dp[i - 1][0] + grid[i][0];   
     }
-
-
+    for (int j = 1; j < gridColSize[0]; j++) {
+        dp[0][j] = dp[0][j - 1] + grid[0][j];
+    }
+    
+    for (int i = 1; i < gridSize; i++) {
+        for (int j = 1; j < gridColSize[0]; j++) {             
+            dp[i][j] = MAX(dp[i - 1][j], dp[i][j - 1]) + grid[i][j];
+        }
+    }
+    return dp[gridSize - 1][gridColSize[0] - 1];
 }
 ```
 
@@ -2743,53 +2728,96 @@ class Solution {
 
  **示例 1:**
 
-```
-输入: "abcabcbb"
-输出: 3 
-解释: 因为无重复字符的最长子串是 "abc"，所以其长度为 3。
-```
+> 输入: "abcabcbb"
+> 输出: 3 
+> 解释: 因为无重复字符的最长子串是 "abc"，所以其长度为 3。
 
 
 **示例 2:**
 
-```
-输入: "bbbbb"
-输出: 1
-解释: 因为无重复字符的最长子串是 "b"，所以其长度为 1。
-```
+> 输入: "bbbbb"
+> 输出: 1
+> 解释: 因为无重复字符的最长子串是 "b"，所以其长度为 1。
 
 
 **示例 3:**
 
-```
-输入: "pwwkew"
-输出: 3
-解释: 因为无重复字符的最长子串是 "wke"，所以其长度为 3。
-     请注意，你的答案必须是 子串 的长度，"pwke" 是一个子序列，不是子串。
-```
+> 输入: "pwwkew"
+> 输出: 3
+> 解释: 因为无重复字符的最长子串是 "wke"，所以其长度为 3。
+>      请注意，你的答案必须是 子串 的长度，"pwke" 是一个子序列，不是子串。
 
 **提示：**
 
 * s.length <= 40000
 
-```java
-class Solution {
-    public int lengthOfLongestSubstring(String s) {
-        HashMap<Character,Integer> map = new HashMap<>();
-      
-        int res = 0, left = 0;
-        for(int i = 0 ; i < s.length(); i++){
-            if(map.containsKey(s.charAt(i))){
-               left = Math.max(left, map.get(s.charAt(i)) + 1 );   //防止出现"abba"的情形
-               
-            }
+```c
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+int IsContains(char *s, char c, int size)
+{
+    for (int i = size - 1; i >= 0; i--) {
+        if (s[i] == c) {
+            return i;
+        }
+    }
 
-            map.put(s.charAt(i),i);
-            res = Math.max(res, i - left + 1);      
+    return -1;
+}
+int lengthOfLongestSubstring(char* s){
+    int len = strlen(s);
+    if (len == 0) {
+        return 0;
+    }
+    int dp[len];
+    memset(dp, 0, len * sizeof(int));
+
+    dp[0] = 1;
+    int res = dp[0];
+    for (int i = 1; i < len; i++) {
+        int num = IsContains(s, s[i], i);
+        if (num >= 0 && dp[i - 1] >= i - num) {
+            dp[i] = i - num;
+        } else {
+            dp[i] = dp[i - 1] + 1;
+        }
+        
+        res = MAX(res,dp[i]);
+    }
+
+    return res;
+}
+```
+
+```c
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+bool IsContains(char *s, int l, int r)
+{
+    for (int i = r -1; i >= l; i--) {
+        if (s[i] == s[r]) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+int lengthOfLongestSubstring(char* s){
+    int len = strlen(s);
+    if (len == 0) {
+        return 0;
+    }
+   
+    int res = 0;
+    int r = 1;
+    for (int i = 0; i < len; i++) {
+        while (r < len && !IsContains(s, i, r)) {
+            r++;
         }
 
-        return  res;
+        res = MAX(res, r - i);
     }
+
+    return res;
 }
 ```
 
@@ -2799,11 +2827,9 @@ class Solution {
 
  **示例:**
 
-```
-输入: n = 10
-输出: 12
-解释: 1, 2, 3, 4, 5, 6, 8, 9, 10, 12 是前 10 个丑数。
-```
+> 输入: n = 10
+> 输出: 12
+> 解释: 1, 2, 3, 4, 5, 6, 8, 9, 10, 12 是前 10 个丑数。
 
 
 **说明:**  
@@ -2811,31 +2837,29 @@ class Solution {
 * 1 是丑数。
 * n 不超过1690。
 
-```java
-class Solution {
-    public int nthUglyNumber(int n) {
-        //新丑数在原丑数的基础上*2/3/5得到
+```c
+#define MIN(a,b) ((a) < (b) ? (a): (b))
+int nthUglyNumber(int n){
+    int arr[n];
 
-        int[] arr = new int[n]; //存放前n个丑数
+    int pos[3];
+    memset(pos, 0, 3 * sizeof(int));
+    arr[0] = 1;
+    for(int i = 1; i < n; i++){
+        int a = arr[pos[0]] * 2; 
+        int b = arr[pos[1]] * 3;
+        int c = arr[pos[2]] * 5;
 
-        int[] pos = new int[3]; // 对应2,3,5
-        arr[0] = 1;
-        for(int i = 1; i < n; i++){
-            int a = arr[pos[0]] * 2; 
-            int b = arr[pos[1]] * 3;
-            int c = arr[pos[2]] * 5;
+        int minNum = MIN(MIN(a,b),c);
 
-            int minNum = Math.min(Math.min(a,b),c);
+        if(a == minNum) pos[0] += 1; //6 = 2*3,a和c同时要更新
+        if(b == minNum) pos[1] += 1;
+        if(c == minNum) pos[2] += 1;
 
-            if(a == minNum) pos[0]++; //6 = 2*3,a和c同时要更新
-            if(b == minNum) pos[1]++;
-            if(c == minNum) pos[2]++;
-
-            arr[i] = minNum;
-        }
-
-        return arr[n-1];
+        arr[i] = minNum;
     }
+
+    return arr[n-1];
 }
 ```
 
@@ -2845,38 +2869,165 @@ class Solution {
 
 **示例:**
 
-```
-s = "abaccdeff"
-返回 "b"
-
-s = "" 
-返回 " "
-```
+> s = "abaccdeff"
+> 返回 "b"
+>
+> s = "" 
+> 返回 " "
 
 **限制：**
 
 0 <= s 的长度 <= 50000
 
-```java
-class Solution {
-    public char firstUniqChar(String s) {
-        HashMap<Character, Integer> dic = new HashMap<>();
-        char[] sc = s.toCharArray();
-        for(char c : sc){
-            if(!dic.containsKey(c))
-                dic.put(c, 1);  
-            else{
-                int value = dic.get(c);               
-                dic.put(c,++value);
-            }
-                
-        }
-            
-        for(char c : sc)
-            if(dic.get(c) == 1) return c;
+```c
+char firstUniqChar(char* s){
+    int len = strlen(s);
+    if (len == 0) {
         return ' ';
     }
+
+    int arr[26];
+    memset(arr, 0, 26 * sizeof(int));
+
+    for (int i = 0; i < len; i++) {
+        int index = s[i] - 'a';
+        arr[index] += 1;    
+    }
+
+    for (int i = 0; i < len; i++) {
+       int index = s[i] - 'a';
+       if (arr[index] == 1) {
+           return s[i];
+       }
+    }
+
+    return ' ';
 }
+```
+
+```c
+#define BUCKET_SIZE 26
+typedef struct Nod{
+    char key;
+    int val;
+    struct Nod *next;
+} Node;
+
+typedef struct Map { 
+    Node **node;
+} HashMap;
+
+HashMap * Init()
+{
+    HashMap * hashMap = (HashMap *)malloc(sizeof(HashMap));
+    if (hashMap == NULL) {
+        return NULL;
+    }
+    
+    Node **nod = (Node **)malloc(BUCKET_SIZE * sizeof(Node*));
+    if (nod == NULL) {
+        return NULL;
+    }
+    memset(nod, 0, BUCKET_SIZE * sizeof(Node*));
+
+    hashMap->node = nod;
+    return hashMap;
+}
+int Hash(int num)
+{
+    return num % 100;
+}
+
+int Get(HashMap *obj, char k)
+{
+    int index = Hash(k - 'a');
+    if (obj->node[index] == NULL) {
+        return 0;
+    }
+    
+    Node *p = obj->node[index];
+    while (p != NULL) {
+        if (p->key == k) {
+            return p->val;
+        }
+        p = p->next;
+    }
+
+    return 0;
+}
+
+void Put(HashMap *obj, char k, int value) 
+{  
+    Node *node = (Node *)malloc(sizeof(Node));
+    if (node == NULL) {
+        return;
+    }
+    node->key = k;
+    node->val = value;
+    node->next = NULL;
+
+    int index = Hash(k - 'a');
+    if (obj->node[index] == NULL) {
+        obj->node[index] = node;
+        return;
+    }
+    
+    Node *p = obj->node[index];
+    Node *pre = p;
+    while (p != NULL) {
+        if (p->key == k) {
+            p->val = value;
+            return;
+        }
+        pre = p;
+        p = p->next;
+    }
+    
+    pre->next = node; 
+}
+void FreeWithRecur(Node *node)
+{
+    while (node->next != NULL) {
+        free(node->next);
+    }
+
+    free(node);
+}
+
+void Free(HashMap *obj)
+{
+    for (int i = 0; i < BUCKET_SIZE; i++) {
+        if (obj->node[i] != NULL) {
+            FreeWithRecur(obj->node[i]);   
+        }    
+    }
+
+    free(obj);
+}
+
+
+char firstUniqChar(char* s){
+    int len = strlen(s);
+    if (len == 0) {
+        return ' ';
+    }
+
+    HashMap *hashMap = Init();
+
+    for (int i = 0; i < len; i++) {
+        Put(hashMap,s[i], Get(hashMap,s[i]) + 1);        
+    }
+
+    for (int i = 0; i < len; i++) {
+       if (Get(hashMap,s[i]) == 1) {
+           Free(hashMap);
+           return s[i];
+       }
+    }
+
+    return ' ';
+}
+
 ```
 
 #### [剑指 Offer 51. 数组中的逆序对](https://leetcode-cn.com/problems/shu-zu-zhong-de-ni-xu-dui-lcof/)
