@@ -3183,29 +3183,27 @@ struct ListNode *getIntersectionNode(struct ListNode *headA, struct ListNode *he
 
 * 0 <= 数组长度 <= 50000
 
-```java
-class Solution {
-    public int search(int[] nums, int target) {
-       
-        int start = binSearch(nums,target);
-        int end = binSearch(nums,target+1);
-        return end - start + (end <= nums.length-1 && nums[end] == target ? 1 : 0 );
-        //end <= nums.length-1是为了判断当只有一个元素的时候nums[end]会发生数组下标越界
-    }
-
-    public int binSearch(int[] nums,int target){
-        int l = 0, r = nums.length;
-        while (l < r) {
-            int mid = l + (r - l) / 2;
-            if (nums[mid] < target) {
-                l = mid + 1;
-            } else {
-                r = mid;
-            }
+```c
+int BinarySearch(int *nums, int l, int r, int target)
+{
+    int mid;
+    while (l <= r) {
+        mid = l + (r - l) /2;
+        if (nums[mid] < target) {
+            l = mid + 1;
+        } else if (nums[mid] > target) {
+            r = mid - 1;
+        } else {
+            r = mid - 1; //去找target的左边界
         }
-        return l;
     }
 
+    return l;
+}
+int search(int* nums, int numsSize, int target){
+    int a = BinarySearch(nums, 0, numsSize - 1, target);
+    int b = BinarySearch(nums, 0, numsSize - 1,target + 1);
+    return b - a;
 }
 ```
 
@@ -3215,46 +3213,36 @@ class Solution {
 
  **示例 1:**
 
-```
-输入: [0,1,3]
-输出: 2
-```
+> 输入: [0,1,3]
+> 输出: 2
 
 
 **示例 2:**
 
-```
-输入: [0,1,2,3,4,5,6,7,9]
-输出: 8
-```
+> 输入: [0,1,2,3,4,5,6,7,9]
+> 输出: 8
 
 **限制：**
 
 * 1 <= 数组长度 <= 10000
 
-```java
-class Solution {
-    public int missingNumber(int[] nums) {
-        int left = 0, right = nums.length;
+```c
+int missingNumber(int* nums, int numsSize){
+   
+    int l = 0;
+    int r = numsSize - 1;
+    int mid;
 
-        if(nums == null || nums.length == 0 )
-            return 0;
-
-        int mid = -1;
-        while(left < right){
-            mid = left + (right - left)/2 ;
-
-            if(nums[mid] != mid )
-                right = mid;
-            else
-                left = mid + 1;
+    while (l <= r) {
+        mid = l + (r - l) / 2;
+        if (nums[mid] == mid) {
+            l = mid + 1;
+        } else {
+            r = mid - 1;
         }
-
-        if(mid == right-1)  //假如是[0,1,2],应该返回3
-           mid++;
-
-        return mid;
     }
+
+    return l;
 }
 ```
 
@@ -3264,51 +3252,57 @@ class Solution {
 
  **示例 1:**
 
-```
-输入: root = [3,1,4,null,2], k = 1
-   3
-  / \
- 1   4
-  \
-   2
-输出: 4
-```
+> 输入: root = [3,1,4,null,2], k = 1
+>    3
+>   / \
+>  1   4
+>   \
+>    2
+> 输出: 4
 
 **示例 2:**
 
-```
-输入: root = [5,3,6,2,4,null,null,1], k = 3
-       5
-      / \
-     3   6
-    / \
-   2   4
-  /
- 1
-输出: 4
-```
+> 输入: root = [5,3,6,2,4,null,null,1], k = 3
+>        5
+>       / \
+>      3   6
+>     / \
+>    2   4
+>   /
+>  1
+> 输出: 4
 
 **限制：**
 
 * 1 ≤ k ≤ 二叉搜索树元素个数
 
-```java
-class Solution {
-    int tmp,res;
-    public int kthLargest(TreeNode root, int k) {
-        //中序遍历二叉搜索树是顺序的，只要按照右，根，左遍历就是逆序了
-        tmp = k;
-        inorder(root);
-        return res;
-    }
+```c
+int count;
 
-    public void inorder(TreeNode root){
-        if(root == null || tmp == 0) return ;
-        
-        inorder(root.right);    
-        if(--tmp == 0) res = root.val; 
-        inorder(root.left);
+void Recur(struct TreeNode* root, int *res)
+{
+    if (root == NULL || count == 0) {
+        return;
     }
+    Recur(root->right, res);
+    
+    count--;
+    if (count == 0) {
+        *res = root->val;
+        return;
+    }
+    
+    Recur(root->left, res);
+}
+
+int kthLargest(struct TreeNode* root, int k)
+{
+    int res;
+    int *p = &res;
+    count = k;
+    Recur(root, p);
+    return res;
+
 }
 ```
 
@@ -3320,11 +3314,11 @@ class Solution {
 
 给定二叉树 [3,9,20,null,null,15,7]，
 
-       3
-      / \
-      9  20
-        /  \
-       15   7
+>    3
+>   / \
+>   9  20
+>     /  \
+>    15   7
 
  返回它的最大深度 3 。
 
@@ -3332,12 +3326,16 @@ class Solution {
 
 节点总数 <= 10000
 
-```java
-class Solution {
-    public int maxDepth(TreeNode root) {
-        if(root == null) return 0;
-        return Math.max(maxDepth(root.left), maxDepth(root.right)) + 1;
+```c
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
+int maxDepth(struct TreeNode* root)
+{
+    if (root == NULL) {
+        return 0;
     }
+    
+    return MAX(maxDepth(root->left), maxDepth(root->right)) + 1;
 }
 ```
 
@@ -3349,11 +3347,12 @@ class Solution {
 
 给定二叉树 [3,9,20,null,null,15,7]
 
-        3
-       / \
-      9  20
-        /  \
-       15   7
+> ​    3
+>
+>    / \
+>   9  20
+>     /  \
+>    15   7
 
 返回 true 。
 
@@ -3361,13 +3360,14 @@ class Solution {
 
 给定二叉树 [1,2,2,3,3,null,null,4,4]
 
-           1
-          / \
-         2   2
-        / \
-       3   3
-      / \
-     4   4
+> ​        1
+> ​       / \
+> ​     2   2
+> ​	/ \
+>
+>    3   3
+>   / \
+>  4   4
 
   返回 false 。
 
@@ -3375,24 +3375,27 @@ class Solution {
 
 * 0 <= 树的结点个数 <= 10000
 
-```java
-class Solution {
+```c
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
+int maxDepth(struct TreeNode* root)
+{
+    if (root == NULL) {
+        return 0;
+    }
     
-    public boolean isBalanced(TreeNode root) {
-        
-        if(root == null) return true;
+    return MAX(maxDepth(root->left), maxDepth(root->right)) + 1;
+}
 
-        int l = deep(root.left);
-        int r = deep(root.right);
-        
-        return Math.abs( l - r ) <= 1 && isBalanced(root.left) && isBalanced(root.right); 
-        
+bool isBalanced(struct TreeNode* root)
+{
+    if (root == NULL) {
+        return true;
     }
 
-    public int deep(TreeNode root){
-        if(root == null) return 0;
-        return Math.max(deep(root.left),deep(root.right)) + 1; 
-    }
+    bool cur = abs(maxDepth(root->left) - maxDepth(root->right)) <= 1 ? true : false;
+
+    return cur && isBalanced(root->left) && isBalanced(root->right);
 }
 ```
 
