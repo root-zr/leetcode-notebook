@@ -3405,43 +3405,54 @@ bool isBalanced(struct TreeNode* root)
 
  **示例 1：**
 
-```
-输入：nums = [4,1,4,6]
-输出：[1,6] 或 [6,1]
-```
+> 输入：nums = [4,1,4,6]
+> 输出：[1,6] 或 [6,1]
 
 
 **示例 2：**
 
-```
-输入：nums = [1,2,10,4,1,4,3,3]
-输出：[2,10] 或 [10,2]
-```
+> 输入：nums = [1,2,10,4,1,4,3,3]
+> 输出：[2,10] 或 [10,2]
 
 **限制：**
 
 * 2 <= nums.length <= 10000
 
-```java
-class Solution {
-    public int[] singleNumbers(int[] nums) {
-        //任何数异或自己都等于0，0异或任何数都等于这个数本身
-        int sum = 0, m = 1 ;
+```c
+#define RES_SIZE 2
+int* singleNumbers(int* nums, int numsSize, int* returnSize){
+    //任何数异或自己都等于0，0异或任何数都等于这个数本身
+    int sum = 0, m = 1 ;
 
-        for(int x: nums)
-           sum ^= x;
-        //异或之后sum里至少有一位是为一的，找到这个位，并且用它分组
-        while((sum & m) == 0)
-            m <<= 1;    // 循环左移，计算 m
-      
-        int a = 0, b = 0;
-        for(int num: nums) {              // 遍历 nums 分组          
-            if((num & m) != 0) a ^= num;  // 当 num & m != 0
-            else b ^= num;                // 当 num & m == 0
-        }
-        return new int[] {a, b};          // 返回出现一次的数字
-
+    for (int i = 0; i < numsSize; i++) {
+        sum = sum ^ nums[i];
     }
+  
+    //异或之后sum里至少有一位是为一的，找到这个位，并且用它分组
+    while((sum & m) == 0) {
+        m <<= 1;    // 循环左移，计算 m
+    }
+
+    int a = 0, b = 0;
+    for (int i = 0; i < numsSize; i++) {
+       if((nums[i] & m) != 0) {
+           a = a ^ nums[i];  
+        } else {
+           b = b ^ nums[i];    
+       }
+       
+    }   
+   
+    *returnSize = RES_SIZE;
+    int *arr = (int *)malloc(RES_SIZE * sizeof(int));
+    if (arr == NULL) {
+        return NULL;
+    }
+    arr[0] = a;
+    arr[1] = b;
+
+    return arr;     
+
 }
 ```
 
@@ -3451,41 +3462,39 @@ class Solution {
 
  **示例 1：**
 
-```
-输入：nums = [3,4,3,3]
-输出：4
-```
+> 输入：nums = [3,4,3,3]
+> 输出：4
 
 
 **示例 2：**
 
-```
-输入：nums = [9,1,7,9,7,9,7]
-输出：1
-```
+> 输入：nums = [9,1,7,9,7,9,7]
+> 输出：1
 
 **限制：**
 
 * 1 <= nums.length <= 10000
 * 1 <= nums[i] < 2^31
 
-```java
-class Solution {
-    public int singleNumber(int[] nums) {
-        int[] counts = new int[32];
-        for(int num : nums) {
-            for(int j = 0; j < 32; j++) {  //将每个数的每一位二进制位都记录在数组中
-                counts[j] += num & 1;
-                num >>>= 1;
-            }
+```c
+#define ARR_SIZE 32
+
+int singleNumber(int* nums, int numsSize){
+    int arr[ARR_SIZE] = {0};
+
+    for (int i = 0; i < numsSize; i++) {
+        for (int j = ARR_SIZE - 1; j >= 0; j--) {
+            arr[j] += nums[i] & 1;
+            nums[i] = nums[i] >> 1;
         }
-        int res = 0, m = 3;
-        for(int i = 0; i < 32; i++) {  //将数组中的数字对3取余，然后采用左移将原来的数还原
-            res <<= 1;
-            res += counts[31 - i] % m;
-        }
-        return res;
     }
+
+    int num = 0;
+    for (int i = 0; i < ARR_SIZE; i++) {
+        num = num * 2 + arr[i] % 3; //这里是二进制位数，所以还原要乘2
+    }
+
+    return num;
 }
 ```
 
@@ -3495,54 +3504,46 @@ class Solution {
 
  **示例 1：**
 
-```
-输入：nums = [2,7,11,15], target = 9
-输出：[2,7] 或者 [7,2]
-```
+> 输入：nums = [2,7,11,15], target = 9
+> 输出：[2,7] 或者 [7,2]
 
 
 **示例 2：**
 
-```
-输入：nums = [10,26,30,31,47,60], target = 40
-输出：[10,30] 或者 [30,10]
-```
+> 输入：nums = [10,26,30,31,47,60], target = 40
+> 输出：[10,30] 或者 [30,10]
 
 **限制：**
 
 * 1 <= nums.length <= 10^5
 * 1 <= nums[i] <= 10^6
 
-```java
-class Solution {
-    public int[] twoSum(int[] nums, int target) {
-        
-        if(nums == null || nums.length == 0)
-            return nums;
-        
-        
-        int left = 0;
-        int right = nums.length-1;
-        int tmp;
-        int[] res = new int[2];
+```c
+int* twoSum(int* nums, int numsSize, int target, int* returnSize){
+    int l = 0;
+    int r = numsSize - 1;
 
-        while(left< right){
-            
-            tmp = nums[left] + nums[right];
-
-            if(tmp < target){
-                left++;
-            }else if(tmp > target){
-                right--;
-            }else{
-                res[0] = nums[left];
-                res[1] = nums[right];
-                return res; 
-            }
-        }
-
-        return res;
+    int *res = (int *)malloc(2 * sizeof(int));
+    if (res == 0) {
+        return NULL;
     }
+    memset(res, 0, 2 * sizeof(int));
+    *returnSize = 2;
+
+    while (l < r) {
+        int sum = nums[l] + nums[r];
+        if(sum > target) {
+            r--;
+        } else if (sum < target) {
+            l++;
+        } else {
+            res[0] = nums[l];
+            res[1] = nums[r];
+            return res;
+        }
+    }
+
+    return res;
 }
 ```
 
@@ -3554,48 +3555,65 @@ class Solution {
 
  **示例 1：**
 
-```
-输入：target = 9
-输出：[[2,3,4],[4,5]]
-```
+> 输入：target = 9
+> 输出：[[2,3,4],[4,5]]
 
 
 **示例 2：**
 
-```
-输入：target = 15
-输出：[[1,2,3,4,5],[4,5,6],[7,8]]
-```
+> 输入：target = 15
+> 输出：[[1,2,3,4,5],[4,5,6],[7,8]]
 
 **限制：**
 
 * 1 <= target <= 10^5
 
-```java
-class Solution {
-    public int[][] findContinuousSequence(int target) {
-        int i = 1, j = 2, s = 3;
-        List<int[]> res = new ArrayList<>();
-       
-        while(i < j) {
-            if(s == target) {
-                int[] ans = new int[j - i + 1];
-                for(int k = i; k <= j; k++)
-                    ans[k - i] = k;
-                res.add(ans);
-            }
-            if(s >= target) {
-                s -= i;
-                i++;
-            } else {
-                j++;
-                s += j;
-            }
-        }
-        return res.toArray(new int[0][]);
+```c
+#define MAX_LEN 1000
+int** findContinuousSequence(int target, int* returnSize, int** returnColumnSizes){
+    int **res = (int **)malloc(MAX_LEN * sizeof(int *));
+    if (res == NULL) {
+        return NULL;
     }
-}
+    memset(res, 0, MAX_LEN * sizeof(int *));
+    *returnColumnSizes = (int *)malloc(MAX_LEN * sizeof(int));
+    if (*returnColumnSizes == NULL) {
+        return NULL;
+    }
+    memset(*returnColumnSizes, 0, MAX_LEN * sizeof(int));
+    int size = 0;
 
+    int l = 1;
+    int r = 2;
+    int sum = 3;
+    while (l < r && r < target) {
+        if (sum > target) {
+            sum -= l;
+            l++;
+        } else if (sum < target) {
+            r++;
+            sum += r;
+        } else {
+      
+            int *arr = (int *)malloc((r - l + 1) * sizeof(int));
+            if (arr == NULL) {
+                return NULL;
+            }
+            for (int i = l; i <= r; i++) {
+                arr[i - l] = i;
+            }
+            res[size] = arr;
+            (*returnColumnSizes)[size] = r - l + 1;
+            size++; 
+
+            sum -= l;
+            l++;         
+        }
+    }
+
+    *returnSize = size;
+    return res;
+}
 ```
 
 #### [剑指 Offer 58 - I. 翻转单词顺序](https://leetcode-cn.com/problems/fan-zhuan-dan-ci-shun-xu-lcof/)
@@ -3604,50 +3622,86 @@ class Solution {
 
  **示例 1：**
 
-```
-输入: "the sky is blue"
-输出: "blue is sky the"
-```
+> 输入: "the sky is blue"
+> 输出: "blue is sky the"
 
 
 **示例 2：**
 
-```
-输入: "  hello world!  "
-输出: "world! hello"
-解释: 输入字符串可以在前面或者后面包含多余的空格，但是反转后的字符不能包括。
-```
+> 输入: "  hello world!  "
+> 输出: "world! hello"
+> 解释: 输入字符串可以在前面或者后面包含多余的空格，但是反转后的字符不能包括。
 
 
 **示例 3：**
 
-```
-输入: "a good   example"
-输出: "example good a"
-解释: 如果两个单词间有多余的空格，将反转后单词间的空格减少到只含一个。
-```
+> 输入: "a good   example"
+> 输出: "example good a"
+> 解释: 如果两个单词间有多余的空格，将反转后单词间的空格减少到只含一个。
 
 **说明：**
 
-```
-无空格字符构成一个单词。
-输入字符串可以在前面或者后面包含多余的空格，但是反转后的字符不能包括。
-如果两个单词间有多余的空格，将反转后单词间的空格减少到只含一个。
-```
+* 无空格字符构成一个单词。
+* 输入字符串可以在前面或者后面包含多余的空格，但是反转后的字符不能包括。
+* 如果两个单词间有多余的空格，将反转后单词间的空格减少到只含一个。
 
-```java
-class Solution {
-    public String reverseWords(String s) {
-        String[] strs = s.trim().split(" "); // 删除首尾空格，分割字符串
-        StringBuilder res = new StringBuilder();
-        for(int i = strs.length - 1; i >= 0; i--) { // 倒序遍历单词列表
-            if(strs[i].equals("")) continue; // 遇到空单词则跳过
-            res.append(strs[i] + " "); // 将单词拼接至 StringBuilder
+```c
+void RemoveDupSpace(char *s)
+{
+    int len = strlen(s);
+    int l = 0;
+    int r = 0;
+    while (r < len && s[r] == ' ') {
+        r++;
+    }
+
+    while (r < len) {
+        if (r > 0 && s[r] == ' ' && s[r -1] == ' ') {
+            r++;
+        } else {
+            s[l] = s[r];
+            l++;
+            r++;
         }
-        return res.toString().trim(); // 转化为字符串，删除尾部空格，并返回
+    }
+
+    if (l > 0 && s[l - 1] == ' ') {
+        s[l - 1] = '\0'; 
+    } else {
+        s[l] = '\0';
+    }    
+}
+
+void Swap(char *s, int l, int r)
+{
+    while (l < r) {
+        char tmp = s[l];
+        s[l] = s[r];
+        s[r] = tmp;
+        
+        l++;
+        r--;
     }
 }
 
+char * reverseWords(char * s)
+{
+    RemoveDupSpace(s);
+    int l = 0;
+    int len = strlen(s);
+    Swap(s, l, len - 1);
+    
+    for (int i = 0; i < len; i++) {
+        if (s[i] == ' ') {
+            Swap(s, l, i - 1);
+            l = i + 1;
+        } else if (i == len - 1) {
+            Swap(s, l, i);
+        }
+    }
+
+    return s;
+}
 ```
 
 #### [剑指 Offer 58 - II. 左旋转字符串](https://leetcode-cn.com/problems/zuo-xuan-zhuan-zi-fu-chuan-lcof/)
@@ -3656,33 +3710,35 @@ class Solution {
 
  **示例 1：**
 
-```
-输入: s = "abcdefg", k = 2
-输出: "cdefgab"
-```
+> 输入: s = "abcdefg", k = 2
+> 输出: "cdefgab"
 
 
 **示例 2：**
 
-```
-输入: s = "lrloseumgh", k = 6
-输出: "umghlrlose"
-```
+> 输入: s = "lrloseumgh", k = 6
+> 输出: "umghlrlose"
 
 **限制：**
 
 * 1 <= k < s.length <= 10000
 
-```java
-class Solution {
-    public String reverseLeftWords(String s, int n) {
-        StringBuilder res = new StringBuilder();
-        for(int i = n; i < n + s.length(); i++)
-            res.append(s.charAt(i % s.length()));
-        return res.toString();
+```c
+char* reverseLeftWords(char* s, int n){
+    char tmp[n];
+    for (int i = 0; i < n; i++) {
+        tmp[i] = s[i];
     }
-}
+    int len = strlen(s);
+    for (int i = n; i < len; i++) {
+        s[i - n] = s[i];
+    }
+    for (int i = len - n; i < len; i++) {
+        s[i] = tmp[i - (len - n)];
+    }
 
+    return s;
+}
 ```
 
 #### [剑指 Offer 59 - I. 滑动窗口的最大值](https://leetcode-cn.com/problems/hua-dong-chuang-kou-de-zui-da-zhi-lcof/)
@@ -3691,52 +3747,146 @@ class Solution {
 
 **示例:**
 
-```
-输入: nums = [1,3,-1,-3,5,3,6,7], 和 k = 3
-输出: [3,3,5,5,6,7] 
-解释: 
-
-  滑动窗口的位置                最大值
-
----------------               -----
-
-[1  3  -1] -3  5  3  6  7       3
- 1 [3  -1  -3] 5  3  6  7       3
- 1  3 [-1  -3  5] 3  6  7       5
- 1  3  -1 [-3  5  3] 6  7       5
- 1  3  -1  -3 [5  3  6] 7       6
- 1  3  -1  -3  5 [3  6  7]      7
-```
+> 输入: nums = [1,3,-1,-3,5,3,6,7], 和 k = 3
+> 输出: [3,3,5,5,6,7] 
+> 解释: 
+>
+>   滑动窗口的位置                最大值
+>
+> ---------------               -----
+>
+> [1  3  -1] -3  5  3  6  7       3
+>  1 [3  -1  -3] 5  3  6  7       3
+>  1  3 [-1  -3  5] 3  6  7       5
+>  1  3  -1 [-3  5  3] 6  7       5
+>  1  3  -1  -3 [5  3  6] 7       6
+>  1  3  -1  -3  5 [3  6  7]      7
 
 **提示：**
 
 你可以假设 k 总是有效的，在输入数组不为空的情况下，1 ≤ k ≤ 输入数组的大小。
 
-```java
-class Solution {
-    public int[] maxSlidingWindow(int[] nums, int k) {
-        if(nums == null || k < 1) return new int[0];
+```c
+typedef struct {
+    int head;
+    int tail;
+    int *arr;
+    int len;
+} CirQueue;
 
-        Deque<Integer> q = new LinkedList<>();  //队列里存放的是nums的下标
-        int[] res = new int[nums.length - k + 1];
-        
-        int index = 0;  //res的索引值
+CirQueue * Init(int k) 
+{
+    CirQueue *que = (CirQueue *)malloc(sizeof(CirQueue));
+    if (que == NULL) {
+        return NULL;
+    }
 
-        for(int i = 0 ; i < nums.length; i ++){
-            if(q.size() > 0 && i - q.peekFirst() >= k)
-                q.pollFirst();
-            while(q.size() > 0 && nums[i] > nums[q.peekLast()])
-                q.pollLast();
-            
-            q.add(i);
-            
-            if(i >= k - 1)
-                res[index++] = nums[q.peekFirst()];
+    que->arr = (int *)malloc((k + 1) * sizeof(int)); //因为循环链表有一个位是为空的
+    if (que->arr == NULL) {
+        return NULL;
+    }
+    memset(que->arr, 0, (k + 1) *sizeof(int));
+
+    que->head = 0;
+    que->tail = 0;
+    que->len = (k + 1);
+
+    return que;
+}
+
+bool IsFull(CirQueue *obj)
+{
+    if ((obj->tail + 1) % obj->len == obj->head) {
+        return true;
+    }
+
+    return false;
+}
+
+void Add(CirQueue *obj, int value) 
+{
+    if (IsFull(obj)) {
+        return;
+    }
+    obj->arr[obj->tail] = value;
+    obj->tail = (obj->tail + 1) % obj->len;
+}
+
+bool IsEmpty(CirQueue *obj)
+{
+   if (obj->head == obj->tail) {
+        return true;
+    }
+
+    return false;
+}
+void PollHead(CirQueue *obj) 
+{
+    if (IsEmpty(obj)) {
+        return ;
+    }
+
+    obj->head = ( obj->head + 1) % obj->len;
+}
+
+int PeekHead(CirQueue *obj)
+{
+    return obj->arr[obj->head];
+}
+
+int PeekLast(CirQueue *obj)
+{
+    return obj->arr[(obj->tail - 1 + obj->len) % obj->len];
+}
+
+void PollLast(CirQueue *obj)
+{
+    if (IsEmpty(obj)) {
+        return ;
+    }
+
+    obj->tail = (obj->tail - 1 + obj->len) % obj->len;
+}
+int* maxSlidingWindow(int* nums, int numsSize, int k, int* returnSize){
+    if (numsSize == 0) {
+        *returnSize = 0;
+        return NULL;
+    }
+    
+    *returnSize = numsSize - k + 1; 
+    int *res = (int *)malloc(*returnSize * sizeof(int));
+    if (res == NULL) {
+        return NULL;
+    }
+    int size = 0;
+
+    CirQueue *cq = Init(k);
+
+    for (int i = 0; i < k; i++) {
+        while (!IsEmpty(cq) && PeekLast(cq) < nums[i]){
+            PollLast(cq);
         }
 
-        return res;
+        Add(cq, nums[i]);
+    } 
 
-    }
+    res[size] = PeekHead(cq);
+    size++; 
+    for (int i = k; i < numsSize; i++) {
+        if (!IsEmpty(cq) && nums[i - k] == PeekHead(cq)) {
+            PollHead(cq);
+        }
+
+        while (!IsEmpty(cq) && PeekLast(cq) < nums[i]){
+            PollLast(cq);
+        }
+
+        Add(cq, nums[i]);
+        res[size] = PeekHead(cq);
+        size++; 
+    } 
+   
+    return res;
 }
 ```
 
