@@ -2639,11 +2639,9 @@ char* minNumber(int* nums, int numsSize){
 
  **示例 1:**
 
-```
-输入: 12258
-输出: 5
-解释: 12258有5种不同的翻译，分别是"bccfi", "bwfi", "bczi", "mcfi"和"mzi"
-```
+> 输入: 12258
+> 输出: 5
+> 解释: 12258有5种不同的翻译，分别是"bccfi", "bwfi", "bczi", "mcfi"和"mzi"
 
 **提示：**
 
@@ -3036,66 +3034,68 @@ char firstUniqChar(char* s){
 
  **示例 1:**
 
-```
-输入: [7,5,6,4]
-输出: 5
-```
+> 输入: [7,5,6,4]
+> 输出: 5
 
 **限制：**
 
 0 <= 数组长度 <= 50000
 
-```java
-class Solution {
-    public int reversePairs(int[] nums) {
-        if(nums.length < 2) return 0;
-        int[] tmp = new int[nums.length];
-
-        return mergeSort(nums,0,nums.length-1,tmp);
+```c
+int mergeSortCross(int nums[],int left,int mid, int right, int tmp[]){
+    for(int i = left; i <= right; i++){
+        tmp[i] = nums[i];
     }
 
-    public int mergeSort(int[] nums,int left, int right, int[] tmp){
-        if(left >= right) return 0 ;
-        int mid = left + (right - left)/2;
+    int i = left;
+    int j = mid + 1;
+    int count = 0;
 
-        int leftNum =  mergeSort(nums,left,mid,tmp);
-        int rightNum = mergeSort(nums,mid+1,right,tmp);
-       
-        if(nums[mid]<= nums[mid+1]) return leftNum + rightNum;
-        int crossNum = mergeSortCross(nums,left,mid,right,tmp);
-
-        return leftNum + rightNum + crossNum;
-    }
-
-    public int mergeSortCross(int[] nums,int left,int mid, int right, int[] tmp){
-        for(int i = left; i<= right; i++){
-            tmp[i] = nums[i];
+    for(int k = left; k <= right ; k++){ //同时做排序和逆序的统计
+        if(i > mid){
+            nums[k] = tmp[j]; //这里顺便排好序，防止重复计数
+            j++;
+        }else if(j > right){
+            nums[k] = tmp[i];
+            i++;
+        }else if(tmp[i]<= tmp[j]){
+            nums[k] = tmp[i]; 
+            i++;
+        }else{
+            nums[k] = tmp[j];
+            j++;
+            count += mid - i + 1; //如果i逆序了，那么i,mid都应该是逆序的，因为数组是递增的
         }
-
-        int i = left;
-        int j = mid + 1;
-        int count = 0;
-
-        for(int k = left; k <= right ; k++){ //同时做排序和逆序的统计
-            if(i > mid){
-                nums[k] = tmp[j]; //这里顺便排好序，防止重复计数
-                j++;
-            }else if(j > right){
-                nums[k] = tmp[i];
-                i++;
-            }else if(tmp[i]<= tmp[j]){
-                nums[k] = tmp[i]; 
-                i++;
-            }else{
-                nums[k] = tmp[j];
-                j++;
-                count += mid - i + 1; //如果i逆序了，那么i,mid都应该是逆序的，因为数组是递增的
-            }
-        }
-
-        return count;
-
     }
+
+    return count;
+
+}
+
+int mergeSort(int nums[],int left, int right, int tmp[]){
+    if(left >= right) return 0 ;
+    int mid = left + (right - left) / 2;
+
+    int leftNum =  mergeSort(nums, left, mid, tmp);
+    int rightNum = mergeSort(nums, mid+1, right, tmp);
+    
+    if(nums[mid] <= nums[mid+1]) {
+        return leftNum + rightNum;
+    }
+    int crossNum = mergeSortCross(nums,left,mid,right,tmp);
+
+    return leftNum + rightNum + crossNum;
+}
+
+int reversePairs(int* nums, int numsSize){
+    if(numsSize < 2) return 0;
+    int *tmp = (int *)malloc(numsSize * sizeof(int));
+    if (tmp == NULL) {
+        return NULL;
+    }
+    memset(tmp, 0, numsSize * sizeof(int));
+   
+    return mergeSort(nums, 0, numsSize - 1, tmp);
 }
 ```
 
@@ -3119,7 +3119,7 @@ class Solution {
 
 **示例 2：**
 
-<img src="E:\大三下\leetcode\leetcode\img_jz\160_example_2.png" style="zoom:50%;" />
+<img src="img_jz/160_example_2.png" style="zoom:50%;" />
 
 > 输入：intersectVal = 2, listA = [0,9,1,2,4], listB = [3,2,4], skipA = 3, skipB = 1
 > 输出：Reference of the node with value = 2
@@ -3898,56 +3898,151 @@ int* maxSlidingWindow(int* nums, int numsSize, int k, int* returnSize){
 
 **示例 1：**
 
-```
-输入: 
-["MaxQueue","push_back","push_back","max_value","pop_front","max_value"]
-[[],[1],[2],[],[],[]]
-输出: [null,null,null,2,1,2]
-```
+> 输入: 
+> ["MaxQueue","push_back","push_back","max_value","pop_front","max_value"]
+> [[],[1],[2],[],[],[]]
+> 输出: [null,null,null,2,1,2]
 
 **示例 2：**
 
-```
-输入: 
-["MaxQueue","pop_front","max_value"]
-[[],[],[]]
-输出: [null,-1,-1]
-```
+> 输入: 
+> ["MaxQueue","pop_front","max_value"]
+> [[],[],[]]
+> 输出: [null,-1,-1]
 
 **限制：**
 
 * 1 <= push_back,pop_front,max_value的总操作数 <= 10000
 * 1 <= value <= 10^5
 
-```java
-class MaxQueue {
+```c
+#define MAX_OPERATOR 10001
+typedef struct NewQueue {
+    int *arr;
+    int head;
+    int tail;
+} Queue;
 
-    Queue<Integer> queue;
-    Deque<Integer> deque; //记录最大值
-
-    public MaxQueue() {
-        queue = new LinkedList<>();
-        deque = new LinkedList<>();
+Queue * InitQueue()
+{
+    Queue *q = (Queue *)malloc(sizeof(Queue));
+    if (q == NULL) {
+        return NULL;
     }
-    
-    public int max_value() {
-        return deque.size() > 0 ? deque.peekFirst() : -1;
+    q->arr = (int *)malloc(MAX_OPERATOR * sizeof(int));
+    if (q->arr == NULL) {
+        return NULL;
     }
-    
-    public void push_back(int value) {
-        queue.add(value);
-        while(deque.size() > 0 &&  value > deque.peekLast())
-            deque.pollLast();
-        deque.add(value);
-    }
-    
-    public int pop_front() {
-        int value = queue.size() > 0 ? queue.poll() : -1 ;
-        if(deque.size() > 0 && value == deque.peekFirst())
-            deque.pollFirst();
-        return value;
-    }
+    memset(q->arr, 0, MAX_OPERATOR *sizeof(int));
+    q->head = 0;
+    q->tail = 0;
+    return q;
 }
+
+bool IsFull(Queue *obj)
+{
+    if (obj->tail == MAX_OPERATOR) {
+        return true;
+    }
+
+    return false;
+}
+
+void Push(Queue *obj, int value)
+{
+    if (IsFull(obj)) {
+        return;
+    }
+    obj->arr[obj->tail] = value;
+    obj->tail++;
+}
+
+bool IsEmpty(Queue *obj)
+{
+    if (obj->head == obj->tail) {
+        return true;
+    }
+    return false;
+
+}
+
+int Pop(Queue *obj)
+{
+    if (IsEmpty(obj)) {
+        return -1;
+    }
+    obj->head++;
+    return obj->arr[obj->head - 1];
+}
+
+int Peek(Queue *obj)
+{
+    if (IsEmpty(obj)) {
+        return -1;
+    }
+    return obj->arr[obj->head];
+}
+
+int PopLast(Queue *obj)
+{
+    if (IsEmpty(obj)) {
+        return -1;
+    }
+    obj->tail--;
+    return obj->arr[obj->tail];
+}
+
+int PeekLast(Queue *obj)
+{
+    if (IsEmpty(obj)) {
+        return -1;
+    }
+    return obj->arr[obj->tail - 1];
+}
+typedef struct {
+    Queue *que;
+    Queue *maxVals;
+} MaxQueue;
+
+
+MaxQueue* maxQueueCreate() {
+    MaxQueue *mq = (MaxQueue *)malloc(sizeof(MaxQueue));
+    if (mq == NULL) {
+        return NULL;
+    }
+    mq->que = InitQueue();
+    mq->maxVals = InitQueue();
+
+    return mq;
+}
+
+int maxQueueMax_value(MaxQueue* obj) {
+    return Peek(obj->maxVals);
+}
+
+void maxQueuePush_back(MaxQueue* obj, int value) {
+    Push(obj->que, value);
+    while (!IsEmpty(obj->maxVals) && PeekLast(obj->maxVals) < value) {
+        PopLast(obj->maxVals);
+    }
+   
+    Push(obj->maxVals, value);
+}
+
+int maxQueuePop_front(MaxQueue* obj) {
+    int num = Pop(obj->que);
+    if (num == maxQueueMax_value(obj)) {
+        Pop(obj->maxVals);
+    }
+    return num;
+}
+
+void maxQueueFree(MaxQueue* obj) {
+    free(obj->que);
+    free(obj->maxVals);
+    free(obj);
+}
+
 ```
 
 #### [剑指 Offer 60. n个骰子的点数](https://leetcode-cn.com/problems/nge-tou-zi-de-dian-shu-lcof/)
@@ -3958,44 +4053,47 @@ class MaxQueue {
 
  **示例 1:**
 
-```
-输入: 1
-输出: [0.16667,0.16667,0.16667,0.16667,0.16667,0.16667]
-```
+> 输入: 1
+> 输出: [0.16667,0.16667,0.16667,0.16667,0.16667,0.16667]
 
 
 **示例 2:**
 
-```
-输入: 2
-输出: [0.02778,0.05556,0.08333,0.11111,0.13889,0.16667,0.13889,0.11111,0.08333,0.05556,0.02778]
-```
+> 输入: 2
+> 输出: [0.02778,0.05556,0.08333,0.11111,0.13889,0.16667,0.13889,0.11111,0.08333,0.05556,0.02778]
 
 **限制：**
 
 * 1 <= n <= 11
 
-```java
-class Solution {
-    public double[] dicesProbability(int n) {
-        double[] res = new double[1 + n * 5];
-        int[][] dp = new int[n + 1 ][6 * n + 1];
+```c
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-        double all = Math.pow(6,n);
-        dp[0][0] = 1;
-        for(int i = 1 ; i <= n; i++){
-            for(int j = 1; j <= 6*n; j++){
-                for(int k = 1; k <= Math.min(j,6); k++)
-                    dp[i][j] += dp[i - 1][j - k];
-            }
-        }
+double* dicesProbability(int n, int* returnSize){
+    int dp[n + 1][n * 6 + 1];
+    memset(dp, 0, (n + 1) * (n * 6 + 1) * sizeof(int));
 
-        for(int i = n ; i <= 6 * n ; i++){
-            res[i - n ] = dp[n][i] / all;
-        }
-
+    double *res = (double *)malloc((1 + n * 5) * sizeof(double));
+    if (res == NULL) {
         return res;
     }
+    memset(res, 0, (1 + n * 5) * sizeof(double));
+ 
+    double all = pow(6,n);
+    dp[0][0] = 1;
+    for(int i = 1 ; i <= n; i++){
+        for(int j = 1; j <= 6*n; j++){
+            for(int k = 1; k <= MIN(j,6); k++)
+                dp[i][j] += dp[i - 1][j - k];
+        }
+    }
+
+    for(int i = n ; i <= 6 * n ; i++){
+        res[i - n ] = dp[n][i] / all;
+    }
+
+    *returnSize = 1 + n * 5;
+    return res;
 }
 ```
 
@@ -4005,43 +4103,44 @@ class Solution {
 
  **示例 1:**
 
-```
-输入: [1,2,3,4,5]
-输出: True
-```
+> 输入: [1,2,3,4,5]
+> 输出: True
 
 **示例 2:**
 
-```
-输入: [0,0,1,2,5]
-输出: True
-```
+> 输入: [0,0,1,2,5]
+> 输出: True
 
 **限制：**
 
 * 数组长度为 5 
 * 数组的数取值为 [0, 13] .
 
-```java
-class Solution {
-    public boolean isStraight(int[] nums) {
+```c
+#define MAX_NUM 14
+#define MIN_NUM 0
+bool isStraight(int* nums, int numsSize){
+    int arr[14] = {0};
 
-        int minNum = 13;
-        int maxNum = nums[0];
-       
-        HashSet<Integer> set = new HashSet<>();
+    int min = MAX_NUM;
+    int max = MIN_NUM;
+    for (int i = 0 ; i < numsSize; i++) {
+        if (nums[i] == 0) {
+            continue;
+        } else if (arr[nums[i]] > 0) {
+            return false;
+        } 
 
-        for(int i = 0 ; i < nums.length; i++){
-            if(nums[i] == 0 ) continue;
-            if(minNum > nums[i]) minNum = nums[i];
-            if(maxNum < nums[i]) maxNum = nums[i];
-            if(!set.add(nums[i])) return false;
+        if (min > nums[i]) {
+            min = nums[i];
         }
-           
-        if(maxNum - minNum < 5) return true;
-        else return false;      
+        if (max < nums[i]) {
+            max = nums[i];
+        }
+        arr[nums[i]]++;
     }
 
+    return max - min <= 4 ? true : false;
 }
 ```
 
@@ -4053,29 +4152,23 @@ class Solution {
 
  **示例 1：**
 
-```
-输入: n = 5, m = 3
-输出: 3
-```
+> 输入: n = 5, m = 3
+> 输出: 3
 
 **示例 2：**
 
-```
-输入: n = 10, m = 17
-输出: 2
-```
+> 输入: n = 10, m = 17
+> 输出: 2
 
 **限制：**
 
 * 1 <= n <= 10^5
 * 1 <= m <= 10^6
 
-```java
-class Solution {
-    public int lastRemaining(int n, int m) {
-        if(n == 1 ) return 0;
-        return (lastRemaining(n -1, m) + m) % n;
-    }
+```c
+int lastRemaining(int n, int m){
+    if(n == 1 ) return 0;
+    return (lastRemaining(n -1, m) + m) % n;
 }
 ```
 
@@ -4085,43 +4178,44 @@ class Solution {
 
  **示例 1:**
 
-```
-输入: [7,1,5,3,6,4]
-输出: 5
-解释: 在第 2 天（股票价格 = 1）的时候买入，在第 5 天（股票价格 = 6）的时候卖出，最大利润 = 6-1 = 5 。
-     注意利润不能是 7-1 = 6, 因为卖出价格需要大于买入价格。
-```
+> 输入: [7,1,5,3,6,4]
+> 输出: 5
+> 解释: 在第 2 天（股票价格 = 1）的时候买入，在第 5 天（股票价格 = 6）的时候卖出，最大利润 = 6-1 = 5 。
+>      注意利润不能是 7-1 = 6, 因为卖出价格需要大于买入价格。
 
 **示例 2:**
 
-```
-输入: [7,6,4,3,1]
-输出: 0
-解释: 在这种情况下, 没有交易完成, 所以最大利润为 0。
-```
+> 输入: [7,6,4,3,1]
+> 输出: 0
+> 解释: 在这种情况下, 没有交易完成, 所以最大利润为 0。
 
 
 **限制：**
 
 0 <= 数组长度 <= 10^5
 
-```java
-class Solution {
-    public int maxProfit(int[] prices) {
+```c
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
 
-        //动态规划
-        if(prices == null || prices.length == 0) return 0;
-       
-       int maxValue = 0,minValue = prices[0];
-
-        for(int i = 1 ; i < prices.length; i++){
-            maxValue = Math.max(maxValue,prices[i] - minValue);
-            minValue = Math.min(minValue,prices[i]);
-        }
-
-        return maxValue;
-    
+int maxProfit(int* prices, int pricesSize){
+    if (pricesSize == 0) {
+        return 0;
     }
+    int minArr[pricesSize];
+    memset(minArr, 0, pricesSize * sizeof(int));
+    
+    minArr[0] = prices[0];
+    for (int i = 1; i < pricesSize; i++) {
+        minArr[i] = MIN(minArr[i - 1], prices[i]);
+    }
+
+    int maxP = 0;
+    for (int i = 1; i < pricesSize; i++) {
+        maxP = MAX(maxP, prices[i] - minArr[i]);
+    }
+
+    return maxP;
 }
 ```
 
@@ -4131,31 +4225,31 @@ class Solution {
 
 **示例 1：**
 
-```
-输入: n = 3
-输出: 6
-```
+> 输入: n = 3
+> 输出: 6
 
 **示例 2：**
 
-```
-输入: n = 9
-输出: 45
-```
+> 输入: n = 9
+> 输出: 45
 
 **限制：**
 
 * 1 <= n <= 10000
 
-```java
-class Solution {
-    int res = 0;
-    public int sumNums(int n) {
-        boolean x = n > 1 && sumNums(n-1) > 0;
-        res += n;
-        return res;
+```c
+int Recur(int n, int *res)
+{
+    bool x = n > 1 && Recur(n-1, res) > 0;
+    *res += n;
+    return *res;
+}
 
-    }
+int sumNums(int n){
+   int res = 0;
+   int *p = &res;
+
+   return Recur(n, p);
 }
 ```
 
@@ -4165,26 +4259,21 @@ class Solution {
 
 **示例:**
 
-```
-输入: a = 1, b = 1
-输出: 2
-```
+> 输入: a = 1, b = 1
+> 输出: 2
 
 **提示：**
 
 * a, b 均可能是负数或 0
 * 结果不会溢出 32 位整数
 
-```java
-class Solution {
-    public int add(int a, int b) {
-        while(b != 0) { // 当进位为 0 时跳出
-            int c = (a & b) << 1;  // c = 进位
-            a ^= b; // a = 非进位和
-            b = c; // b = 进位
-        }
+```c
+int add(int a, int b){
+    if (b == 0) {
         return a;
     }
+
+    return add(a ^ b, (unsigned)(a & b) << 1);
 }
 
 ```
@@ -4195,10 +4284,8 @@ class Solution {
 
  **示例:**
 
-```
-输入: [1,2,3,4,5]
-输出: [120,60,40,30,24]
-```
+> 输入: [1,2,3,4,5]
+> 输出: [120,60,40,30,24]
 
 **提示：**
 
