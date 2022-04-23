@@ -4292,24 +4292,39 @@ int add(int a, int b){
 * 所有元素乘积之和不会溢出 32 位整数
 * a.length <= 100000
 
-```java
-class Solution {
-    public int[] constructArr(int[] a) {
-        //在i的时候避开*a[i],先乘左边，再去乘右边
-        int[] res = new int[a.length];
-
-        for(int i = 0 , p = 1; i < a.length ; i ++){
-            res[i] = p;
-            p *= a[i];
-        }
-
-        for(int i = a.length -1 ,p = 1; i >=0 ; i--){
-            res[i] *= p;
-            p *= a[i];
-        }
-
-        return res;
+```c
+int* constructArr(int* a, int aSize, int* returnSize){
+    if (aSize == 0) {
+        *returnSize = 0;
+        return NULL;
     }
+    int lArr[aSize];
+    int rArr[aSize];
+
+    int *res = (int *)malloc(aSize * sizeof(int));
+    if (res == NULL) {
+        return NULL;
+    }
+    memset(res, 0, aSize * sizeof(int));
+
+    int tmp = 1;
+    for (int i = 0; i < aSize; i++) {
+        lArr[i] = tmp;
+        tmp *= a[i];
+    }
+
+    tmp = 1;
+    for (int i = aSize - 1; i >= 0; i--) {
+        rArr[i] = tmp;
+        tmp *= a[i];
+    }
+
+    for (int i = 0; i < aSize; i++) {
+        res[i] = lArr[i] * rArr[i];
+    }
+
+    *returnSize = aSize;
+    return res;
 }
 ```
 
@@ -4333,72 +4348,66 @@ class Solution {
 
 **示例 1:**
 
-```
-输入: "42"
-输出: 42
-```
+> 输入: "42"
+> 输出: 42
 
 **示例 2:**
 
-```
-输入: "   -42"
-输出: -42
-解释: 第一个非空白字符为 '-', 它是一个负号。
-     我们尽可能将负号与后面所有连续出现的数字组合起来，最后得到 -42 。
-```
+> 输入: "   -42"
+> 输出: -42
+> 解释: 第一个非空白字符为 '-', 它是一个负号。
+>      我们尽可能将负号与后面所有连续出现的数字组合起来，最后得到 -42 。
 
 **示例 3:**
 
-```
-输入: "4193 with words"
-输出: 4193
-解释: 转换截止于数字 '3' ，因为它的下一个字符不为数字。
-```
+> 输入: "4193 with words"
+> 输出: 4193
+> 解释: 转换截止于数字 '3' ，因为它的下一个字符不为数字。
 
 **示例 4:**
 
-```
-输入: "words and 987"
-输出: 0
-解释: 第一个非空字符是 'w', 但它不是数字或正、负号。
-     因此无法执行有效的转换。
-```
+> 输入: "words and 987"
+> 输出: 0
+> 解释: 第一个非空字符是 'w', 但它不是数字或正、负号。
+>      因此无法执行有效的转换。
 
 **示例 5:**
 
-```
-输入: "-91283472332"
-输出: -2147483648
-解释: 数字 "-91283472332" 超过 32 位有符号整数范围。 
-     因此返回 INT_MIN (−231) 。
-```
+> 输入: "-91283472332"
+> 输出: -2147483648
+> 解释: 数字 "-91283472332" 超过 32 位有符号整数范围。 
+>      因此返回 INT_MIN (−231) 。
 
-```java
-class Solution {
-    public int strToInt(String str) {
-        char[] arr = str.trim().toCharArray();
-
-        int alertNum = Integer.MAX_VALUE / 10 ; //214748364,防止超出最大整数
-        if(arr.length == 0 ) return 0;
-
-        int res = 0,sign = 1;
-
-        int index = 1;
-        if(arr[0] == '-') sign = -1;
-        else if(arr[0] != '+') index = 0;
-
-        for(int i = index ; i < arr.length; i++){
-            if(arr[i] < '0' || arr[i] > '9') break;
-
-            //如果res == 214748364并且arr[i]>'7',这个数就会超过最大整数
-            if(res > alertNum || (res == alertNum && arr[i] > '7'))
-                return sign == 1 ? Integer.MAX_VALUE:Integer.MIN_VALUE;
-            res = res * 10 + (arr[i] - '0');
-        }
-
-        return sign* res;
-
+```c
+char * DelDump(char *str)
+{
+    int i = 0;
+    while (str[i] == ' ') {
+        i++;
     }
+    return &str[i];
+}
+int strToInt(char* str){
+    str = DelDump(str);
+    int alertNum = INT_MAX / 10 ; //214748364,防止超出最大整数
+    int len = strlen(str);
+    if(len == 0 ) return 0;
+
+    int res = 0,sign = 1;
+
+    int index = 1;
+    if(str[0] == '-') sign = -1;
+    else if(str[0] != '+') index = 0;
+
+    for(int i = index ; i < len; i++){
+        if(str[i] < '0' || str[i] > '9') break;
+
+        if(res > alertNum || (res == alertNum && str[i] > '7'))
+            return sign == 1 ? INT_MAX : INT_MIN;
+        res = res * 10 + (str[i] - '0');
+    }
+
+    return sign* res;
 }
 ```
 
@@ -4410,39 +4419,44 @@ class Solution {
 
 例如，给定如下二叉搜索树:  root = [6,2,8,0,4,7,9,null,null,3,5]
 
-![](E:\大三下\leetcode\leetcode\img_jz\binarysearchtree_improved.png)
+![](img_jz/binarysearchtree_improved.png)
 
 **示例 1:**
 
-```
-输入: root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 8
-输出: 6 
-解释: 节点 2 和节点 8 的最近公共祖先是 6。
-```
+> 输入: root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 8
+> 输出: 6 
+> 解释: 节点 2 和节点 8 的最近公共祖先是 6。
 
 
 **示例 2:**
 
-```
-输入: root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 4
-输出: 2
-解释: 节点 2 和节点 4 的最近公共祖先是 2, 因为根据定义最近公共祖先节点可以为节点本身。
-```
+> 输入: root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 4
+> 输出: 2
+> 解释: 节点 2 和节点 4 的最近公共祖先是 2, 因为根据定义最近公共祖先节点可以为节点本身。
 
 **说明:**
 
 * 所有节点的值都是唯一的。
 * p、q 为不同节点且均存在于给定的二叉搜索树中。
 
-```java
-class Solution {
-    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
-        if(root.val < p.val && root.val < q.val)
-            return lowestCommonAncestor(root.right, p, q);
-        if(root.val > p.val && root.val > q.val)
-            return lowestCommonAncestor(root.left, p, q);
+```c
+struct TreeNode* lowestCommonAncestor(struct TreeNode* root, struct TreeNode* p, struct TreeNode* q) {
+    if (root == NULL) {
+        return root;
+    }    
+
+    if (root->val == p->val || root->val == q->val) {
         return root;
     }
+
+    if (root->val > p->val && root->val > q->val) {
+        return lowestCommonAncestor(root->left, p, q);
+    } else if (root->val < p->val && root->val < q->val) {
+        return lowestCommonAncestor(root->right, p, q);
+    } else {
+        return root;
+    }
+    
 }
 ```
 
@@ -4454,40 +4468,47 @@ class Solution {
 
 例如，给定如下二叉树:  root = [3,5,1,6,2,0,8,null,null,7,4]
 
-![](E:\大三下\leetcode\leetcode\img_jz\binarytree.png)
+![](img_jz/binarytree.png)
 
  **示例 1:**
 
-```
-输入: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1
-输出: 3
-解释: 节点 5 和节点 1 的最近公共祖先是节点 3。
-```
+> 输入: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1
+> 输出: 3
+> 解释: 节点 5 和节点 1 的最近公共祖先是节点 3。
 
 
 **示例 2:**
 
-```
-输入: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 4
-输出: 5
-解释: 节点 5 和节点 4 的最近公共祖先是节点 5。因为根据定义最近公共祖先节点可以为节点本身。
-```
+> 输入: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 4
+> 输出: 5
+> 解释: 节点 5 和节点 4 的最近公共祖先是节点 5。因为根据定义最近公共祖先节点可以为节点本身。
 
 **说明:**
 
 * 所有节点的值都是唯一的。
 * p、q 为不同节点且均存在于给定的二叉树中。
 
-```java
-class Solution {
-    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
-        if(root == null || root == p || root == q) return root;
-        TreeNode left = lowestCommonAncestor(root.left, p, q);
-        TreeNode right = lowestCommonAncestor(root.right, p, q);
-        if(left == null) return right;
-        if(right == null) return left;
+```c
+struct TreeNode* lowestCommonAncestor(struct TreeNode* root, struct TreeNode* p, struct TreeNode* q){
+    if (root == NULL) {
         return root;
     }
+
+    if (root->val == p->val || root->val == q->val) {
+        return root;
+    }
+
+    struct TreeNode *l = lowestCommonAncestor(root->left, p, q);
+    struct TreeNode *r = lowestCommonAncestor(root->right, p, q);
+    if (l == NULL) {
+        return r;
+    }
+     
+    if (r == NULL) {
+        return l;
+    }
+
+    return root;
 }
 ```
 
