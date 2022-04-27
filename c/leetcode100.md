@@ -273,57 +273,53 @@ struct ListNode* addTwoNumbers(struct ListNode* l1, struct ListNode* l2){
 
 **示例 1:**
 
-```
-输入: s = "abcabcbb"
-输出: 3 
-解释: 因为无重复字符的最长子串是 "abc"，所以其长度为 3。
-```
+> 输入: s = "abcabcbb"
+> 输出: 3 
+> 解释: 因为无重复字符的最长子串是 "abc"，所以其长度为 3。
 
 **示例 2:**
 
-```
-输入: s = "bbbbb"
-输出: 1
-解释: 因为无重复字符的最长子串是 "b"，所以其长度为 1。
-```
+> 输入: s = "bbbbb"
+> 输出: 1
+> 解释: 因为无重复字符的最长子串是 "b"，所以其长度为 1。
 
 **示例 3:**
 
-```
-输入: s = "pwwkew"
-输出: 3
-解释: 因为无重复字符的最长子串是 "wke"，所以其长度为 3。
-     请注意，你的答案必须是 子串 的长度，"pwke" 是一个子序列，不是子串。
-```
+> 输入: s = "pwwkew"
+> 输出: 3
+> 解释: 因为无重复字符的最长子串是 "wke"，所以其长度为 3。
+>      请注意，你的答案必须是 子串 的长度，"pwke" 是一个子序列，不是子串。
 
 **示例 4:**
 
-```
-输入: s = ""
-输出: 0
-```
+> 输入: s = ""
+> 输出: 0
 
-```java
-class Solution {
-    public int lengthOfLongestSubstring(String s) {
-        if (s.length()==0) return 0;
-        HashMap<Character, Integer> map = new HashMap<Character, Integer>();
-        int max = 0;//最长子串长度
-        int left = 0;//滑动窗口左下标，i相当于滑动窗口右下标
-        for(int i = 0; i < s.length(); i ++){
-            if(map.containsKey(s.charAt(i))){
-                //charAt() 方法用于返回指定索引处的字符。            
-                //索引范围为从 0 到 length() - 1。
-                left = Math.max(left,map.get(s.charAt(i)) + 1);      
-                //map.get():返回字符所对应的索引(原函数是返回KEY对应的值，这里值就是字符串的索                //引），当发现重复元素时，窗口左指针右移
-            }        
-           //map.get('a')=0,因为map中只有第一个a的下标，然后更新left指针到原来left的的下一位
-            map.put(s.charAt(i),i);      //再更新map中a映射的下标
-            max = Math.max(max,i-left+1);     //比较两个参数的大小
-        }
-        return max;
-        
+```c
+#define ASCII_LEN 128
+
+int lengthOfLongestSubstring(char * s)
+{
+    int sLen = strlen(s);
+    if (sLen == 0 || sLen == 1) {
+        return sLen;
     }
+    int arr[ASCII_LEN];
+    memset(arr, -1, ASCII_LEN * sizeof(int));
+
+    int maxLen = 0;
+    int l = 0;
+    for (int i = 0; i < sLen; i++) {
+        if (arr[s[i]] != -1) {
+            l = fmax(l, arr[s[i]] + 1);
+        }
+       
+        maxLen = fmax(maxLen, i - l + 1);
+        arr[s[i]] = i;
+       
+    }
+
+    return maxLen;
 }
 ```
 
@@ -333,41 +329,31 @@ class Solution {
 
 **示例 1：**
 
-```
-输入：nums1 = [1,3], nums2 = [2]
-输出：2.00000
-解释：合并数组 = [1,2,3] ，中位数 2
-```
+> 输入：nums1 = [1,3], nums2 = [2]
+> 输出：2.00000
+> 解释：合并数组 = [1,2,3] ，中位数 2
 
 **示例 2：**
 
-```
-输入：nums1 = [1,2], nums2 = [3,4]
-输出：2.50000
-解释：合并数组 = [1,2,3,4] ，中位数 (2 + 3) / 2 = 2.5
-```
+> 输入：nums1 = [1,2], nums2 = [3,4]
+> 输出：2.50000
+> 解释：合并数组 = [1,2,3,4] ，中位数 (2 + 3) / 2 = 2.5
 
 **示例 3：**
 
-```
-输入：nums1 = [0,0], nums2 = [0,0]
-输出：0.00000
-```
+> 输入：nums1 = [0,0], nums2 = [0,0]
+> 输出：0.00000
 
 **示例 4：**
 
-```
-输入：nums1 = [], nums2 = [1]
-输出：1.00000
-```
+> 输入：nums1 = [], nums2 = [1]
+> 输出：1.00000
 
 
 **示例 5：**
 
-```
-输入：nums1 = [2], nums2 = []
-输出：2.00000
-```
+> 输入：nums1 = [2], nums2 = []
+> 输出：2.00000
 
 **提示：**
 
@@ -380,70 +366,49 @@ class Solution {
 
 **进阶：**   你能设计一个时间复杂度为 O(log (m+n)) 的算法解决此问题吗？
 
-```java
-//采用归并排序的方式来解题
-class Solution {
-    public double findMedianSortedArrays(int[] nums1, int[] nums2) {    
-        int a = 0;  
-        int b = 0;
-        int len1 = nums1.length;
-        int len2 = nums2.length;
-
-        //判断是否有一个数组是空的，直接用另一个数组计算中位数
-        if(len1 == 0){
-            double result = middle(nums2,len1,len2);
-            return result ;
-        }
-
-        if(len2 == 0){
-            double result = middle(nums1,len1,len2);
-            return result ;
-        }
-         
-        //第三个数组，长度为前两个之和，保存排好序的数组
-        int[] nums = new int[len1 + len2];
-        int count = 0;  
-
-        while(a < len1 && b < len2){
-            if(nums1[a] <= nums2[b]){
-                nums[count++] = nums1[a];
-                a++;
-            }
-
-            else{
-                nums[count++] = nums2[b];
-                b++;
-            }
-            
-            //第一个数组已经排完了，把第二个数组中的元素全部放到后面就行
-            if(a == len1){
-                for(int i = b; i <len2; i++){
-                    nums[count++] = nums2[i];
-                }
-            }
-            //第二个数组已经排完了，把第一个数组中的元素全部放到后面
-            if(b == len2){
-                for(int i = a; i <len1; i++){
-                    nums[count++] = nums1[i];
-                }
-            }
-        }
-      
-       return middle(nums,len1,len2);
-     
+```c
+double findMedianSortedArrays(int* nums1, int nums1Size, int* nums2, int nums2Size){
+    int *arr = (int *)malloc((nums1Size + nums2Size) * sizeof(int));
+    if (arr == NULL) {
+        return -1;
     }
-    
-    //找一个数组的中位数的函数
-    public double middle(int[] nums, int len1,int len2){
-        if((len1+ len2)%2 == 0){
-            int mid = (len1+ len2)/2 ;
-            return (nums[mid] + nums[mid-1])/2.0;
-        }
+    memset(arr, 0, (nums1Size + nums2Size) * sizeof(int));
+    int l1 = 0;
+    int l2 = 0;
+    int count = 0;
+    while (l1 < nums1Size && l2 < nums2Size) {
+        if (nums1[l1] < nums2[l2]) {
+            arr[count] = nums1[l1];
+            count++;
+            l1++;
+        } else {
+            arr[count] = nums2[l2];
+            count++;
+            l2++;
+        }        
+    }
 
-        else{
-            int mid = (len1+ len2)/2;
-            return nums[mid] ;
+    if (l1 == nums1Size && l2 < nums2Size) {
+        while (count < nums1Size + nums2Size) {
+            arr[count] = nums2[l2];
+            count++;
+            l2++;
         }
+    } else if (l1 < nums1Size && l2 == nums2Size)  {
+        while (count < nums1Size + nums2Size) {
+            arr[count] = nums1[l1];
+            count++;
+            l1++;
+        }
+    }
+
+    int mid = (nums1Size + nums2Size) / 2;
+    bool isEven = (nums1Size + nums2Size) % 2 == 0 ? true : false;
+
+    if (isEven) {
+        return (arr[mid] + arr[mid - 1]) / 2.0;
+    } else {
+        return arr[mid];
     }
 }
 ```
@@ -454,34 +419,26 @@ class Solution {
 
 **示例 1：**
 
-```
-输入：s = "babad"
-输出："bab"
-解释："aba" 同样是符合题意的答案。
-```
+> 输入：s = "babad"
+> 输出："bab"
+> 解释："aba" 同样是符合题意的答案。
 
 **示例 2：**
 
-```
-输入：s = "cbbd"
-输出："bb"
-```
+> 输入：s = "cbbd"
+> 输出："bb"
 
 
 **示例 3：**
 
-```
-输入：s = "a"
-输出："a"
-```
+> 输入：s = "a"
+> 输出："a"
 
 
 **示例 4：**
 
-```
-输入：s = "ac"
-输出："a"
-```
+> 输入：s = "ac"
+> 输出："a"
 
 **提示：**
 
@@ -495,49 +452,34 @@ class Solution {
   * 如果里面的子串是回文，整体就是回文串；
   * 如果里面的子串不是回文串，整体就不是回文串。
 
-```java
-public class Solution {
+```c
+char * longestPalindrome(char * s)
+{
+    int len = strlen(s);
+    bool dp[len][len];
+    memset(dp, false, len * len * sizeof(bool));
 
-    public String longestPalindrome(String s) {
-       
-        int len = s.length();
-        if (len < 2) {
-            return s;
-        }
-    
-        int maxLen = 1;
-        int begin = 0;
+    int maxLen = 0;
+    int begin = 0; 
+    int end = 0;
 
-        // dp[i][j] 表示 s[i, j] 是否是回文串
-        boolean[][] dp = new boolean[len][len];
-        char[] charArray = s.toCharArray();
+    for (int r = 1; r < len; r++) {
+        for (int l = 0; l < r; l++) {
+            dp[l][r] = (s[l] == s[r]) && (r - l <= 2 || dp[l + 1][r - 1]);
 
-        for (int i = 0; i < len; i++) {
-            dp[i][i] = true;
-        }
-        for (int j = 1; j < len; j++) {
-            for (int i = 0; i < j; i++) {
-                if (charArray[i] != charArray[j]) {
-                    dp[i][j] = false;
-                } else {
-                    if (j - i < 3) {
-                        dp[i][j] = true;
-                    } else {
-                        dp[i][j] = dp[i + 1][j - 1];
-                    }
-                }
-
-       // 只要 dp[i][j] == true 成立，就表示子串 s[i..j] 是回文，此时记录回文长度和起始位置
-                if (dp[i][j] && j - i + 1 > maxLen) {
-                    maxLen = j - i + 1;
-                    begin = i;
-                }
+            if (dp[l][r] && r - l + 1 > maxLen) {
+                maxLen = r - l + 1;
+                begin = l;
+                end = r;
             }
+  
         }
-        return s.substring(begin, begin + maxLen);
     }
+   
+    s[end + 1] = '\0';
+    
+    return &s[begin];
 }
-
 ```
 
 #### [6. Z 字形变换](https://leetcode-cn.com/problems/zigzag-conversion/)
@@ -546,45 +488,35 @@ public class Solution {
 
 比如输入字符串为 "PAYPALISHIRING" 行数为 3 时，排列如下：
 
-```
-P   A   H   N
-A P L S I I G
-Y   I   R
-```
+> P   A   H   N
+> A P L S I I G
+> Y   I   R
 
 之后，你的输出需要从左往右逐行读取，产生出一个新的字符串，比如：`"PAHNAPLSIIGYIR"`。
 
 请你实现这个将字符串进行指定行数变换的函数：
 
-```
-string convert(string s, int numRows);
-```
+> string convert(string s, int numRows);
 
 **示例 1：**
 
-```
-输入：s = "PAYPALISHIRING", numRows = 3
-输出："PAHNAPLSIIGYIR"
-```
+> 输入：s = "PAYPALISHIRING", numRows = 3
+> 输出："PAHNAPLSIIGYIR"
 
 **示例 2：**
 
-```
-输入：s = "PAYPALISHIRING", numRows = 4
-输出："PINALSIGYAHRPI"
-解释：
-P     I    N
-A   L S  I G
-Y A   H R
-P     I
-```
+> 输入：s = "PAYPALISHIRING", numRows = 4
+> 输出："PINALSIGYAHRPI"
+> 解释：
+> P     I    N
+> A   L S  I G
+> Y A   H R
+> P     I
 
 **示例 3：**
 
-```
-输入：s = "A", numRows = 1
-输出："A"
-```
+> 输入：s = "A", numRows = 1
+> 输出："A"
 
 **提示：**
 
@@ -592,31 +524,48 @@ P     I
 * s 由英文字母（小写和大写）、',' 和 '.' 组成
 * 1 <= numRows <= 1000
 
-```java
-class Solution {
-    public String convert(String s, int numRows) {
-        if(numRows == 1)
-            return s;
-        
-        int len = Math.min(s.length(), numRows);
-        String []rows = new String[len];
-        for(int i = 0; i< len; i++) rows[i] = "";
-        int loc = 0;
-        boolean down = false;
-
-        for(int i=0;i<s.length();i++) {
-            rows[loc] += s.substring(i,i+1);
-            if(loc == 0 || loc == numRows - 1)
-                down = !down;
-            loc += down ? 1 : -1; // down为true，loc = loc + 1 否则，loc = loc - 1
-        }
-        
-        String ans = "";
-        for(String row : rows) {
-            ans += row;
-        }
-        return ans;
+```c
+char * convert(char * s, int numRows){
+    if (numRows == 1) {
+        return s;
     }
+    int len = strlen(s);
+    char arr[numRows][len];
+    memset(arr,0, numRows * len * sizeof(char));
+
+    int row = 0;
+    int col = 0;
+    bool isAcc = false;
+    int count = 0;
+    for (int i = 0; i < len; i++) {
+        if (row == 0 || row == numRows - 1) {
+            isAcc = !isAcc;
+        }
+
+        if (row < numRows - 1 && isAcc) {
+            arr[row][col] = s[i];
+            row++;
+        } 
+
+        if (row >= 0 && !isAcc) {
+            arr[row][col] = s[i];
+            if (row > 0) {
+                row--;
+            }
+            col++;    
+        } 
+      
+    }
+
+    for (int i = 0; i < numRows; i++) {
+        for (int j = 0; j < len; j++) {
+            if (arr[i][j] != 0) {
+                s[count++] = arr[i][j];
+            }
+        }
+    }
+
+    return s;
 }
 ```
 
@@ -628,65 +577,46 @@ class Solution {
 
 **假设环境不允许存储 64 位整数（有符号或无符号）。**
 
-注：也就是说我们不能用long存储最终结果，而且有些数字可能是合法范围内的数字，但是反转过来就超过范围了。假设有1147483649这个数字，它是小于最大的32位整数2147483647的，但是将这个数字反转过来后就变成了9463847411，这就比最大的32位整数还要大了，这样的数字是没法存到int里面的，所以肯定要返回0(溢出了)。
-
-来自大佬的解释：https://leetcode-cn.com/problems/reverse-integer/solution/tu-jie-7-zheng-shu-fan-zhuan-by-wang_ni_ma/
-
 **示例 1：**
 
-```
-输入：x = 123
-输出：321
-```
+> 输入：x = 123
+> 输出：321
 
 **示例 2：**
 
-```
-输入：x = -123
-输出：-321
-```
+> 输入：x = -123
+> 输出：-321
 
 
 **示例 3：**
 
-```
-输入：x = 120
-输出：21
-```
+> 输入：x = 120
+> 输出：21
 
 
 **示例 4：**
 
-```
-输入：x = 0
-输出：0
-```
+> 输入：x = 0
+> 输出：0
 
 **提示：**
 
 * $-2^{31} <= x <= 2^{31} - 1$
 
-```java
-//将数或者字符串反转的方法可以用栈的方式来解决,因为本题是整数，所以也能用整除和取余的办法来做。
-class Solution {
-    public int reverse(int x) {
-        int res = 0;
-        while(x!=0) {
-            //每次取末尾数字
-            int tmp = x%10;
-            //判断是否 大于 最大32位整数214748364
-            if (res>214748364 || (res==214748364 && tmp>7)) {
-                return 0;
-            }
-            //判断是否 小于 最小32位整数
-            if (res<-214748364 || (res==-214748364 && tmp<-8)) {
-                return 0;
-            }
-            res = res*10 + tmp;
-            x /= 10;
+```c
+int reverse(int x)
+{
+    int res = 0;
+    while (x != 0) {
+        if (res < INT_MIN / 10 || res > INT_MAX / 10) {
+            return 0;
         }
-        return res;
+
+        res = res * 10 + x % 10;
+        x = x / 10;
     }
+
+    return res;
 }	
 ```
 
@@ -710,143 +640,118 @@ class Solution {
 
 **示例 1：**
 
-```
-输入：s = "42"
-输出：42
-解释：加粗的字符串为已经读入的字符，插入符号是当前读取的字符。
-第 1 步："42"（当前没有读入字符，因为没有前导空格）
-         ^
-第 2 步："42"（当前没有读入字符，因为这里不存在 '-' 或者 '+'）
-         ^
-第 3 步："42"（读入 "42"）
-           ^
-解析得到整数 42 。
-由于 "42" 在范围 [-231, 231 - 1] 内，最终结果为 42 。
-```
+> 输入：s = "42"
+> 输出：42
+> 解释：加粗的字符串为已经读入的字符，插入符号是当前读取的字符。
+> 第 1 步："42"（当前没有读入字符，因为没有前导空格）
+>          ^
+> 第 2 步："42"（当前没有读入字符，因为这里不存在 '-' 或者 '+'）
+>          ^
+> 第 3 步："42"（读入 "42"）
+>            ^
+> 解析得到整数 42 。
+> 由于 "42" 在范围 [-231, 231 - 1] 内，最终结果为 42 。
 
 **示例 2：**
 
-```
-输入：s = "   -42"
-输出：-42
-解释：
-第 1 步："   -42"（读入前导空格，但忽视掉）
-            ^
-第 2 步："   -42"（读入 '-' 字符，所以结果应该是负数）
-             ^
-第 3 步："   -42"（读入 "42"）
-               ^
-解析得到整数 -42 。
-由于 "-42" 在范围 [-231, 231 - 1] 内，最终结果为 -42 。
-```
+> 输入：s = "   -42"
+> 输出：-42
+> 解释：
+> 第 1 步："   -42"（读入前导空格，但忽视掉）
+>             ^
+> 第 2 步："   -42"（读入 '-' 字符，所以结果应该是负数）
+>              ^
+> 第 3 步："   -42"（读入 "42"）
+>                ^
+> 解析得到整数 -42 。
+> 由于 "-42" 在范围 [-231, 231 - 1] 内，最终结果为 -42 。
 
 **示例 3：**
 
-```
-输入：s = "4193 with words"
-输出：4193
-解释：
-第 1 步："4193 with words"（当前没有读入字符，因为没有前导空格）
-         ^
-第 2 步："4193 with words"（当前没有读入字符，因为这里不存在 '-' 或者 '+'）
-         ^
-第 3 步："4193 with words"（读入 "4193"；由于下一个字符不是一个数字，所以读入停止）
-             ^
-解析得到整数 4193 。
-由于 "4193" 在范围 [-231, 231 - 1] 内，最终结果为 4193 。
-```
+> 输入：s = "4193 with words"
+> 输出：4193
+> 解释：
+> 第 1 步："4193 with words"（当前没有读入字符，因为没有前导空格）
+>          ^
+> 第 2 步："4193 with words"（当前没有读入字符，因为这里不存在 '-' 或者 '+'）
+>          ^
+> 第 3 步："4193 with words"（读入 "4193"；由于下一个字符不是一个数字，所以读入停止）
+>              ^
+> 解析得到整数 4193 。
+> 由于 "4193" 在范围 [-231, 231 - 1] 内，最终结果为 4193 。
 
 **示例 4：**
 
-```
-输入：s = "words and 987"
-输出：0
-解释：
-第 1 步："words and 987"（当前没有读入字符，因为没有前导空格）
-         ^
-第 2 步："words and 987"（当前没有读入字符，因为这里不存在 '-' 或者 '+'）
-         ^
-第 3 步："words and 987"（由于当前字符 'w' 不是一个数字，所以读入停止）
-         ^
-解析得到整数 0 ，因为没有读入任何数字。
-由于 0 在范围 [-231, 231 - 1] 内，最终结果为 0 。
-```
+> 输入：s = "words and 987"
+> 输出：0
+> 解释：
+> 第 1 步："words and 987"（当前没有读入字符，因为没有前导空格）
+>          ^
+> 第 2 步："words and 987"（当前没有读入字符，因为这里不存在 '-' 或者 '+'）
+>          ^
+> 第 3 步："words and 987"（由于当前字符 'w' 不是一个数字，所以读入停止）
+>          ^
+> 解析得到整数 0 ，因为没有读入任何数字。
+> 由于 0 在范围 [-231, 231 - 1] 内，最终结果为 0 。
 
 **示例 5：**
 
-```
-输入：s = "-91283472332"
-输出：-2147483648
-解释：
-第 1 步："-91283472332"（当前没有读入字符，因为没有前导空格）
-         ^
-第 2 步："-91283472332"（读入 '-' 字符，所以结果应该是负数）
-          ^
-第 3 步："-91283472332"（读入 "91283472332"）
-                     ^
-解析得到整数 -91283472332 。
-由于 -91283472332 小于范围 [-231, 231 - 1] 的下界，最终结果被截断为 -231 = -2147483648 。
-```
+> 输入：s = "-91283472332"
+> 输出：-2147483648
+> 解释：
+> 第 1 步："-91283472332"（当前没有读入字符，因为没有前导空格）
+>          ^
+> 第 2 步："-91283472332"（读入 '-' 字符，所以结果应该是负数）
+>           ^
+> 第 3 步："-91283472332"（读入 "91283472332"）
+>                      ^
+> 解析得到整数 -91283472332 。
+> 由于 -91283472332 小于范围 [-231, 231 - 1] 的下界，最终结果被截断为 -231 = -2147483648 。
 
 **提示：**
 
 - `0 <= s.length <= 200`
 - `s` 由英文字母（大写和小写）、数字（`0-9`）、`' '`、`'+'`、`'-'` 和 `'.'` 组成
 
-```java
-public class Solution {
+```c
+int myAtoi(char * s)
+{
+   
+    int len = strlen(s);
+    int res = 0;
 
-    public int myAtoi(String str) {
-        int len = str.length();
-        // str.charAt(i) 方法回去检查下标的合法性，一般先转换成字符数组
-        char[] charArray = str.toCharArray();
-
-        // 1、去除前导空格
-        int index = 0;
-        while (index < len && charArray[index] == ' ') {
-            index++;
-        }
-
-        // 2、如果已经遍历完成（针对极端用例 "      "）
-        if (index == len) {
-            return 0;
-        }
-
-        // 3、如果出现符号字符，仅第 1 个有效，并记录正负
-        int sign = 1;
-        char firstChar = charArray[index];
-        if (firstChar == '+') {
-            index++;
-        } else if (firstChar == '-') {
-            index++;
-            sign = -1;
-        }
-
-        // 4、将后续出现的数字字符进行转换
-        // 不能使用 long 类型，这是题目说的
-        int res = 0;
-        while (index < len) {
-            char currChar = charArray[index];
-            // 4.1 先判断不合法的情况
-            if (currChar > '9' || currChar < '0') {
-                break;
-            }
-
-            // 题目中说：环境只能存储 32 位大小的有符号整数，因此，需要提前判：断乘以 10 以后是否越界
-            if (res > Integer.MAX_VALUE / 10 || (res == Integer.MAX_VALUE / 10 && (currChar - '0') > Integer.MAX_VALUE % 10)) {
-                return Integer.MAX_VALUE;
-            }
-            if (res < Integer.MIN_VALUE / 10 || (res == Integer.MIN_VALUE / 10 && (currChar - '0') > -(Integer.MIN_VALUE % 10))) {
-                return Integer.MIN_VALUE;
-            }
-
-            // 4.2 合法的情况下，才考虑转换，每一步都把符号位乘进去
-            res = res * 10 + sign * (currChar - '0');
-            index++;
-        }
-        return res;
+    int i = 0;
+    while (s[i] == ' ') {
+        i++;
     }
 
+    bool isNegitive = false;
+    if (s[i] == '-') {
+        isNegitive = true;
+        i++;
+    }  else if (s[i] == '+') {
+        i++;
+    }
+
+    for (i; i < len; i++) {
+        if (!(s[i] >= '0' && s[i] <= '9')) {
+            break;
+        }
+
+        if ( res > INT_MAX / 10 || 
+                (res == INT_MAX / 10 && s[i] - '0' > INT_MAX % 10)) {
+            
+            return isNegitive ? INT_MIN : INT_MAX;
+        }  
+
+        res = res * 10 + (s[i] - '0');
+    }
+
+    if (isNegitive) {
+        res = -res;
+    }
+
+    return res;
 }
 ```
 
@@ -858,61 +763,54 @@ public class Solution {
 
  **示例 1：**
 
-```
-输入：x = 121
-输出：true
-```
+> 输入：x = 121
+> 输出：true
 
 
 **示例 2：**
 
-```
-输入：x = -121
-输出：false
-解释：从左向右读, 为 -121 。 从右向左读, 为 121- 。因此它不是一个回文数。
-```
+> 输入：x = -121
+> 输出：false
+> 解释：从左向右读, 为 -121 。 从右向左读, 为 121- 。因此它不是一个回文数。
 
 
 **示例 3：**
 
-```
-输入：x = 10
-输出：false
-解释：从右向左读, 为 01 。因此它不是一个回文数。
-```
+> 输入：x = 10
+> 输出：false
+> 解释：从右向左读, 为 01 。因此它不是一个回文数。
 
 
 **示例 4：**
 
-```
-输入：x = -101
-输出：false
-```
+> 输入：x = -101
+> 输出：false
 
 **提示：**
 
 - 2^31^ <= x <= 2^31^ - 1
 
-```java
-class Solution {
-    public boolean isPalindrome(int x) {
-        char[] str = String.valueOf(x).toCharArray();
+```c
+#define MAX_INT_SIZE 33
+bool isPalindrome(int x){
+    char s[MAX_INT_SIZE];
+    memset(s, 0, MAX_INT_SIZE * sizeof(char));
 
-        int  l = 0, r = str.length -1;
-
-        while(r -l > 0){
-            if(str[l] != str[r])
-                return false;
-            l++;
-            r--;
+    sprintf(s, "%d", x);
+    int l = 0;
+    int r = strlen(s) - 1;
+    while (l < r) {
+        if (s[l] != s[r]) {
+            return false;
         }
 
-        return true;
+        l++;
+        r--;
     }
+
+    return true; 
 }
 ```
-
-
 
 #### [10. 正则表达式匹配](https://leetcode-cn.com/problems/regular-expression-matching/)
 
@@ -925,46 +823,36 @@ class Solution {
 
 **示例 1：**
 
-```
-输入：s = "aa" p = "a"
-输出：false
-解释："a" 无法匹配 "aa" 整个字符串。
-```
+> 输入：s = "aa" p = "a"
+> 输出：false
+> 解释："a" 无法匹配 "aa" 整个字符串。
 
 
 **示例 2:**
 
-```
-输入：s = "aa" p = "a*"
-输出：true
-解释：因为 '*' 代表可以匹配零个或多个前面的那一个元素, 在这里前面的元素就是 'a'。因此，字符串 "aa" 可被视为 'a' 重复了一次。
-```
+> 输入：s = "aa" p = "a*"
+> 输出：true
+> 解释：因为 '*' 代表可以匹配零个或多个前面的那一个元素, 在这里前面的元素就是 'a'。因此，字符串 "aa" 可被视为 'a' 重复了一次。
 
 
 **示例 3：**
 
-```
-输入：s = "ab" p = ".*"
-输出：true
-解释：".*" 表示可匹配零个或多个（'*'）任意字符（'.'）。
-```
+> 输入：s = "ab" p = ".*"
+> 输出：true
+> 解释：".*" 表示可匹配零个或多个（'*'）任意字符（'.'）。
 
 
 **示例 4：**
 
-```
-输入：s = "aab" p = "c*a*b"
-输出：true
-解释：因为 '*' 表示零个或多个，这里 'c' 为 0 个, 'a' 被重复一次。因此可以匹配字符串 "aab"。
-```
+> 输入：s = "aab" p = "c*a*b"
+> 输出：true
+> 解释：因为 '*' 表示零个或多个，这里 'c' 为 0 个, 'a' 被重复一次。因此可以匹配字符串 "aab"。
 
 
 **示例 5：**
 
-```
-输入：s = "mississippi" p = "mis*is*p*."
-输出：false
-```
+> 输入：s = "mississippi" p = "mis*is*p*."
+> 输出：false
 
 **提示：**
 
@@ -974,44 +862,40 @@ class Solution {
 * p 可能为空，且只包含从 a-z 的小写字母，以及字符 . 和 *。
 * 保证每次出现字符 * 时，前面都匹配到有效的字符
 
-```java
-class Solution {
-    public boolean isMatch(String s, String p) {
-        int m = s.length();
-        int n = p.length();
-        boolean f[][] = new boolean[m + 1][n + 1];
-        f[0][0] = true;
-        //f[0][0]代表s和p均为空字符串，f[1][1]代表s和p的第一个字符（即在s和p中下标为0的字符）
-        for(int i = 0; i <= m ; ++i) {
-            for(int j = 1; j <= n; ++j) {
-                if(p.charAt(j - 1) == '*') {//p的第j个字符为*
-                    if(matches(s, p, i, j - 1)) {//匹配s的第i个字符和p的第j-1个字符
-                        f[i][j] = f[i - 1][j] || f[i][j - 2];
-                        //p中*前面的字符在s中出现多次或者在s中只出现1次
-                    }
-                    else {
-                        f[i][j] = f[i][j - 2];//p中*前面的在s中字符出现0次
+```c
+bool isMatch(char* s, char* p){
+    int lenOfS = strlen(s);
+    int lenOfP = strlen(p);
+
+    bool dp[lenOfS +1 ][lenOfP +1];
+
+    memset(dp,false,(lenOfS +1)* (lenOfP + 1)*sizeof(bool));
+    
+    dp[0][0] = true;
+    for( int i = 0 ; i <= lenOfS; i++ ) {
+        for(int j = 0 ; j <= lenOfP; j++ ) {
+           if (j == 0) {
+                dp[i][j] = (i == 0 ? true : false);
+            }
+            else {
+                if (p[j - 1] != '*') {
+                    if (i > 0 && (s[i - 1] == p[j - 1] || p[j - 1] == '.')) {
+                        dp[i][j] = dp[i - 1][j - 1];
                     }
                 }
-                else {//p的第j个字符不为*
-                   if(matches(s, p, i, j)) {//匹配s的第i个字符和p的第j个字符
-                       f[i][j] = f[i - 1][j - 1];//匹配成功，状态转移；匹配不成功，默认是false
-                   } 
+                else { // 当p[j] == '*'时，由于'*'跟在一个字符后面，所以j必然大于等于2；
+                    dp[i][j] = dp[i][j - 2];
+                    if (i > 0 && (s[i - 1] == p[j - 2] || p[j - 2] == '.')) {
+                        dp[i][j] |= dp[i - 1][j];
+                    }
                 }
             }
+
+                  
         }
-        return f[m][n];
     }
 
-    private boolean matches(String s, String p, int i, int j) {//注意在字符串中的下标变换
-        if(i == 0) { //代表是空字符，直接返回
-            return false;
-        }
-        if(p.charAt(j - 1) == '.') {
-            return true;
-        }
-        return s.charAt(i - 1) == p.charAt(j - 1);
-    }
+    return dp[lenOfS][lenOfP];
 }
 ```
 
@@ -1023,7 +907,7 @@ class Solution {
 
 **示例 1：**
 
-![](E:\大三下\leetcode\leetcode\img\question_11.jpg)
+![](img/question_11.jpg)
 
 ```
 输入：[1,8,6,2,5,4,8,3,7]
