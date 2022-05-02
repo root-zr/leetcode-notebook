@@ -909,32 +909,24 @@ bool isMatch(char* s, char* p){
 
 ![](img/question_11.jpg)
 
-```
-输入：[1,8,6,2,5,4,8,3,7]
-输出：49 
-解释：图中垂直线代表输入数组 [1,8,6,2,5,4,8,3,7]。在此情况下，容器能够容纳水（表示为蓝色部分）的最大值为 49。
-```
+> 输入：[1,8,6,2,5,4,8,3,7]
+> 输出：49 
+> 解释：图中垂直线代表输入数组 [1,8,6,2,5,4,8,3,7]。在此情况下，容器能够容纳水（表示为蓝色部分）的最大值为 49。
 
 **示例 2：**
 
-```
-输入：height = [1,1]
-输出：1
-```
+> 输入：height = [1,1]
+> 输出：1
 
 **示例 3：**
 
-```
-输入：height = [4,3,2,1,4]
-输出：16
-```
+> 输入：height = [4,3,2,1,4]
+> 输出：16
 
 **示例 4：**
 
-```
-输入：height = [1,2,1]
-输出：2
-```
+> 输入：height = [1,2,1]
+> 输出：2
 
 **提示：**
 
@@ -942,17 +934,26 @@ bool isMatch(char* s, char* p){
 *  $2 <= n <= 3 * 10^4$
 * $0 <= height[i] <= 3 * 10^4$
 
-```java
-class Solution {
-    public int maxArea(int[] height) {
-        int i = 0, j = height.length - 1, res = 0;
-        while(i < j){
-            res = height[i] < height[j] ? 
-                Math.max(res, (j - i) * height[i++]): 
-                Math.max(res, (j - i) * height[j--]); 
+```c
+int maxArea(int* height, int heightSize){
+    int maxVal = 0;
+    int l = 0;
+    int r = heightSize - 1;
+
+    while (l < r) {
+        int area = fmin(height[l], height[r]) * (r - l);
+        if (height[l] < height[r]) {
+            l++;
+        } else {
+            r--;
         }
-        return res;
+
+        if (area > maxVal) {
+            maxVal = area;
+        }
     }
+
+    return maxVal;
 }
 ```
 
@@ -960,16 +961,14 @@ class Solution {
 
 罗马数字包含以下七种字符： `I`， `V`， `X`， `L`，`C`，`D` 和 `M`。
 
-```
-字符          数值
-I             1
-V             5
-X             10
-L             50
-C             100
-D             500
-M             1000
-```
+> 字符          数值
+> I             1
+> V             5
+> X             10
+> L             50
+> C             100
+> D             500
+> M             1000
 
 例如， 罗马数字 2 写做 II ，即为两个并列的 1。12 写做 XII ，即为 X + II 。 27 写做  XXVII, 即为 XX + V + II 。
 
@@ -983,68 +982,66 @@ M             1000
 
 **示例 1:**
 
-```
-输入: 3
-输出: "III"
-```
+> 输入: 3
+> 输出: "III"
 
 
 **示例 2:**
 
-```
-输入: 4
-输出: "IV"
-```
+> 输入: 4
+> 输出: "IV"
 
 
 **示例 3:**
 
-```
-输入: 9
-输出: "IX"
-```
+> 输入: 9
+> 输出: "IX"
 
 
 **示例 4:**
 
-```
-输入: 58
-输出: "LVIII"
-解释: L = 50, V = 5, III = 3.
-```
+> 输入: 58
+> 输出: "LVIII"
+> 解释: L = 50, V = 5, III = 3.
 
 
 **示例 5:**
 
-```
-输入: 1994
-输出: "MCMXCIV"
-解释: M = 1000, CM = 900, XC = 90, IV = 4.
-```
+> 输入: 1994
+> 输出: "MCMXCIV"
+> 解释: M = 1000, CM = 900, XC = 90, IV = 4.
 
 **提示：**
 
 * 1 <= num <= 3999
 
-```java
-public class Solution {
+```c
+#define MAX_SIZE 100
 
-    public String intToRoman(int num) {
-        int[] nums = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
-        String[] romans = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
-
-        StringBuilder stringBuilder = new StringBuilder();
-        int index = 0;
-        while (index < 13) {
-            // 特别注意：这里是等号
-            while (num >= nums[index]) {
-                stringBuilder.append(romans[index]);
-                num -= nums[index];
-            }
-            index++;
-        }
-        return stringBuilder.toString();
+char * intToRoman(int num)
+{
+    char *res = (char *)malloc(MAX_SIZE * sizeof(char));
+    if (res == NULL) {
+        return NULL;
     }
+    memset(res, 0, MAX_SIZE * sizeof(char));
+
+    int nums[] = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+    char *romans[] = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+
+    int count = 0;
+    while (num > 0) {
+        for (int i = 0; i < 13; i++) {
+            if (num >= nums[i]) {
+                strcpy(&res[count],romans[i]);
+                count += strlen(romans[i]);
+                num -= nums[i];
+                break;
+            }
+        }
+    }
+
+    return res;
 }
 ```
 
@@ -1052,16 +1049,14 @@ public class Solution {
 
 罗马数字包含以下七种字符: `I`， `V`， `X`， `L`，`C`，`D` 和 `M`。
 
-```
-字符          数值
-I             1
-V             5
-X             10
-L             50
-C             100
-D             500
-M             1000
-```
+> 字符          数值
+> I             1
+> V             5
+> X             10
+> L             50
+> C             100
+> D             500
+> M             1000
 
 
 例如， 罗马数字 2 写做 II ，即为两个并列的 1。12 写做 XII ，即为 X + II 。 27 写做  XXVII, 即为 XX + V + II 。
@@ -1076,44 +1071,34 @@ M             1000
 
 **示例 1:**
 
-```
-输入: "III"
-输出: 3
-```
+> 输入: "III"
+> 输出: 3
 
 
 **示例 2:**
 
-```
-输入: "IV"
-输出: 4
-```
+> 输入: "IV"
+> 输出: 4
 
 
 **示例 3:**
 
-```
-输入: "IX"
-输出: 9
-```
+> 输入: "IX"
+> 输出: 9
 
 
 **示例 4:**
 
-```
-输入: "LVIII"
-输出: 58
-解释: L = 50, V= 5, III = 3.
-```
+> 输入: "LVIII"
+> 输出: 58
+> 解释: L = 50, V= 5, III = 3.
 
 
 **示例 5:**
 
-```
-输入: "MCMXCIV"
-输出: 1994
-解释: M = 1000, CM = 900, XC = 90, IV = 4.
-```
+> 输入: "MCMXCIV"
+> 输出: 1994
+> 解释: M = 1000, CM = 900, XC = 90, IV = 4.
 
 **提示：**
 
@@ -1124,37 +1109,29 @@ M             1000
 * IL 和 IM 这样的例子并不符合题目要求，49 应该写作 XLIX，999 应该写作 CMXCIX 。
 * 关于罗马数字的详尽书写规则，可以参考 [罗马数字 - Mathematics](https://b2b.partcommunity.com/community/knowledge/zh_CN/detail/10753/罗马数字#knowledge_article)。
 
-```java
-class Solution {
-    public int romanToInt(String s) {
-        Map<String, Integer> map = new HashMap<>();
-        map.put("I", 1);
-        map.put("IV", 4);
-        map.put("V", 5);
-        map.put("IX", 9);
-        map.put("X", 10);
-        map.put("XL", 40);
-        map.put("L", 50);
-        map.put("XC", 90);
-        map.put("C", 100);
-        map.put("CD", 400);
-        map.put("D", 500);
-        map.put("CM", 900);
-        map.put("M", 1000);
-        
-        int ans = 0;
-        for(int i = 0;i < s.length();) {
-            if(i + 1 < s.length() && map.containsKey(s.substring(i, i+2))) {
-                ans += map.get(s.substring(i, i+2));
-                i += 2;
-            } else {
-                ans += map.get(String.valueOf(s.charAt(i)));
-                i ++;
-            }
+```c
+int romanToInt(char* s) {
+    int symbolValues[26];
+    symbolValues['I' - 'A'] = 1;
+    symbolValues['V' - 'A'] = 5;
+    symbolValues['X' - 'A'] = 10;
+    symbolValues['L' - 'A'] = 50;
+    symbolValues['C' - 'A'] = 100;
+    symbolValues['D' - 'A'] = 500;
+    symbolValues['M' - 'A'] = 1000;
+    int ans = 0;
+    int n = strlen(s);
+    for (int i = 0; i < n; ++i) {
+        int value = symbolValues[s[i] - 'A'];
+        if (i < n - 1 && value < symbolValues[s[i + 1] - 'A']) {
+            ans -= value;
+        } else {
+            ans += value;
         }
-        return ans;
     }
+    return ans;
 }
+
 ```
 
 #### [14. 最长公共前缀](https://leetcode-cn.com/problems/longest-common-prefix/)
@@ -1165,19 +1142,15 @@ class Solution {
 
 **示例 1：**
 
-```
-输入：strs = ["flower","flow","flight"]
-输出："fl"
-```
+> 输入：strs = ["flower","flow","flight"]
+> 输出："fl"
 
 
 **示例 2：**
 
-```
-输入：strs = ["dog","racecar","car"]
-输出：""
-解释：输入不存在公共前缀。
-```
+> 输入：strs = ["dog","racecar","car"]
+> 输出：""
+> 解释：输入不存在公共前缀。
 
 **提示：**
 
@@ -1185,28 +1158,33 @@ class Solution {
 * 0 <= strs[i].length <= 200
 * strs[i] 仅由小写英文字母组成
 
-```java
-class Solution {
-    public String longestCommonPrefix(String[] strs) {
-        if(strs.length == 0) 
-            return "";
-        String ans = strs[0];
-        for(int i =1;i<strs.length;i++) {
-            int j=0;
-            for(;j<ans.length() && j < strs[i].length();j++) {
-                if(ans.charAt(j) != strs[i].charAt(j))
-                    break;
-            }
-
-            //先1和2比较，找到公共前缀，再用两个的公共前缀和3去比较，以此类推
-            ans = ans.substring(0, j);
-            if(ans.equals(""))
-                return ans;
-        }
-        return ans;
+```c
+char * longestCommonPrefix(char ** strs, int strsSize)
+{
+    if (strsSize == 1) {
+        return strs[0];
     }
-}
+    
+    int max_len = strlen(strs[0]);
+    for (int i = 1; i < strsSize; i++) {
+        int j;
+        for (j = 0; j < fmin(strlen(strs[i]), max_len); j++) {
+            if (strs[i][j] != strs[0][j] ) {
+                break;
+            }       
+        }
 
+        if (max_len > j) {
+            max_len = j;
+        }
+        if (max_len == 0) {
+            return "";
+        }
+    }
+
+    strs[0][max_len] = '\0';
+    return strs[0];
+}
 ```
 
 #### [15. 三数之和](https://leetcode-cn.com/problems/3sum/)
@@ -1217,68 +1195,90 @@ class Solution {
 
 **示例 1：**
 
-```
-输入：nums = [-1,0,1,2,-1,-4]
-输出：[[-1,-1,2],[-1,0,1]]
-```
+> 输入：nums = [-1,0,1,2,-1,-4]
+> 输出：[[-1,-1,2],[-1,0,1]]
 
 
 **示例 2：**
 
-```
-输入：nums = []
-输出：[]
-```
+> 输入：nums = []
+> 输出：[]
 
 
 **示例 3：**
 
-```
-输入：nums = [0]
-输出：[]
-```
+> 输入：nums = [0]
+> 输出：[]
 
 **提示：**
 
 * 0 <= nums.length <= 3000
 * $-105 <= nums[i] <= 10^5$
 
-```java
-public class Solution{
-    public List<List<Integer>> threeSum(int[] nums) {
-        List<List<Integer>> lists = new ArrayList<>();
-        //排序
-        Arrays.sort(nums);
-        //双指针
-        int len = nums.length;
-        for(int i = 0;i < len;++i) {
-            if(nums[i] > 0) return lists;
+```c
+int Cmp(const void *a, const void *b)
+{
+    return *(int *)a - *(int *)b;
+}
 
-            if(i > 0 && nums[i] == nums[i-1]) continue;
+int** threeSum(int* nums, int numsSize, int* returnSize, int** returnColumnSizes)
+{
+    qsort(nums, numsSize, sizeof(int), Cmp);
 
-            int curr = nums[i];
-            int L = i+1, R = len-1;
-            while (L < R) {
-                int tmp = curr + nums[L] + nums[R];
-                if(tmp == 0) {
-                    List<Integer> list = new ArrayList<>();
-                    list.add(curr);
-                    list.add(nums[L]);
-                    list.add(nums[R]);
-                    lists.add(list);
-                    while(L < R && nums[L+1] == nums[L]) ++L;
-                    while (L < R && nums[R-1] == nums[R]) --R;
-                    ++L;
-                    --R;
-                } else if(tmp < 0) {
-                    ++L;
-                } else {
-                    --R;
+    int **res = (int **)malloc(numsSize  * numsSize * sizeof(int *));
+    if (res == NULL) {
+        return NULL;
+    }
+    memset(res, 0,numsSize  * numsSize * sizeof(int *));
+    int size = 0;
+
+    *returnColumnSizes = (int *)malloc(numsSize  * numsSize * sizeof(int));
+    if (*returnColumnSizes == NULL) {
+        return NULL;
+    }
+
+    for (int i = 0; i < numsSize - 2; i++) {
+        if (nums[i] > 0) {
+            break;
+        }
+        if (i > 0 && nums[i] == nums[i - 1]) {
+            continue;
+        }
+        int l = i + 1;
+        int r = numsSize - 1;
+        while (l < r) {
+            int sum = nums[i] + nums[l] + nums[r];
+         
+            if (sum == 0) {
+                int *tmp = (int *)malloc(3 * sizeof(int));
+                if (tmp == NULL) {
+                    return NULL;
                 }
+                tmp[0] = nums[i];
+                tmp[1] = nums[l];
+                tmp[2] = nums[r];
+                
+               
+                res[size] = tmp;
+                (*returnColumnSizes)[size] = 3;
+                size++;
+
+                while (l < r && nums[l] == nums[l + 1]) {
+                    l++;
+                }
+                l++;
+                r--;
+            } else if (sum > 0) {
+                r--;
+            } else {
+                l++;
             }
         }
-        return lists;
     }
+    
+    *returnSize = size;
+    
+    return res;
 }
 ```
 
@@ -1288,11 +1288,9 @@ public class Solution{
 
  **示例：**
 
-```
-输入：nums = [-1,2,1,-4], target = 1
-输出：2
-解释：与 target 最接近的和是 2 (-1 + 2 + 1 = 2) 。
-```
+> 输入：nums = [-1,2,1,-4], target = 1
+> 输出：2
+> 解释：与 target 最接近的和是 2 (-1 + 2 + 1 = 2) 。
 
 **提示：**
 
@@ -1300,27 +1298,37 @@ public class Solution{
 * -10^3^ <= nums[i] <= 10^3^
 * -10^4^ <= target <= 10^4^
 
-```java
-class Solution {
-    public int threeSumClosest(int[] nums, int target) {
-        Arrays.sort(nums);
-        int ans = nums[0] + nums[1] + nums[2];
-        for(int i=0;i<nums.length;i++) {
-            int start = i+1, end = nums.length - 1;
-            while(start < end) {
-                int sum = nums[start] + nums[end] + nums[i];
-                if(Math.abs(target - sum) < Math.abs(target - ans))
-                    ans = sum;
-                if(sum > target)
-                    end--;
-                else if(sum < target)
-                    start++;
-                else
-                    return ans;
+```c
+int Cmp(const void *a, const void *b)
+{
+    return *(int *)a - *(int *)b;
+}
+
+int threeSumClosest(int* nums, int numsSize, int target){
+    qsort(nums, numsSize, sizeof(int), Cmp);
+
+    int res = nums[0] + nums[1] + nums[2];
+
+    for (int i = 0; i < numsSize - 2; i++) {
+        int l = i + 1;
+        int r = numsSize - 1;
+        while (l < r) {
+            int sum = nums[i] + nums[l] + nums[r];
+
+            if (abs(sum - target) < abs(res - target)) {
+                res = sum;
+            }
+            if (sum > target) {
+                r--;
+            } else if (sum < target){
+                l++;
+            } else {
+                return target;
             }
         }
-        return ans;
     }
+    
+    return res; 
 }
 ```
 
@@ -1330,77 +1338,87 @@ class Solution {
 
 给出数字到字母的映射如下（与电话按键相同）。注意 1 不对应任何字母。
 
-![](E:\大三下\leetcode\leetcode\img\17_telephone_keypad.png)
+![](img/17_telephone_keypad.png)
 
 **示例 1：**
 
-```
-输入：digits = "23"
-输出：["ad","ae","af","bd","be","bf","cd","ce","cf"]
-```
+> 输入：digits = "23"
+> 输出：["ad","ae","af","bd","be","bf","cd","ce","cf"]
 
 
 **示例 2：**
 
-```
-输入：digits = ""
-输出：[]
-```
+> 输入：digits = ""
+> 输出：[]
 
 
 **示例 3：**
 
-```
-输入：digits = "2"
-输出：["a","b","c"]
-```
+> 输入：digits = "2"
+> 输出：["a","b","c"]
 
 **提示：**
 
-```
-0 <= digits.length <= 4
-digits[i] 是范围 ['2', '9'] 的一个数字。
-```
+> 0 <= digits.length <= 4
+> digits[i] 是范围 ['2', '9'] 的一个数字。
 
-```java
-class Solution {
-    List<String> result = new ArrayList<>();
-    // 将所有映射添加到Map中
-    Map<Character, String> numToLetter = new HashMap<>() {{
-        put('2', "abc");
-        put('3', "def");
-        put('4', "ghi");
-        put('5', "jkl");
-        put('6', "mno");
-        put('7', "pqrs");
-        put('8', "tuv");
-        put('9', "wxyz");
-    }};
-    public List<String> letterCombinations(String digits) {
-        if(digits.length() > 0) {
-            backtrack(0, digits, new StringBuilder());
+```c
+#define MAX_SIZE 4*4*4*4
+
+char *words[] = 
+{
+    "",
+    "",
+    "abc",
+    "def",
+    "ghi",
+    "jkl",
+    "mno",
+    "pqrs",
+    "tuv",
+    "wxyz"
+};
+
+void Dfs(char *digits, char *cur, int index, char **res, int *sizeOfRes)
+{
+    if (index == strlen(digits)) {
+        char *tmp = (char *)malloc((index + 1) * sizeof(char));
+        for (int i = 0; i < index; i++) {
+            tmp[i] = cur[i];
         }
-        return result;
+        tmp[index] = '\0';
+
+        res[(*sizeOfRes)++] = tmp;
+        return;
     }
 
-    public void backtrack(int pos, String digits, StringBuilder sb) {
-        // 判断返回的条件：已经读取完所有digits的数字
-        if(pos == digits.length()) {
-            result.add(sb.toString());
-            return;
-        }
-        // 获取当前数字
-        char number = digits.charAt(pos);
-        // 从Map中读取数字映射的字母
-        String letters = numToLetter.get(number);
-        // 遍历每个字母，进行：添加、递归、删除
-        for(int i = 0; i < letters.length(); i++) {
-            sb.append(letters.charAt(i));
-            // 递归时pos应该+1，因为该读取下一位了
-            backtrack(pos+1, digits, sb);
-            sb.deleteCharAt(sb.length()-1);
-        }
+    char *word = words[digits[index] - '0'];
+    for (int i = 0; i < strlen(word); i++) {
+        cur[index] = word[i];
+        Dfs(digits, cur, index + 1, res, sizeOfRes);
     }
+}
+
+char ** letterCombinations(char * digits, int* returnSize){
+
+    char **res = (char **)malloc(MAX_SIZE * sizeof(char *));
+    if (res == NULL) {
+        return NULL;
+    }
+    int sizeOfRes = 0;
+    
+    char *cur = (char *)malloc(5 * sizeof(char));
+    int index = 0;
+    
+    if (strlen(digits) == 0) {
+       *returnSize = 0;
+       return NULL;
+    }
+
+    Dfs(digits, cur, index, res, &sizeOfRes);
+    *returnSize = sizeOfRes;
+
+    return res;
 }
 ```
 
@@ -1412,18 +1430,14 @@ class Solution {
 
 **示例 1：**
 
-```
-输入：nums = [1,0,-1,0,-2,2], target = 0
-输出：[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]
-```
+> 输入：nums = [1,0,-1,0,-2,2], target = 0
+> 输出：[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]
 
 
 **示例 2：**
 
-```
-输入：nums = [], target = 0
-输出：[]
-```
+> 输入：nums = [], target = 0
+> 输出：[]
 
 **提示：**
 
@@ -1431,46 +1445,79 @@ class Solution {
 * -10^9^<= nums[i] <= 10^9^
 * -10^9^ <= target <= 10^9^
 
-```java
-class Solution {
-    public List<List<Integer>> fourSum(int[] nums, int target) {
-        List<List<Integer>> ans=new ArrayList<>();
-        if(nums.length < 4 || nums == null)
-            return ans;
-           
-        Arrays.sort(nums);
+```c
+#define MAX_SIZE 200 * 4
 
-        for(int i=0;i<nums.length-3;i++){
-            //枚举最小的数字
-            if(i>0&&nums[i]==nums[i-1]){continue;}//最小数字不可重复
-            if(nums[i]+nums[i+1]+nums[i+2]+nums[i+3]>target){break;}//只要和大于t那么后边都不用看了
-            if(nums[i]+nums[nums.length-3]+nums[nums.length-2]+nums[nums.length-1]<target){continue;}
-            //最大的可能和也不足t只能重新枚举最小数
-            for(int j=i+1;j<nums.length-2;j++){
-                //下面列举第二小的数
-                if(j>i+1&&nums[j]==nums[j-1]){continue;}//第二小的数字也不能重复
-                if(nums[i]+nums[j]+nums[j+1]+nums[j+2]>target){break;}//只要和大于t那么后边都不用看了
-                if(nums[i]+nums[j]+nums[nums.length-2]+nums[nums.length-1]<target){continue;}
-                //最大的可能和也不足t只能重新枚举第二小的数
-                int l=j+1;
-                int r=nums.length-1;
-                //l和r分别代表第3,4个数
-                while(l<r){
-                    int sum=nums[i]+nums[j]+nums[l]+nums[r];
-                    if(sum==target){
-                        ans.add(Arrays.asList(nums[i],nums[j],nums[l],nums[r]));
-                        while(l<r&&nums[l]==nums[l+1]){l++;}//去重第三个数                            
-                        while(l<r&&nums[r]==nums[r-1]){r--;}//去重第四个数
-                        l++;
-                        r--;
+int Cmp(const void *a, const void *b)
+{
+    return *(int *)a - *(int *)b;
+}
+
+int** fourSum(int* nums, int numsSize, int target, int* returnSize, int** returnColumnSizes){
+    int **res = (int **)malloc(MAX_SIZE * sizeof(int *));
+    if (res == NULL) {
+        return NULL;
+    }
+    int sizeOfRes = 0;
+
+    *returnColumnSizes = (int *)malloc(MAX_SIZE * sizeof(int));
+    if (*returnColumnSizes == NULL) {
+        return NULL;
+    }
+
+    qsort(nums, numsSize, sizeof(int), Cmp);
+
+    for (int i = 0; i < numsSize - 3; i++) {
+        if (i > 0 && nums[i] == nums[i - 1]) {
+            continue;
+        }
+
+        if((long long)nums[i] + nums[i+1] + nums[i+2] + nums[i+3] > target) {
+            break;
+        }
+
+        for (int j = i + 1; j < numsSize - 2; j++) {
+            if (j > i + 1 && nums[j] == nums[j - 1]) {
+                continue;
+            }
+            int l = j + 1;
+            int r = numsSize - 1;
+
+            while (l < r) {
+
+                long long sum = (long long)nums[i] + nums[j] + nums[l] + nums[r];
+
+                if (sum == target) {
+                    int *tmp = (int *) malloc(4 * sizeof(int));
+                    if (tmp == NULL) {
+                        return NULL;
                     }
-                    else if(sum>target){r--;}
-                    else{l++;}
+
+                    tmp[0] = nums[i];
+                    tmp[1] = nums[j];
+                    tmp[2] = nums[l];
+                    tmp[3] = nums[r];
+
+                    res[sizeOfRes] = tmp;
+                    (*returnColumnSizes)[sizeOfRes] = 4;
+                    sizeOfRes++;
+
+                    while (l < r && nums[l] == nums[l + 1]) {
+                        l++;
+                    }
+                    l++;
+                    r--;
+                } else if (sum > target) {
+                    r--;
+                } else {
+                    l++;
                 }
             }
         }
-        return ans;     
     }
+
+    *returnSize = sizeOfRes;
+    return res;
 }
 ```
 
@@ -1482,28 +1529,22 @@ class Solution {
 
 **示例 1：**
 
-![](E:\大三下\leetcode\leetcode\img\remove_ex1.jpg)
+![](img/remove_ex1.jpg)
 
-```
-输入：head = [1,2,3,4,5], n = 2
-输出：[1,2,3,5]
-```
+> 输入：head = [1,2,3,4,5], n = 2
+> 输出：[1,2,3,5]
 
 
 **示例 2：**
 
-```
-输入：head = [1], n = 1
-输出：[]
-```
+> 输入：head = [1], n = 1
+> 输出：[]
 
 
 **示例 3：**
 
-```
-输入：head = [1,2], n = 1
-输出：[1]
-```
+> 输入：head = [1,2], n = 1
+> 输出：[1]
 
 **提示：**
 
@@ -1512,29 +1553,28 @@ class Solution {
 * 0 <= Node.val <= 100
 * 1 <= n <= sz
 
-```java
-/**
- * Definition for singly-linked list.
- * public class ListNode {
- *     int val;
- *     ListNode next;
- *     ListNode() {}
- *     ListNode(int val) { this.val = val; }
- *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
- * }
- */
-class Solution {
-    public ListNode removeNthFromEnd(ListNode head, int n) {
-        ListNode index1 = head, index2 = head;
-        for(int i = 0; i < n; i++)  index2 = index2.next; //使得index1与index2之间间隔n-1个节点       
-        if(index2 == null) return head.next;   //说明删除的是头节点
-        while(index2.next != null){      //将index2移至最后一个节点
-            index2 = index2.next;
-            index1 = index1.next;
-        }
-        index1.next = index1.next.next;
-        return head;
+```c
+struct ListNode* removeNthFromEnd(struct ListNode* head, int n){
+    struct ListNode *fast = head;
+    for (int i = 0; i < n; i++) {
+        fast = fast->next;
     }
+
+    if(fast == NULL) {
+        return head->next;   //说明删除的是头节点
+    }
+    struct ListNode *slow = head;
+    struct ListNode *pre = NULL;
+    while (fast != NULL) {
+        fast = fast->next;
+        pre = slow;
+        slow = slow ->next;
+    }
+
+    
+    pre->next = pre->next->next;
+    
+    return head;
 }
 ```
 
@@ -1549,77 +1589,78 @@ class Solution {
 
 **示例 1：**
 
-```
-输入：s = "()"
-输出：true
-```
+> 输入：s = "()"
+> 输出：true
 
 
 **示例 2：**
 
-```
-输入：s = "()[]{}"
-输出：true
-```
+> 输入：s = "()[]{}"
+> 输出：true
 
 
 **示例 3：**
 
-```
-输入：s = "(]"
-输出：false
-```
+> 输入：s = "(]"
+> 输出：false
 
 
 **示例 4：**
 
-```
-输入：s = "([)]"
-输出：false
-```
+> 输入：s = "([)]"
+> 输出：false
 
 
 **示例 5：**
 
-```
-输入：s = "{[]}"
-输出：true
-```
+> 输入：s = "{[]}"
+> 输出：true
 
 **提示：**
 
 * 1 <= s.length <= 10^4^
 * s 仅由括号 '()[]{}' 组成
 
-```java
-class Solution {
-    public boolean isValid(String s) {
-        int n = s.length();
-        if (n % 2 == 1) {
-            return false;
-        }
+```c
+# define MAX_SIZE 10001
+char GetPairs(char a) {
+    if (a == '}') return '{';
+    if (a == ']') return '[';
+    if (a == ')') return '(';
+    return 0;
+}
 
-        Map<Character, Character> pairs = new HashMap<Character, Character>() {{
-            put(')', '(');
-            put(']', '[');
-            put('}', '{');
-        }};
+bool isValid(char * s){
+    char stack[MAX_SIZE];
+    memset(stack, 0, MAX_SIZE * sizeof(char));
+    int top = 0;
 
-        Stack stack = new Stack();
-    
-        for (int i = 0; i < n; i++) {
-            char ch = s.charAt(i);
-            if (pairs.containsKey(ch)) {
-                if (stack.isEmpty() || stack.peek() != pairs.get(ch)) {
-                    return false;
-                }
-                stack.pop();
+    int len = strlen(s);
+     if (len % 2 == 1) {
+        return false;
+    }
+    for (int i = 0; i < len; i++) {
+        if (s[i] == '(' || s[i] == '[' || s[i] == '{') {
+            stack[top++] = s[i];
+        } else {
+            char tmp = GetPairs(s[i]);
+       
+            if (tmp != 0 && top > 0 && tmp == stack[top - 1]) {
+                top--;
             } else {
-                stack.push(ch);
+                return false;
             }
         }
-        return stack.isEmpty();
+        
+        
     }
+
+    if (top != 0) {
+        return false;
+    } 
+    
+    return true;
+   
 }
 ```
 
@@ -1629,27 +1670,21 @@ class Solution {
 
 **示例 1：**
 
-![](E:\大三下\leetcode\leetcode\img\merge_ex1.jpg)
+![](img/merge_ex1.jpg)
 
-```
-输入：l1 = [1,2,4], l2 = [1,3,4]
-输出：[1,1,2,3,4,4]
-```
+> 输入：l1 = [1,2,4], l2 = [1,3,4]
+> 输出：[1,1,2,3,4,4]
 
 **示例 2：**
 
-```
-输入：l1 = [], l2 = []
-输出：[]
-```
+> 输入：l1 = [], l2 = []
+> 输出：[]
 
 
 **示例 3：**
 
-```
-输入：l1 = [], l2 = [0]
-输出：[0]
-```
+> 输入：l1 = [], l2 = [0]
+> 输出：[0]
 
 **提示：**
 
@@ -1657,72 +1692,36 @@ class Solution {
 * -100 <= Node.val <= 100
 * l1 和 l2 均按 非递减顺序 排列
 
-```java
-//这道题用归并排序的方法时间复杂度是线性的，但是递归的方式思路很精妙，代码量也很少。递归就是程序内部维护了一个栈。这个题就是每次都把最小值压入栈，最后出栈的时候，将所有数连在一起就可以了。说白了，就是用一个栈维护了顺序。最后的连接，当然是小的连小的，所以l1 小，就连到 l1,l2 小就连到 l2，最后先返回的，就是最小的头结点。
-class Solution {
-
-    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
-
-        if (l1 == null) return l2;
-        if (l2 == null) return l1;
-
-        ListNode dummy = new ListNode(0);
-        ListNode p = dummy;
-
-        while (l1 != null && l2 != null) {
-
-            if (l1.val < l2.val) {
-
-                p.next = l1;
-                l1 = l1.next;
-            } else {
-
-                p.next = l2;
-                l2 = l2.next;
-            }
-            p = p.next;
-        }
-
-        while (l1 != null) {
-
-            p.next = l1;
-            l1 = l1.next;
-            p = p.next;
-        }
-        while (l2 != null) {
-
-            p.next = l2;
-            l2 = l2.next;
-            p = p.next;
-        }
-        return dummy.next;
+```c
+struct ListNode* mergeTwoLists(struct ListNode* list1, struct ListNode* list2){
+    struct ListNode * res = (struct ListNode *)malloc(sizeof(struct ListNode));
+    if (res == NULL) {
+        return NULL;
     }
-}
-```
+    memset(res, 0, sizeof(struct ListNode));
 
-```java
-//递归
-class Solution {
-    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
-        if(l1 == null) {
-            return l2;
-        }
-        if(l2 == null) {
-            return l1;
-        }
+    struct ListNode *p = res;
 
-        if(l1.val < l2.val) {
-            l1.next = mergeTwoLists(l1.next, l2);
-            return l1;
+    while (list1 != NULL && list2 != NULL) {
+        if (list1->val < list2->val) {
+            p->next = list1;
+            list1 = list1->next;
         } else {
-            l2.next = mergeTwoLists(l1, l2.next);
-            return l2;
+            p->next = list2;
+            list2 = list2->next;
         }
+        p = p->next;
     }
+
+    if (list1 == NULL && list2 != NULL) {
+        p->next = list2;
+    } else if (list1 != NULL && list2 == NULL) {
+        p->next = list1;
+    }
+
+    return res->next;
 }
 ```
-
-
 
 #### [22. 括号生成](https://leetcode-cn.com/problems/generate-parentheses/)
 
@@ -1730,49 +1729,58 @@ class Solution {
 
 **示例 1：**
 
-```
-输入：n = 3
-输出：["((()))","(()())","(())()","()(())","()()()"]
-```
+> 输入：n = 3
+> 输出：["((()))","(()())","(())()","()(())","()()()"]
 
 **示例 2：**
 
-```
-输入：n = 1
-输出：["()"]
-```
+> 输入：n = 1
+> 输出：["()"]
 
 **提示：**
 
 * 1 <= n <= 8
 
-```java
-class Solution {
-    List<String> res = new ArrayList<>();
-    public List<String> generateParenthesis(int n) {
-        if(n <= 0){
-            return res;
-        }
-        getParenthesis("",n,n);
-        return res;
-    }
+```c
+#define MAX_SIZE 10001
 
-    private void getParenthesis(String str,int left, int right) {
-        if(left == 0 && right == 0 ){
-            res.add(str);
-            return;
+void GetParenthesis(char *str,int left, int right, int len, char **res, int *sizeofRes)
+{
+    if(left == 0 && right == 0 ){
+        char *tmp = (char *)malloc((len + 1) * sizeof(char));
+        for (int i = 0; i < len; i++) {
+            tmp[i] = str[i];
         }
-        if(left == right){
-            //剩余左右括号数相等，下一个只能用左括号
-            getParenthesis(str+"(",left-1,right);
-        }else if(left < right){
-            //剩余左括号小于右括号，下一个可以用左括号也可以用右括号
-            if(left > 0){
-                getParenthesis(str+"(",left-1,right);
-            }
-            getParenthesis(str+")",left,right-1);
-        }
+        tmp[len] = '\0';
+
+        res[(*sizeofRes)++] = tmp;
+        return;
     }
+    if(left == right){
+        //剩余左右括号数相等，下一个只能用左括号
+        str[len] = '(';
+        GetParenthesis(str,left-1, right, len + 1, res, sizeofRes);
+    }else if(left < right){
+        //剩余左括号小于右括号，下一个可以用左括号也可以用右括号
+        if(left > 0){
+            str[len] = '(';
+            GetParenthesis(str,left-1, right, len + 1, res, sizeofRes);
+        }
+        str[len] = ')';
+        GetParenthesis(str, left, right-1, len + 1, res, sizeofRes);
+    }
+}
+
+char ** generateParenthesis(int n, int* returnSize){
+    char **res = (char **)malloc(MAX_SIZE * sizeof(char *));
+    int sizeofRes = 0;
+
+    char *s = (char *)malloc((n * 2 + 1) * sizeof(char));
+    memset(s, 0, (n * 2 + 1) * sizeof(char));
+    GetParenthesis(s, n, n, 0, res, &sizeofRes);
+
+    *returnSize = sizeofRes;
+    return res;
 }
 ```
 
@@ -1784,33 +1792,27 @@ class Solution {
 
 **示例 1：**
 
-```
-输入：lists = [[1,4,5],[1,3,4],[2,6]]
-输出：[1,1,2,3,4,4,5,6]
-解释：链表数组如下：
-[
-  1->4->5,
-  1->3->4,
-  2->6
-]
-将它们合并到一个有序链表中得到。
-1->1->2->3->4->4->5->6
-```
+> 输入：lists = [[1,4,5],[1,3,4],[2,6]]
+> 输出：[1,1,2,3,4,4,5,6]
+> 解释：链表数组如下：
+> [
+>   1->4->5,
+>   1->3->4,
+>   2->6
+> ]
+> 将它们合并到一个有序链表中得到。
+> 1->1->2->3->4->4->5->6
 
 **示例 2：**
 
-```
-输入：lists = []
-输出：[]
-```
+> 输入：lists = []
+> 输出：[]
 
 
 **示例 3：**
 
-```
-输入：lists = [[]]
-输出：[]
-```
+> 输入：lists = [[]]
+> 输出：[]
 
 **提示：**
 
@@ -1821,45 +1823,46 @@ class Solution {
 * lists[i] 按 升序 排列
 * lists[i].length 的总和不超过 10^4^
 
-```java
-/**
- * Definition for singly-linked list.
- * public class ListNode {
- *     int val;
- *     ListNode next;
- *     ListNode() {}
- *     ListNode(int val) { this.val = val; }
- *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
- * }
- */
-class Solution {
-    public ListNode mergeKLists(ListNode[] lists) {
-        ListNode ans = null;
-        for (int i = 0; i < lists.length; ++i) {
-            ans = mergeTwoLists(ans, lists[i]);
-        }
-        return ans;
+```c
+struct ListNode * MergeTwoList(struct ListNode *a, struct ListNode *b)
+{
+    if (a == NULL || b == NULL) {
+        return a == NULL ? b : a;
     }
 
-    public ListNode mergeTwoLists(ListNode a, ListNode b) {
-        if (a == null || b == null) {
-            return a != null ? a : b;
+    struct ListNode *tmpA = a;
+    struct ListNode *tmpB = b;
+
+    struct ListNode *dummy = (struct ListNode *)malloc(sizeof(struct ListNode));
+    struct ListNode *p = dummy;
+    while (tmpA != NULL && tmpB != NULL) {
+        if (tmpA->val < tmpB->val) {
+            p->next = tmpA;
+            tmpA = tmpA->next;
+        } else {
+            p->next = tmpB;
+            tmpB = tmpB->next;  
         }
-        ListNode head = new ListNode(0);
-        ListNode tail = head, aPtr = a, bPtr = b;
-        while (aPtr != null && bPtr != null) {
-            if (aPtr.val < bPtr.val) {
-                tail.next = aPtr;
-                aPtr = aPtr.next;
-            } else {
-                tail.next = bPtr;
-                bPtr = bPtr.next;
-            }
-            tail = tail.next;
-        }
-        tail.next = (aPtr != null ? aPtr : bPtr);
-        return head.next;
+        p = p->next;
     }
+
+    if (tmpA == NULL) {
+        p->next = tmpB;
+    } else {
+        p->next = tmpA;
+    }
+
+    return dummy->next;
+}
+
+struct ListNode* mergeKLists(struct ListNode** lists, int listsSize){
+    struct ListNode *p = NULL;
+
+    for (int i = 0; i < listsSize; i++) {
+        p = MergeTwoList(p, lists[i]);
+    }
+
+    return p;
 }
 ```
 
@@ -1871,64 +1874,44 @@ class Solution {
 
 **示例 1：**
 
-![](E:\大三下\leetcode\leetcode\img\swap_ex1.jpg)
+![](img/swap_ex1.jpg)
 
-```
-输入：head = [1,2,3,4]
-输出：[2,1,4,3]
-```
+> 输入：head = [1,2,3,4]
+> 输出：[2,1,4,3]
 
 **示例 2：**
 
-```
-输入：head = []
-输出：[]
-```
+> 输入：head = []
+> 输出：[]
 
 **示例 3：**
 
-```
-输入：head = [1]
-输出：[1]
-```
+> 输入：head = [1]
+> 输出：[1]
 
 **提示：**
 
    * 链表中节点的数目在范围 [0, 100] 内
    * 0 <= Node.val <= 100
 
-```java
-//递归
-class Solution {
-    public ListNode swapPairs(ListNode head) {
-        if(head == null || head.next == null){
-            return head;
-        }
-        ListNode next = head.next;
-        head.next = swapPairs(next.next);
-        next.next = head;
-        return next;
-    }
-}
-```
+```c
+struct ListNode* swapPairs(struct ListNode* head){
 
-```java
-//非递归
-class Solution {
-    public ListNode swapPairs(ListNode head) {
-        ListNode pre = new ListNode(0);
-        pre.next = head;
-        ListNode temp = pre;
-        while(temp.next != null && temp.next.next != null) {
-            ListNode start = temp.next;
-            ListNode end = temp.next.next;
-            temp.next = end;
-            start.next = end.next;
-            end.next = start;
-            temp = start;
-        }
-        return pre.next;
+    struct ListNode *dummy = (struct ListNode *)malloc(sizeof(struct ListNode));
+    dummy->next = head;
+    struct ListNode *cur = dummy;
+
+    while (head != NULL && head->next != NULL) {
+        cur->next = head->next;
+        struct ListNode *tmp = head->next->next;
+        head->next->next = head;
+        head->next = tmp;
+       
+        cur = head;
+        head = tmp;
     }
+
+    return dummy->next;
 }
 ```
 
@@ -1947,121 +1930,90 @@ k 是一个正整数，它的值小于或等于链表的长度。
 
 **示例 1：**
 
-![](E:\大三下\leetcode\leetcode\img\reverse_ex1.jpg)
+![](img/reverse_ex1.jpg)
 
-```
-输入：head = [1,2,3,4,5], k = 2
-输出：[2,1,4,3,5]
-```
+> 输入：head = [1,2,3,4,5], k = 2
+> 输出：[2,1,4,3,5]
 
 **示例 2：**
 
-![](E:\大三下\leetcode\leetcode\img\reverse_ex2.jpg)
+![](img/reverse_ex2.jpg)
 
-```
-输入：head = [1,2,3,4,5], k = 3
-输出：[3,2,1,4,5]
-```
+> 输入：head = [1,2,3,4,5], k = 3
+> 输出：[3,2,1,4,5]
 
 **示例 3：**
 
-```
-输入：head = [1,2,3,4,5], k = 1
-输出：[1,2,3,4,5]
-```
+> 输入：head = [1,2,3,4,5], k = 1
+> 输出：[1,2,3,4,5]
 
 
 **示例 4：**
 
-```
-输入：head = [1], k = 1
-输出：[1]
-```
+> 输入：head = [1], k = 1
+> 输出：[1]
 
 
 **提示：**
 
-    *  列表中节点的数量在范围 sz 内
-    *  1 <= sz <= 5000
-    *  0 <= Node.val <= 1000
-    *  1 <= k <= sz
+*  列表中节点的数量在范围 sz 内
+*  1 <= sz <= 5000
+*  0 <= Node.val <= 1000
+*  1 <= k <= sz
 
-```java
-/**
- * Definition for singly-linked list.
- * public class ListNode {
- *     int val;
- *     ListNode next;
- *     ListNode(int x) { val = x; }
- * }
- */
-class Solution {
-    public ListNode reverseKGroup(ListNode head, int k) {
-        if (head == null || head.next == null){
-            return head;
-        }
-        //定义一个假的节点。
-        ListNode dummy=new ListNode(0);
-        //假节点的next指向head。
-        // dummy->1->2->3->4->5
-        dummy.next=head;
-   //初始化pre和end都指向dummy。pre指每次要翻转的链表的头结点的上一个节点。end指每次要翻转的链表的尾节点
-        ListNode pre=dummy;
-        ListNode end=dummy;
-
-        while(end.next!=null){
-            //循环k次，找到需要翻转的链表的结尾,这里每次循环要判断end是否等于空,因为如果为空，end.next会报空指针异常。
-            //dummy->1->2->3->4->5 若k为2，循环2次，end指向2
-            for(int i=0;i<k&&end != null;i++){
-                end=end.next;
-            }
-            //如果end==null，即需要翻转的链表的节点数小于k，不执行翻转。
-            if(end==null){
-                break;
-            }
-            //先记录下end.next,方便后面链接链表
-            ListNode next=end.next;
-            //然后断开链表
-            end.next=null;
-            //记录下要翻转链表的头节点
-            ListNode start=pre.next;
-            //翻转链表,pre.next指向翻转后的链表。1->2 变成2->1。 dummy->2->1
-            pre.next=reverse(start);
-            //翻转后头节点变到最后。通过.next把断开的链表重新链接。
-            start.next=next;
-            //将pre换成下次要翻转的链表的头结点的上一个节点。即start
-            pre=start;
-            //翻转结束，将end置为下次要翻转的链表的头结点的上一个节点。即start
-            end=start;
-        }
-        return dummy.next;
-
-
-    }
-    //链表翻转
-    // 例子：   head： 1->2->3->4
-    public ListNode reverse(ListNode head) {
-         //单链表为空或只有一个节点，直接返回原单链表
-        if (head == null || head.next == null){
-            return head;
-        }
-        //前一个节点指针
-        ListNode preNode = null;
-        //当前节点指针
-        ListNode curNode = head;
-        //下一个节点指针
-        ListNode nextNode = null;
-        while (curNode != null){
-            nextNode = curNode.next;//nextNode 指向下一个节点,保存当前节点后面的链表。
-            curNode.next=preNode;//将当前节点next域指向前一个节点   null<-1<-2<-3<-4
-            preNode = curNode;//preNode 指针向后移动。preNode指向当前节点。
-            curNode = nextNode;//curNode指针向后移动。下一个节点变成当前节点
-        }
-        return preNode;
-
+```c
+struct ListNode * ReverseListNode(struct ListNode * head)
+{
+    if (head == NULL || head->next == NULL) {
+        return head;
     }
 
+    struct ListNode *pre = NULL;
+    struct ListNode *cur = head;
 
+    while (cur != NULL) {
+        struct ListNode *tmp = cur->next;
+        cur->next = pre;
+        pre = cur;
+        cur = tmp;
+    }
+
+    return pre;
+}
+
+struct ListNode* reverseKGroup(struct ListNode* head, int k){
+    if (head == NULL || head->next == NULL){
+        return head;
+    }
+        
+    struct ListNode *dummy = (struct ListNode *)malloc(sizeof(struct ListNode));
+    dummy->next=head;
+  
+    struct ListNode *pre = dummy;
+    struct ListNode *end = dummy;
+
+    while (end->next != NULL) {
+        
+        for (int i = 0; i < k && end != NULL; i++) {
+            end=end->next;
+        }
+       
+        if (end == NULL) {
+            break;
+        }
+        
+        struct ListNode *next = end->next;
+        end->next=NULL;
+        
+        struct ListNode *start = pre->next;
+       
+        pre->next = ReverseListNode(start);
+        start->next = next;
+        
+        pre = start;
+        end = start;
+    }
+    return dummy->next;
 }
 ```
 
@@ -2092,43 +2044,39 @@ for (int i = 0; i < len; i++) {
 
 **示例 1：**
 
-```
-输入：nums = [1,1,2]
-输出：2, nums = [1,2]
-解释：函数应该返回新的长度 2 ，并且原数组 nums 的前两个元素被修改为 1, 2 。不需要考虑数组中超出新长度后面的元素。
-```
+> 输入：nums = [1,1,2]
+> 输出：2, nums = [1,2]
+> 解释：函数应该返回新的长度 2 ，并且原数组 nums 的前两个元素被修改为 1, 2 。不需要考虑数组中超出新长度后面的元素。
 
 
 **示例 2：**
 
-```
-输入：nums = [0,0,1,1,1,2,2,3,3,4]
-输出：5, nums = [0,1,2,3,4]
-解释：函数应该返回新的长度 5 ， 并且原数组 nums 的前五个元素被修改为 0, 1, 2, 3, 4 。不需要考虑数组中超出新长度后面的元素。
-```
+> 输入：nums = [0,0,1,1,1,2,2,3,3,4]
+> 输出：5, nums = [0,1,2,3,4]
+> 解释：函数应该返回新的长度 5 ， 并且原数组 nums 的前五个元素被修改为 0, 1, 2, 3, 4 。不需要考虑数组中超出新长度后面的元素。
 
 **提示：**
 
-    *  0 <= nums.length <= 3 * 10^4^
-    *  -10^4^ <= nums[i] <= 10^4^
-    *  nums 已按升序排列
+*  0 <= nums.length <= 3 * 10^4^
+*  -10^4^ <= nums[i] <= 10^4^
+*  nums 已按升序排列
 
-```java
-class Solution {
-    public int removeDuplicates(int[] nums) {
-        if(nums == null || nums.length == 0) return 0;
-        int p = 0;
-        int q = 1;
-        while(q < nums.length){
-            if(nums[p] != nums[q]){
-                nums[p + 1] = nums[q];
-                p++;
-            }
-            q++;
+```c
+int removeDuplicates(int* nums, int numsSize){
+    if (numsSize == 0) {
+        return 0;
+    }
+
+    int l = 1;
+    for (int i = 1; i < numsSize; i++) {
+        if (nums[i] == nums[i - 1]) {
+            continue;
         }
-        return p + 1;
-    } 
+        nums[l] = nums[i];
+        l++;
+    }
 
+    return l;
 }
 ```
 
@@ -2161,20 +2109,16 @@ for (int i = 0; i < len; i++) {
 
 **示例 1：**
 
-```
-输入：nums = [3,2,2,3], val = 3
-输出：2, nums = [2,2]
-解释：函数应该返回新的长度 2, 并且 nums 中的前两个元素均为 2。你不需要考虑数组中超出新长度后面的元素。例如，函数返回的新长度为 2 ，而 nums = [2,2,3,3] 或 nums = [2,2,0,0]，也会被视作正确答案。
-```
+> 输入：nums = [3,2,2,3], val = 3
+> 输出：2, nums = [2,2]
+> 解释：函数应该返回新的长度 2, 并且 nums 中的前两个元素均为 2。你不需要考虑数组中超出新长度后面的元素。例如，函数返回的新长度为 2 ，而 nums = [2,2,3,3] 或 nums = [2,2,0,0]，也会被视作正确答案。
 
 
 **示例 2：**
 
-```
-输入：nums = [0,1,2,2,3,0,4,2], val = 2
-输出：5, nums = [0,1,4,0,3]
-解释：函数应该返回新的长度 5, 并且 nums 中的前五个元素为 0, 1, 3, 0, 4。注意这五个元素可为任意顺序。你不需要考虑数组中超出新长度后面的元素。
-```
+> 输入：nums = [0,1,2,2,3,0,4,2], val = 2
+> 输出：5, nums = [0,1,4,0,3]
+> 解释：函数应该返回新的长度 5, 并且 nums 中的前五个元素为 0, 1, 3, 0, 4。注意这五个元素可为任意顺序。你不需要考虑数组中超出新长度后面的元素。
 
 **提示：**
 
@@ -2182,19 +2126,18 @@ for (int i = 0; i < len; i++) {
 * 0 <= nums[i] <= 50
 * 0 <= val <= 100
 
-```java
-class Solution {
-    public int removeElement(int[] nums, int val) {
-        int i = 0;
-        for (int j = 0; j < nums.length; j++) {
-            if (nums[j] != val) {
-                nums[i] = nums[j];
-                i++;
-            }
+```c
+int removeElement(int* nums, int numsSize, int val){
+    int l = 0;
+    
+    for (int i = 0; i < numsSize; i++) {
+        if (nums[i] == val) {
+            continue;
         }
-        return i;
+        nums[l++] = nums[i];
     }
 
+    return l;
 }
 ```
 
@@ -2206,17 +2149,13 @@ class Solution {
 
 **示例 1:**
 
-```
-输入: haystack = "hello", needle = "ll"
-输出: 2
-```
+> 输入: haystack = "hello", needle = "ll"
+> 输出: 2
 
 **示例 2:**
 
-```
-输入: haystack = "aaaaa", needle = "bba"
-输出: -1
-```
+> 输入: haystack = "aaaaa", needle = "bba"
+> 输出: -1
 
 
 **说明:**
@@ -2225,51 +2164,47 @@ class Solution {
 
 对于本题而言，当 needle 是空字符串时我们应当返回 0 。这与C语言的 strstr() 以及 Java的 indexOf() 定义相符。
 
-```java
-class Solution {
-    public int strStr(String haystack, String needle) {
-        if(needle.length() == 0) return 0;
-       
-        int[] next = kmpNext(needle);
+```c
+int * kmpNext(char * haystack) {
+    
+    int len = strlen(haystack);
+    int *next = (int *)malloc(len * sizeof(int));
+   
+    next[0] = 0; 
+    for(int i = 1, j = 0; i < len; i++) {
+        while(j > 0 &&haystack[i] != haystack[j]) {
+            j = next[j - 1];
+        }
 
-		for(int i = 0, j = 0; i <haystack.length(); i++) {
-				
-			while( j > 0 && haystack.charAt(i) != needle.charAt(j)) {
-				j = next[j-1]; 
-			}
-			
-			if(haystack.charAt(i) == needle.charAt(j)) {
-				j++;
-			}	
-
-			if(j == needle.length()) {//找到了 // j = 3 i 
-				return i - j + 1;
-			}
-		}
-		return  -1;
-
+        if(haystack[i] == haystack[j]) {
+            j++;
+        }
+        next[i] = j; 
     }
-  	
-	//获取到一个字符串(子串) 的部分匹配值表
-	public  int[] kmpNext(String dest) {
-		//创建一个next 数组保存部分匹配值
-		int[] next = new int[dest.length()];
-		next[0] = 0; //如果字符串是长度为1 部分匹配值就是0
-		for(int i = 1, j = 0; i < dest.length(); i++) {
-			//当dest.charAt(i) != dest.charAt(j) ，我们需要从next[j-1]获取新的j
-			
-			while(j > 0 && dest.charAt(i) != dest.charAt(j)) {
-				j = next[j-1];
-			}
-			
-			//当dest.charAt(i) == dest.charAt(j) 满足时，部分匹配值就是+1
-			if(dest.charAt(i) == dest.charAt(j)) {
-				j++;
-			}
-			next[i] = j;
-		}
-		return next;
-	}
+    return next;
+}
+
+int strStr(char * haystack, char * needle){
+    int *next = kmpNext(needle); //先得到next数组
+    int lenOfHaystack = strlen(haystack);
+    int lenOfneedle = strlen(needle);
+    int i, j = 0;
+    for( i = 0 ; i < lenOfHaystack && j < lenOfneedle; i++){
+        
+        while( j > 0 && haystack[i] != needle[j]) {
+            j = next[j-1]; 
+        }
+        
+        if (haystack[i] == needle[j]){ 
+            j++;
+        }
+
+        if (j == lenOfneedle) {
+            return i - j + 1;
+        }
+    }
+    
+    return -1;
 }
 ```
 
