@@ -3823,7 +3823,110 @@ double myPow(double x, int n){
 }
 ```
 
+#### [51. N 皇后](https://leetcode.cn/problems/n-queens/)
 
+n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，并且使皇后彼此之间不能相互攻击。
+
+给你一个整数 n ，返回所有不同的 n 皇后问题 的解决方案。
+
+每一种解法包含一个不同的 n 皇后问题 的棋子放置方案，该方案中 'Q' 和 '.' 分别代表了皇后和空位。
+
+ 示例 1：
+
+![](img/queens.jpg)
+
+> 输入：n = 4
+> 输出：[[".Q..","...Q","Q...","..Q."],["..Q.","Q...","...Q",".Q.."]]
+> 解释：如上图所示，4 皇后问题存在两个不同的解法。
+
+示例 2：
+
+> 输入：n = 1
+> 输出：[["Q"]]
+
+
+提示：
+
+* 1 <= n <= 9
+
+```c
+#define MAX_SIZE 1000
+
+bool IsValid(char **arr, int arrSize, int row, int col)
+{
+    for (int i = 0;  i < row; i++) {
+        if (arr[i][col] == 'Q') {
+            return false;
+        }
+    }
+
+    for (int i = row - 1, j = col + 1; i >= 0 && j < arrSize; i--, j++) {
+        if (arr[i][j] == 'Q') {
+            return false;
+        }
+    }
+
+    for (int i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--) {
+        if (arr[i][j] == 'Q') {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void BackTrack(char **arr, int arrSize, int cur, char ***res, int *sizeOfRes)
+{
+    if (cur == arrSize) {
+        char **tmp = (char **)malloc(arrSize * sizeof(char *));
+        for (int i = 0; i < arrSize; i++) {
+            tmp[i] = (char *)malloc((arrSize + 1) * sizeof(char));
+            for (int j = 0; j < arrSize; j++) {
+                tmp[i][j] = arr[i][j];
+            }
+            tmp[i][arrSize] = '\0';
+        }
+        res[(*sizeOfRes)++] = tmp;
+        return;
+    }
+
+    for (int i = 0; i < arrSize; i++) {
+        
+        if (!IsValid(arr, arrSize, cur, i)) {
+           continue;
+        }
+        arr[cur][i] = 'Q';
+        BackTrack(arr, arrSize, cur + 1, res, sizeOfRes);
+        arr[cur][i] = '.';         
+    }
+}
+
+char *** solveNQueens(int n, int* returnSize, int** returnColumnSizes){
+    char ***res = (char ***)malloc(MAX_SIZE * sizeof(char **));
+    int sizeOfRes = 0;
+ 
+    char **arr = (char **)malloc(n * sizeof(char *));
+    for (int i = 0; i < n; i++) {
+        arr[i] = (char *)malloc((n + 1) * sizeof(char));
+        memset(arr[i], '.', n * sizeof(char));
+        arr[i][n] = '\0';
+    }
+
+    BackTrack(arr, n, 0, res, &sizeOfRes);
+
+    for (int i = 0; i < n; i++) {
+        free(arr[i]);
+    }
+    free(arr);
+  
+    *returnSize = sizeOfRes;
+    *returnColumnSizes = (int *)malloc(sizeOfRes * sizeof(int));
+    for (int i = 0; i < sizeOfRes; i++) {
+        (*returnColumnSizes)[i] = n;
+    }
+    return res;
+}
+```
 
 #### [52. N皇后 II](https://leetcode.cn/problems/n-queens-ii/)
 
@@ -4065,6 +4168,400 @@ bool canJump(int* nums, int numsSize)
     return maxLoc >= numsSize - 1 ? true : false;
 }
 ```
+
+#### [56. 合并区间](https://leetcode.cn/problems/merge-intervals/)
+
+以数组 intervals 表示若干个区间的集合，其中单个区间为 intervals[i] = [starti, endi] 。请你合并所有重叠的区间，并返回 一个不重叠的区间数组，该数组需恰好覆盖输入中的所有区间 。
+
+ 示例 1：
+
+> 输入：intervals = [[1,3],[2,6],[8,10],[15,18]]
+> 输出：[[1,6],[8,10],[15,18]]
+> 解释：区间 [1,3] 和 [2,6] 重叠, 将它们合并为 [1,6].
+
+示例 2：
+
+> 输入：intervals = [[1,4],[4,5]]
+> 输出：[[1,5]]
+> 解释：区间 [1,4] 和 [4,5] 可被视为重叠区间。
+
+
+提示：
+
+* 1 <= intervals.length <= 104
+* intervals[i].length == 2
+* 0 <= starti <= endi <= 104
+
+```c
+int Cmp(const void *a, const void *b)
+{
+    int *tmp1 = *(int **)a;
+    int *tmp2 = *(int **)b;
+    return tmp1[0] - tmp2[0];
+}
+
+int** merge(int** intervals, int intervalsSize, int* intervalsColSize, int* returnSize, int** returnColumnSizes){
+    qsort(intervals, intervalsSize, sizeof(int *), Cmp);
+    int **res = (int **)malloc(intervalsSize * sizeof(int *));
+    int sizeOfRes = 0;
+
+    int l = intervals[0][0];
+    int r = intervals[0][1];
+    for (int i = 0; i < intervalsSize; i++) {
+       
+        if (i < intervalsSize - 1 && r >= intervals[i + 1][0]) {
+            r = fmax(r, intervals[i + 1][1]);
+            continue;
+        } 
+
+        int *tmp = (int *)malloc(2 * sizeof(int));
+        tmp[0] = l;
+        tmp[1] = r;
+        res[sizeOfRes++] = tmp;
+
+        if (i + 1 < intervalsSize) {
+            l = intervals[i + 1][0];
+            r = intervals[i + 1][1];  
+        }   
+    }
+    
+    *returnSize = sizeOfRes;
+    *returnColumnSizes = (int *)malloc(sizeOfRes * sizeof(int));
+    for (int i = 0; i < sizeOfRes; i++) {
+        (*returnColumnSizes)[i] = 2;
+    }
+    return res;
+}
+```
+
+#### [57. 插入区间](https://leetcode.cn/problems/insert-interval/)
+
+给你一个 无重叠的 ，按照区间起始端点排序的区间列表。
+
+在列表中插入一个新的区间，你需要确保列表中的区间仍然有序且不重叠（如果有必要的话，可以合并区间）。
+
+ 示例 1：
+
+> 输入：intervals = [[1,3],[6,9]], newInterval = [2,5]
+> 输出：[[1,5],[6,9]]
+
+示例 2：
+
+> 输入：intervals = [[1,2],[3,5],[6,7],[8,10],[12,16]], newInterval = [4,8]
+> 输出：[[1,2],[3,10],[12,16]]
+> 解释：这是因为新的区间 [4,8] 与 [3,5],[6,7],[8,10] 重叠。
+
+示例 3：
+
+> 输入：intervals = [], newInterval = [5,7]
+> 输出：[[5,7]]
+
+示例 4：
+
+> 输入：intervals = [[1,5]], newInterval = [2,3]
+> 输出：[[1,5]]
+
+示例 5：
+
+> 输入：intervals = [[1,5]], newInterval = [2,7]
+> 输出：[[1,7]]
+
+
+提示：
+
+* 0 <= intervals.length <= 104
+* intervals[i].length == 2
+* 0 <= intervals[i][0] <= intervals[i][1] <= 105
+* intervals 根据 intervals[i][0] 按 升序 排列
+* newInterval.length == 2
+* 0 <= newInterval[0] <= newInterval[1] <= 105
+
+```c
+int Cmp(const void *a, const void *b)
+{
+    int *tmp1 = *(int **)a;
+    int *tmp2 = *(int **)b;
+    return tmp1[0] - tmp2[0];
+}
+
+int** merge(int** intervals, int intervalsSize, int* returnSize, int** returnColumnSizes){
+    qsort(intervals, intervalsSize, sizeof(int *), Cmp);
+    int **res = (int **)malloc(intervalsSize * sizeof(int *));
+    int sizeOfRes = 0;
+
+    int l = intervals[0][0];
+    int r = intervals[0][1];
+    for (int i = 0; i < intervalsSize; i++) {
+       
+        if (i < intervalsSize - 1 && r >= intervals[i + 1][0]) {
+            r = fmax(r, intervals[i + 1][1]);
+            continue;
+        } 
+
+        int *tmp = (int *)malloc(2 * sizeof(int));
+        tmp[0] = l;
+        tmp[1] = r;
+        res[sizeOfRes++] = tmp;
+
+        if (i + 1 < intervalsSize) {
+            l = intervals[i + 1][0];
+            r = intervals[i + 1][1];  
+        }   
+    }
+    
+    *returnSize = sizeOfRes;
+    *returnColumnSizes = (int *)malloc(sizeOfRes * sizeof(int));
+    for (int i = 0; i < sizeOfRes; i++) {
+        (*returnColumnSizes)[i] = 2;
+    }
+    return res;
+}
+
+int** insert(int** intervals, int intervalsSize, int* intervalsColSize, int* newInterval, int newIntervalSize, int* returnSize, int** returnColumnSizes){
+    int **res = (int **)malloc((intervalsSize + 1) * sizeof(int *));
+    for (int i = 0; i < intervalsSize; i++) {
+        res[i] = intervals[i];
+    }
+    res[intervalsSize] = newInterval;
+    return merge(res, intervalsSize + 1, returnSize, returnColumnSizes);
+}
+```
+
+#### [58. 最后一个单词的长度](https://leetcode.cn/problems/length-of-last-word/)
+
+给你一个字符串 s，由若干单词组成，单词前后用一些空格字符隔开。返回字符串中 最后一个 单词的长度。
+
+单词 是指仅由字母组成、不包含任何空格字符的最大子字符串。
+
+ 示例 1：
+
+> 输入：s = "Hello World"
+> 输出：5
+> 解释：最后一个单词是“World”，长度为5。
+
+示例 2：
+
+> 输入：s = "   fly me   to   the moon  "
+> 输出：4
+> 解释：最后一个单词是“moon”，长度为4。
+
+示例 3：
+
+> 输入：s = "luffy is still joyboy"
+> 输出：6
+> 解释：最后一个单词是长度为6的“joyboy”。
+
+
+提示：
+
+* 1 <= s.length <= 104
+* s 仅有英文字母和空格 ' ' 组成
+* s 中至少存在一个单词
+
+```c
+int lengthOfLastWord(char * s){
+    int len = strlen(s);
+    int i = len - 1;
+    while (s[i] == ' ') {
+        i--;
+    }
+
+    int count = 0;
+    while (i >= 0 && s[i] != ' ') {
+        count++;
+        i--;
+    }
+
+    return count;
+}
+```
+
+#### [59. 螺旋矩阵 II](https://leetcode.cn/problems/spiral-matrix-ii/)
+
+给你一个正整数 n ，生成一个包含 1 到 n2 所有元素，且元素按顺时针顺序螺旋排列的 n x n 正方形矩阵 matrix 。
+
+ 示例 1：
+
+![](img/spiraln.jpg)
+
+> 输入：n = 3
+> 输出：[[1,2,3],[8,9,4],[7,6,5]]
+
+示例 2：
+
+> 输入：n = 1
+> 输出：[[1]]
+
+
+提示：
+
+* 1 <= n <= 20
+
+```c
+int** generateMatrix(int n, int* returnSize, int** returnColumnSizes){
+    int **res = (int **)malloc(n * sizeof(int *));
+    for (int i = 0; i < n; i++) {
+        res[i] = (int *)malloc(n * sizeof(int));
+    }
+    int count = 1;
+    int totalSize = n * n;
+
+    int l = 0; 
+    int r = n - 1;
+    int up = 0;
+    int down = n - 1;
+
+    while (count <= totalSize) {
+       
+        for (int i = l; i <= r && count <= totalSize; i++) {
+            res[up][i] = count++;
+        }
+        up++;
+        for (int i = up; i <= down && count <= totalSize; i++) {
+            res[i][r] = count++;
+        }
+        r--;
+        
+        for (int i = r; i >= l && count <= totalSize; i--) {
+            res[down][i] = count++;
+        }
+        down--;
+        
+        for (int i = down; i >= up && count <= totalSize; i--) {
+            res[i][l] = count++;
+        }
+        l++;   
+    }
+
+    *returnSize = n;
+    *returnColumnSizes = (int *)malloc(n * sizeof(int));
+    for (int i = 0; i < n; i++) {
+        (*returnColumnSizes)[i] = n;
+    }
+    return res;
+}
+```
+
+#### [60. 排列序列](https://leetcode.cn/problems/permutation-sequence/)
+
+给出集合 [1,2,3,...,n]，其所有元素共有 n! 种排列。
+
+按大小顺序列出所有排列情况，并一一标记，当 n = 3 时, 所有排列如下：
+
+"123"
+"132"
+"213"
+"231"
+"312"
+"321"
+给定 n 和 k，返回第 k 个排列。
+
+ 示例 1：
+
+> 输入：n = 3, k = 3
+> 输出："213"
+
+示例 2：
+
+> 输入：n = 4, k = 9
+> 输出："2314"
+
+示例 3：
+
+> 输入：n = 3, k = 1
+> 输出："123"
+
+
+提示：
+
+* 1 <= n <= 9
+* 1 <= k <= n!
+
+```c
+char * getPermutation(int n, int k){
+    int fact[n + 1]; //记录n的阶乘
+    fact[0] = 1;
+    for (int i = 1; i <= n; i++) {
+        fact[i] = fact[i - 1] * i;
+    }
+
+    bool isUsed[n + 1];
+    memset(isUsed, false, (n + 1) * sizeof(bool));
+    
+    char *res = (char *)malloc((n + 1) * sizeof(char));
+    res[n] = '\0';
+    int size = 0;
+    for (int i = 0; i < n; i++) {
+        int count = fact[n - i - 1];
+        for (int j = 1; j <= n; j++) {
+            if (isUsed[j]) {
+                continue;
+            }
+            if (k > count) {
+                k -= count;
+            } else {
+                res[size++] = j + '0';
+                isUsed[j] = true;
+                break;
+            }
+        }
+    }
+
+    return res;
+}
+```
+
+#### [61. 旋转链表](https://leetcode.cn/problems/rotate-list/)
+
+给你一个链表的头节点 head ，旋转链表，将链表每个节点向右移动 k 个位置。
+
+ 示例 1：
+
+![](img/rotate1.jpg)
+
+> 输入：head = [1,2,3,4,5], k = 2
+> 输出：[4,5,1,2,3]
+
+示例 2：
+
+![](img/roate2.jpg)
+
+> 输入：head = [0,1,2], k = 4
+> 输出：[2,0,1]
+
+
+提示：
+
+* 链表中节点的数目在范围 [0, 500] 内
+* -100 <= Node.val <= 100
+* 0 <= k <= 2 * 109
+
+```c
+struct ListNode* rotateRight(struct ListNode* head, int k){
+    if (head == NULL) {
+        return head;
+    }
+
+    //先成环，再断开
+    struct ListNode *cur = head;
+    int size = 1;
+    while (cur->next != NULL) {
+        cur = cur->next;
+        size++;
+    }
+
+    cur->next = head;
+    for (int i = 0; i < size - k % size; i++) {
+        cur = cur->next;
+    }
+    
+    head = cur->next;
+    cur->next = NULL;
+    return head;
+}
+```
+
+
 
 
 
