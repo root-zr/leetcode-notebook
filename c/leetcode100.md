@@ -4561,7 +4561,764 @@ struct ListNode* rotateRight(struct ListNode* head, int k){
 }
 ```
 
+#### [62. 不同路径](https://leetcode.cn/problems/unique-paths/)
 
+一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为 “Start” ）。
+
+机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为 “Finish” ）。
+
+问总共有多少条不同的路径？
+
+示例 1：
+
+![](img/robot_maze.png)
+
+> 输入：m = 3, n = 7
+> 输出：28
+
+示例 2：
+
+> 输入：m = 3, n = 2
+> 输出：3
+> 解释：
+> 从左上角开始，总共有 3 条路径可以到达右下角。
+>
+> 1. 向右 -> 向下 -> 向下
+> 2. 向下 -> 向下 -> 向右
+> 3. 向下 -> 向右 -> 向下
+>
+
+示例 3：
+
+> 输入：m = 7, n = 3
+> 输出：28
+
+示例 4：
+
+> 输入：m = 3, n = 3
+> 输出：6
+
+
+提示：
+
+* 1 <= m, n <= 100
+* 题目数据保证答案小于等于 2 * 109
+
+```c
+int uniquePaths(int m, int n){
+    int dp[m][n];
+
+    for (int i = 0; i < m; i++) {
+        dp[i][0] = 1;
+    }
+    for (int i = 0; i < n; i++) {
+        dp[0][i] = 1;
+    }
+
+    for (int i = 1; i < m; i++) {
+        for (int j = 1; j < n; j++) {
+            dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+        }
+    }
+
+    return dp[m - 1][n - 1];
+}
+```
+
+#### [63. 不同路径 II](https://leetcode.cn/problems/unique-paths-ii/)
+
+一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为 “Start” ）。
+
+机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为 “Finish”）。
+
+现在考虑网格中有障碍物。那么从左上角到右下角将会有多少条不同的路径？
+
+网格中的障碍物和空位置分别用 1 和 0 来表示。
+
+ 示例 1：
+
+![](img/robot1.jpg)
+
+> 输入：obstacleGrid = [[0,0,0],[0,1,0],[0,0,0]]
+> 输出：2
+> 解释：3x3 网格的正中间有一个障碍物。
+> 从左上角到右下角一共有 2 条不同的路径：
+>
+> 1. 向右 -> 向右 -> 向下 -> 向下
+> 2. 向下 -> 向下 -> 向右 -> 向右
+>
+
+示例 2：
+
+![](img/robot2.jpg)
+
+> 输入：obstacleGrid = [[0,1],[0,0]]
+> 输出：1
+
+
+提示：
+
+* m == obstacleGrid.length
+* n == obstacleGrid[i].length
+* 1 <= m, n <= 100
+* obstacleGrid[i][j] 为 0 或 1
+
+```c
+int uniquePathsWithObstacles(int** obstacleGrid, int obstacleGridSize, int* obstacleGridColSize){
+    if (obstacleGrid[0][0] == 1) {
+        return 0;
+    }
+    
+    int m = obstacleGridSize;
+    int n = obstacleGridColSize[0];
+    int dp[m][n];
+    
+    dp[0][0] = 1;
+    for (int i = 1; i < m; i++) {
+        if (obstacleGrid[i][0] == 1) {
+            dp[i][0] = 0;
+        } else {
+            dp[i][0] = dp[i - 1][0];
+        }
+        
+    }
+    for (int i = 1; i < n; i++) {
+        if (obstacleGrid[0][i] == 1) {
+            dp[0][i] = 0;
+        } else {
+            dp[0][i] = dp[0][i - 1];
+        }
+        
+    }
+
+    for (int i = 1; i < m; i++) {
+        for (int j = 1; j < n; j++) {
+            if (obstacleGrid[i][j]) {
+                dp[i][j] = 0;
+            } else {
+                dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+            } 
+        }
+    }
+
+    return dp[m -1][n - 1];
+}
+```
+
+#### [64. 最小路径和](https://leetcode.cn/problems/minimum-path-sum/)
+
+给定一个包含非负整数的 m x n 网格 grid ，请找出一条从左上角到右下角的路径，使得路径上的数字总和为最小。
+
+说明：每次只能向下或者向右移动一步。
+
+ 示例 1：
+
+![](img/minpath.jpg)
+
+> 输入：grid = [[1,3,1],[1,5,1],[4,2,1]]
+> 输出：7
+> 解释：因为路径 1→3→1→1→1 的总和最小。
+
+示例 2：
+
+> 输入：grid = [[1,2,3],[4,5,6]]
+> 输出：12
+
+
+提示：
+
+* m == grid.length
+* n == grid[i].length
+* 1 <= m, n <= 200
+* 0 <= grid[i][j] <= 100
+
+```c
+int minPathSum(int** grid, int gridSize, int* gridColSize){
+    int m = gridSize;
+    int n = gridColSize[0];
+    int dp[m][n];
+    
+    dp[0][0] = grid[0][0];
+    for (int i = 1; i < m; i++) {    
+        dp[i][0] = dp[i - 1][0] + grid[i][0];        
+    }
+    for (int i = 1; i < n; i++) {
+        dp[0][i] = dp[0][i - 1] + grid[0][i];     
+    }
+
+    for (int i = 1; i < m; i++) {
+        for (int j = 1; j < n; j++) {     
+            dp[i][j] = fmin(dp[i - 1][j], dp[i][j - 1]) + grid[i][j];       
+        }
+    }
+
+    return dp[m -1][n - 1];
+}
+```
+
+#### [65. 有效数字](https://leetcode.cn/problems/valid-number/)
+
+**有效数字**（按顺序）可以分成以下几个部分：
+
+* 一个 小数 或者 整数
+* （可选）一个 'e' 或 'E' ，后面跟着一个 整数
+
+**小数**（按顺序）可以分成以下几个部分：
+
+* （可选）一个符号字符（'+' 或 '-'）
+* 下述格式之一：
+  * 至少一位数字，后面跟着一个点 '.' ，后面再跟着至少一位数字
+  * 一个点 '.' ，后面跟着至少一位数字
+  * 至少一位数字，后面跟着一个点 '.'
+
+**整数**（按顺序）可以分成以下几个部分：
+
+* （可选）一个符号字符（'+' 或 '-'）
+* 至少一位数字
+
+部分有效数字列举如下：["2", "0089", "-0.1", "+3.14", "4.", "-.9", "2e10", "-90E3", "3e+7", "+6e-1", "53.5e93", "-123.456e789"]
+
+部分无效数字列举如下：["abc", "1a", "1e", "e3", "99e2.5", "--6", "-+3", "95a54e53"]
+
+给你一个字符串 s ，如果 s 是一个 有效数字 ，请返回 true 。
+
+示例 1：
+
+> 输入：s = "0"
+> 输出：true
+
+示例 2：
+
+> 输入：s = "e"
+> 输出：false
+
+示例 3：
+
+> 输入：s = "."
+> 输出：false
+
+
+提示：
+
+* 1 <= s.length <= 20
+* s 仅含英文字母（大写和小写），数字（0-9），加号 '+' ，减号 '-' ，或者点 '.' 。
+
+```c
+bool Check(char *s, int start, int end, bool isInt)
+{
+    if (s[start] == '+' || s[start] == '-') {
+        start++;
+    }
+
+    bool point = false;
+    int numDigit = 0;
+    for (int i = start; i < end; i++) {
+        if (s[i] == '.') {
+            if (point || isInt) {
+                return false;
+            } 
+            point = true;
+        } else if (isdigit(s[i])) {
+            numDigit++;
+        } else {
+            return false;
+        }   
+    }
+
+    if (numDigit > 0) {
+        return true;
+    }
+    return false;
+}
+
+bool isNumber(char * s){
+    int len = strlen(s);
+    int idx = -1;
+    for (int i = 0; i < len; i++) {
+        if (s[i] == 'e' || s[i] == 'E') {
+            if (idx == -1) {
+                idx = i;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    if (idx == -1) {
+        return Check(s, 0, len, false);
+    }
+
+    return Check(s, 0, idx, false) && Check(s, idx + 1, len, true);
+
+}
+```
+
+#### [66. 加一](https://leetcode.cn/problems/plus-one/)
+
+给定一个由 整数 组成的 非空 数组所表示的非负整数，在该数的基础上加一。
+
+最高位数字存放在数组的首位， 数组中每个元素只存储单个数字。
+
+你可以假设除了整数 0 之外，这个整数不会以零开头。
+
+ 示例 1：
+
+> 输入：digits = [1,2,3]
+> 输出：[1,2,4]
+> 解释：输入数组表示数字 123。
+
+示例 2：
+
+> 输入：digits = [4,3,2,1]
+> 输出：[4,3,2,2]
+> 解释：输入数组表示数字 4321。
+
+示例 3：
+
+> 输入：digits = [0]
+> 输出：[1]
+
+
+提示：
+
+* 1 <= digits.length <= 100
+* 0 <= digits[i] <= 9
+
+```c
+int* plusOne(int* digits, int digitsSize, int* returnSize){  
+    int carry = 1;
+
+    int sum;
+    for (int i = digitsSize - 1; i >= 0; i--) {
+        sum = carry + digits[i];
+        digits[i] = sum % 10;
+        carry = sum / 10;
+        if (carry == 0) {
+            *returnSize = digitsSize;
+            return digits;
+        }
+    }
+
+    if (carry == 1) {
+        int * res = (int *)malloc((digitsSize + 1) * sizeof(int));
+        res[0] = 1;
+        for (int i = 1; i <= digitsSize; i++) {
+            res[i] = digits[i - 1];
+        }
+
+        free(digits);
+        *returnSize = digitsSize + 1;
+        return res;
+    }
+
+    *returnSize = digitsSize;
+    return digits;
+}
+```
+
+#### [67. 二进制求和](https://leetcode.cn/problems/add-binary/)
+
+给你两个二进制字符串，返回它们的和（用二进制表示）。
+
+输入为 非空 字符串且只包含数字 1 和 0。
+
+ 示例 1:
+
+> 输入: a = "11", b = "1"
+> 输出: "100"
+
+示例 2:
+
+> 输入: a = "1010", b = "1011"
+> 输出: "10101"
+
+
+提示：
+
+* 每个字符串仅由字符 '0' 或 '1' 组成。
+* 1 <= a.length, b.length <= 10^4
+* 字符串如果不是 "0" ，就都不含前导零。
+
+```c
+char * addBinary(char * a, char * b){
+    int lenOfA = strlen(a);
+    int lenOfB= strlen(b);
+    int size = fmax(lenOfA, lenOfB) + 1;
+    char *res = (char *)malloc((size + 1) * sizeof(char));
+    res[size] = '\0';
+
+    int carry = 0;
+    int sum;
+    while (lenOfA > 0 && lenOfB > 0) {
+        int tmpA = a[lenOfA - 1] - '0';
+        int tmpB = b[lenOfB - 1] - '0';
+        sum = tmpA + tmpB + carry;
+        res[--size] = sum % 2 + '0';
+        carry = sum / 2;
+
+        lenOfA--;
+        lenOfB--;
+    }
+   
+    while (lenOfA > 0) {
+        sum = a[lenOfA - 1] - '0' + carry;
+        lenOfA--;
+        res[--size] = sum % 2 + '0';
+        carry = sum / 2;
+    }
+
+    while (lenOfB > 0) {
+        sum = b[lenOfB - 1] - '0' + carry;
+        lenOfB--;
+        res[--size] = sum % 2 + '0';
+        carry = sum / 2;
+    }
+
+    if (carry == 1) {
+        res[0] = '1';
+        return res;
+    }
+    return &res[1];
+}
+```
+
+#### [68. 文本左右对齐](https://leetcode.cn/problems/text-justification/)
+
+给定一个单词数组 words 和一个长度 maxWidth ，重新排版单词，使其成为每行恰好有 maxWidth 个字符，且左右两端对齐的文本。
+
+你应该使用 “贪心算法” 来放置给定的单词；也就是说，尽可能多地往每行中放置单词。必要时可用空格 ' ' 填充，使得每行恰好有 maxWidth 个字符。
+
+要求尽可能均匀分配单词间的空格数量。如果某一行单词间的空格不能均匀分配，则左侧放置的空格数要多于右侧的空格数。
+
+文本的最后一行应为左对齐，且单词之间不插入额外的空格。
+
+注意:
+
+* 单词是指由非空格字符组成的字符序列。
+* 每个单词的长度大于 0，小于等于 maxWidth。
+* 输入单词数组 words 至少包含一个单词。
+
+
+示例 1:
+
+> 输入: words = ["This", "is", "an", "example", "of", "text", "justification."], maxWidth = 16
+> 输出:
+> [
+>    "This    is    an",
+>    "example  of text",
+>    "justification.  "
+> ]
+
+示例 2:
+
+> 输入:words = ["What","must","be","acknowledgment","shall","be"], maxWidth = 16
+> 输出:
+> [
+>   "What   must   be",
+>   "acknowledgment  ",
+>   "shall be        "
+> ]
+> 解释: 注意最后一行的格式应为 "shall be    " 而不是 "shall     be",
+>      因为最后一行应为左对齐，而不是左右两端对齐。       
+>      第二行同样为左对齐，这是因为这行只包含一个单词。
+
+示例 3:
+
+> 输入:words = ["Science","is","what","we","understand","well","enough","to","explain","to","a","computer.","Art","is","everything","else","we","do"]，maxWidth = 20
+> 输出:
+> [
+>   "Science  is  what we",
+>   "understand      well",
+>   "enough to explain to",
+>   "a  computer.  Art is",
+>   "everything  else  we",
+>   "do                  "
+> ]
+
+
+提示:
+
+* 1 <= words.length <= 300
+* 1 <= words[i].length <= 20
+* words[i] 由小写英文字母和符号组成
+* 1 <= maxWidth <= 100
+* words[i].length <= maxWidth
+
+```c
+#define MAX_WIDTH_SIZE 101
+
+char * FillSpace(char **cur, int sizeOfCur, int maxWidth, bool isLast)
+{
+    int curWidth = 0;
+    for (int i = 0; i < sizeOfCur; i++) {
+        if (i != sizeOfCur - 1) {
+            int lenOfCur = strlen(cur[i]);
+            char *tmp = (char *)malloc((lenOfCur + 2) * sizeof(char));
+            for (int j = 0; j < lenOfCur; j++) {
+                tmp[j] = cur[i][j];
+            }
+            tmp[lenOfCur] = ' ';
+            tmp[lenOfCur + 1] = '\0';
+
+            free(cur[i]);
+            cur[i] = tmp;
+        }
+
+        curWidth += strlen(cur[i]);
+    }
+
+    if (isLast || sizeOfCur == 1) {
+        int lenOfCur = strlen(cur[sizeOfCur - 1]);
+        char *tmp = (char *)malloc((lenOfCur + maxWidth - curWidth + 1) * sizeof(char));
+        int lenOfTmp = lenOfCur + maxWidth - curWidth;
+        for (int j = 0; j < lenOfTmp; j++) {
+            if (j < lenOfCur) {
+                tmp[j] = cur[sizeOfCur - 1][j];
+            } else {
+                tmp[j] = ' ';
+            }           
+        }
+        tmp[lenOfTmp] = '\0';
+        cur[sizeOfCur - 1] = tmp; 
+    } else {
+        for (int i = 0; curWidth++ < maxWidth; i = (i + 1) % (sizeOfCur - 1)) {
+            int lenOfCur = strlen(cur[i]);
+            char *tmp = (char *)malloc((lenOfCur + 2) * sizeof(char));
+            for (int j = 0; j < lenOfCur; j++) {
+                tmp[j] = cur[i][j];
+            }
+            tmp[lenOfCur] = ' ';
+            tmp[lenOfCur + 1] = '\0';
+
+            free(cur[i]);
+            cur[i] = tmp;
+        }
+    }
+
+    char *ans = (char *)malloc(MAX_WIDTH_SIZE * sizeof(char));
+    int size = 0;
+    for (int i = 0; i < sizeOfCur; i++) {
+        int lenOfCur = strlen(cur[i]);
+        for (int j = 0; j < lenOfCur; j++) {
+            ans[size++] = cur[i][j];
+        }
+    }
+    ans[size] = '\0';
+    return ans;
+}
+char ** fullJustify(char ** words, int wordsSize, int maxWidth, int* returnSize){
+    char **res = (char **)malloc(wordsSize * sizeof(char *));
+    int sizeOfRes = 0;
+    char **cur = (char **)malloc(wordsSize * sizeof(char *));
+    int sizeOfCur = 0;
+
+    for (int i = 0, curWidth = 0; i < wordsSize; i++) {
+        // 这里sizeOfCur是因为单词之间至少一个空格
+        int lenOfWord = strlen(words[i]);
+        if (lenOfWord + curWidth + sizeOfCur <= maxWidth) { 
+            curWidth += lenOfWord;
+            cur[sizeOfCur++] = words[i];
+        } else {
+            res[sizeOfRes++] = FillSpace(cur, sizeOfCur, maxWidth, false);
+            sizeOfCur = 0;
+            curWidth = 0;
+            cur[sizeOfCur++] = words[i];
+            curWidth += lenOfWord;
+        }
+    }
+    res[sizeOfRes++] = FillSpace(cur, sizeOfCur, maxWidth, true);
+
+    *returnSize = sizeOfRes;
+    return res;
+}
+```
+
+#### [69. x 的平方根 ](https://leetcode.cn/problems/sqrtx/)
+
+给你一个非负整数 x ，计算并返回 x 的 算术平方根 。
+
+由于返回类型是整数，结果只保留 整数部分 ，小数部分将被 舍去 。
+
+注意：不允许使用任何内置指数函数和算符，例如 pow(x, 0.5) 或者 x ** 0.5 。
+
+ 示例 1：
+
+> 输入：x = 4
+> 输出：2
+
+示例 2：
+
+> 输入：x = 8
+> 输出：2
+> 解释：8 的算术平方根是 2.82842..., 由于返回类型是整数，小数部分将被舍去。
+
+
+提示：
+
+* 0 <= x <= 231 - 1
+
+```c
+int mySqrt(int x){
+    int ans = 0;
+
+    int l = 0;
+    int r = x;
+
+    while (l <= r) {
+        int mid = l + (r - l) / 2;
+        long tmp = (long)mid * mid;
+        if (tmp <= x) {
+            ans = mid;
+            l = mid + 1;
+        } else {
+            r = mid - 1;
+        }
+    }
+
+    return ans;
+}
+```
+
+#### [70. 爬楼梯](https://leetcode.cn/problems/climbing-stairs/)
+
+假设你正在爬楼梯。需要 n 阶你才能到达楼顶。
+
+每次你可以爬 1 或 2 个台阶。你有多少种不同的方法可以爬到楼顶呢？
+
+ 示例 1：
+
+> 输入：n = 2
+> 输出：2
+> 解释：有两种方法可以爬到楼顶。
+> 1. 1 阶 + 1 阶
+> 2. 2 阶
+>
+
+示例 2：
+
+> 输入：n = 3
+> 输出：3
+> 解释：有三种方法可以爬到楼顶。
+>
+> 1. 1 阶 + 1 阶 + 1 阶
+> 2. 1 阶 + 2 阶
+> 3. 2 阶 + 1 阶
+>
+
+
+提示：
+
+* 1 <= n <= 45
+
+```c
+int climbStairs(int n)
+{
+    if (n == 1 || n == 2) {
+        return n;
+    }
+    int first = 1;
+    int second = 2;
+
+    int tmp;
+    for (int i = 3; i <= n; i++) {
+        tmp = first + second;
+        first = second;
+        second = tmp;        
+    }
+
+    return second;
+}
+```
+
+#### [71. 简化路径](https://leetcode.cn/problems/simplify-path/)
+
+给你一个字符串 path ，表示指向某一文件或目录的 Unix 风格 绝对路径 （以 '/' 开头），请你将其转化为更加简洁的规范路径。
+
+在 Unix 风格的文件系统中，一个点（.）表示当前目录本身；此外，两个点 （..） 表示将目录切换到上一级（指向父目录）；两者都可以是复杂相对路径的组成部分。任意多个连续的斜杠（即，'//'）都被视为单个斜杠 '/' 。 对于此问题，任何其他格式的点（例如，'...'）均被视为文件/目录名称。
+
+请注意，返回的 规范路径 必须遵循下述格式：
+
+始终以斜杠 '/' 开头。
+两个目录名之间必须只有一个斜杠 '/' 。
+最后一个目录名（如果存在）不能 以 '/' 结尾。
+此外，路径仅包含从根目录到目标文件或目录的路径上的目录（即，不含 '.' 或 '..'）。
+返回简化后得到的 规范路径 。
+
+ 示例 1：
+
+> 输入：path = "/home/"
+> 输出："/home"
+> 解释：注意，最后一个目录名后面没有斜杠。 
+
+示例 2：
+
+> 输入：path = "/../"
+> 输出："/"
+> 解释：从根目录向上一级是不可行的，因为根目录是你可以到达的最高级。
+
+示例 3：
+
+> 输入：path = "/home//foo/"
+> 输出："/home/foo"
+> 解释：在规范路径中，多个连续斜杠需要用一个斜杠替换。
+
+示例 4：
+
+> 输入：path = "/a/./b/../../c/"
+> 输出："/c"
+
+
+提示：
+
+* 1 <= path.length <= 3000
+* path 由英文字母，数字，'.'，'/' 或 '_' 组成。
+* path 是一个有效的 Unix 风格绝对路径。
+
+```c
+char * simplifyPath(char * path){
+    int len = strlen(path);
+    char *curPath = (char *)malloc((len + 1) * sizeof(char));
+    int sizeOfCurPath = 0;
+
+    char **stack = (char **)malloc(len * sizeof(char *));
+    int sizeOfStack = 0;
+    for (int i = 0; i < len; i++) {
+        if (path[i] == '/' || i == len - 1) {
+            if (i == len - 1 && path[i] != '/') {
+                curPath[sizeOfCurPath++] = path[i];
+            }
+            curPath[sizeOfCurPath++] = '\0';
+            if (strcmp(curPath, "..") == 0) {
+                if (sizeOfStack > 0) {
+                    free(stack[sizeOfStack - 1]);
+                    sizeOfStack--;
+                } 
+            } else if (strcmp(curPath, ".") != 0 && strcmp(curPath, "") != 0) {
+                char *tmp = (char *)malloc((sizeOfCurPath + 1) * sizeof(char));
+                for (int j = 0; j < sizeOfCurPath; j++) {
+                    tmp[j] = curPath[j];
+                }
+                tmp[sizeOfCurPath] = '\0';
+                stack[sizeOfStack++] = tmp;
+            }
+            sizeOfCurPath = 0;
+        } else {
+            curPath[sizeOfCurPath++] = path[i];
+        }
+    }
+
+    char *res = (char *)malloc((len + 1) * sizeof(char));
+    int sizeOfRes = 0;
+    for (int i = 0; i < sizeOfStack; i++) {
+        res[sizeOfRes++] = '/';
+        for (int j = 0; j < strlen(stack[i]); j++) {
+            res[sizeOfRes++] = stack[i][j];
+        }
+    }
+    res[sizeOfRes++] = '\0';
+    return sizeOfStack == 0 ? "/" : res;
+}
+```
 
 
 
