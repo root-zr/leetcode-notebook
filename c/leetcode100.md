@@ -5320,7 +5320,726 @@ char * simplifyPath(char * path){
 }
 ```
 
+#### [72. 编辑距离](https://leetcode.cn/problems/edit-distance/)
 
+给你两个单词 word1 和 word2， 请返回将 word1 转换成 word2 所使用的最少操作数  。
+
+你可以对一个单词进行如下三种操作：
+
+插入一个字符
+删除一个字符
+替换一个字符
+
+
+示例 1：
+
+> 输入：word1 = "horse", word2 = "ros"
+> 输出：3
+> 解释：
+> horse -> rorse (将 'h' 替换为 'r')
+> rorse -> rose (删除 'r')
+> rose -> ros (删除 'e')
+
+示例 2：
+
+> 输入：word1 = "intention", word2 = "execution"
+> 输出：5
+> 解释：
+> intention -> inention (删除 't')
+> inention -> enention (将 'i' 替换为 'e')
+> enention -> exention (将 'n' 替换为 'x')
+> exention -> exection (将 'n' 替换为 'c')
+> exection -> execution (插入 'u')
+
+
+提示：
+
+* 0 <= word1.length, word2.length <= 500
+* word1 和 word2 由小写英文字母组成
+
+```c
+int minDistance(char * word1, char * word2){
+    int m = strlen(word1);
+    int n = strlen(word2);
+   
+    int dp[m + 1][n + 1]; // dp[0][0] 表示 word1 和 word2 都为空
+    for (int i = 0; i <= m; i++) {
+        dp[i][0] = i; // word2 为空，要删除 m 次
+    }
+    for (int j = 0; j <= n; j++) {
+        dp[0][j] = j; // word1 为空，要插入 n 次
+    }
+
+    for (int i = 1; i <= m; i++) {
+        for (int j = 1; j <= n; j++) {
+            if (word1[i - 1] == word2[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1];
+            } else {
+                /*
+                   dp[i, j - 1] + 1 插入
+                   dp[i - 1, j] + 1 删除
+                   dp[i - 1][j - 1] + 1 替换
+                */
+                dp[i][j] = fmin(dp[i][j - 1] + 1, fmin(dp[i - 1][j] + 1, dp[i - 1][j - 1] + 1));
+            }
+        }
+    }
+
+    return dp[m][n];
+}
+```
+
+#### [73. 矩阵置零](https://leetcode.cn/problems/set-matrix-zeroes/)
+
+给定一个 m x n 的矩阵，如果一个元素为 0 ，则将其所在行和列的所有元素都设为 0 。请使用 原地 算法。
+
+ 示例 1：
+
+> 输入：matrix = [[1,1,1],[1,0,1],[1,1,1]]
+> 输出：[[1,0,1],[0,0,0],[1,0,1]]
+
+示例 2：
+
+> 输入：matrix = [[0,1,2,0],[3,4,5,2],[1,3,1,5]]
+> 输出：[[0,0,0,0],[0,4,5,0],[0,3,1,0]]
+
+
+提示：
+
+* m == matrix.length
+* n == matrix[0].length
+* 1 <= m, n <= 200
+* -231 <= matrix[i][j] <= 231 - 1
+
+
+进阶：
+
+* 一个直观的解决方案是使用  O(mn) 的额外空间，但这并不是一个好的解决方案。
+* 一个简单的改进方案是使用 O(m + n) 的额外空间，但这仍然不是最好的解决方案。
+* 你能想出一个仅使用常量空间的解决方案吗？
+
+```c
+void setZeroes(int** matrix, int matrixSize, int* matrixColSize){
+    bool row = false;
+    bool col = false;
+
+    for (int i = 0; i < matrixSize; i++) {
+        for (int j = 0; j < matrixColSize[0]; j++) {
+            if (matrix[i][j] == 0) {
+                if (i == 0) {
+                    row = true;
+                } 
+                if (j == 0) {
+                    col = true;
+                }
+                matrix[i][0] = 0;
+                matrix[0][j] = 0;
+            }
+        }
+    }
+
+    for (int i = 1; i < matrixSize; i++) {
+        if (matrix[i][0] != 0) {
+            continue;
+        }
+        for (int j = 1; j < matrixColSize[0]; j++) {
+            matrix[i][j] = 0;    
+        }
+    }
+
+    for (int j = 1; j < matrixColSize[0]; j++) {
+        if (matrix[0][j] != 0) {
+            continue;
+        }
+        for (int i = 1; i < matrixSize; i++) {
+            matrix[i][j] = 0;    
+        }
+    }
+    if (row) {
+        for (int i = 0; i < matrixColSize[0]; i++) {
+            matrix[0][i] = 0;
+        }
+    }
+    if (col) {
+        for (int i = 0; i < matrixSize; i++) {
+            matrix[i][0] = 0;
+        }
+    }
+    return matrix;
+}
+```
+
+#### [74. 搜索二维矩阵](https://leetcode.cn/problems/search-a-2d-matrix/)
+
+编写一个高效的算法来判断 m x n 矩阵中，是否存在一个目标值。该矩阵具有如下特性：
+
+每行中的整数从左到右按升序排列。
+每行的第一个整数大于前一行的最后一个整数。
+
+示例 1：
+
+![](img/mat22.jpg)
+
+> 输入：matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 3
+> 输出：true
+
+示例 2：
+
+> 输入：matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 13
+> 输出：false
+
+
+提示：
+
+* m == matrix.length
+* n == matrix[i].length
+* 1 <= m, n <= 100
+* -104 <= matrix[i][j], target <= 104
+
+```c
+bool searchMatrix(int** matrix, int matrixSize, int* matrixColSize, int target){
+    int l = 0;
+    int r = matrixSize * matrixColSize[0] - 1;
+
+    while (l <= r) {
+        int mid = l + (r - l) / 2;
+        int midSize = matrix[mid / matrixColSize[0]][mid % matrixColSize[0]];
+        if (midSize == target) {
+            return true;
+        } else if (midSize > target) {
+            r = mid - 1;
+        } else {
+            l = mid + 1;
+        }
+    }
+
+    return false;
+}
+```
+
+#### [75. 颜色分类](https://leetcode.cn/problems/sort-colors/)
+
+给定一个包含红色、白色和蓝色、共 n 个元素的数组 nums ，原地对它们进行排序，使得相同颜色的元素相邻，并按照红色、白色、蓝色顺序排列。
+
+我们使用整数 0、 1 和 2 分别表示红色、白色和蓝色。
+
+必须在不使用库的sort函数的情况下解决这个问题。
+
+ 示例 1：
+
+> 输入：nums = [2,0,2,1,1,0]
+> 输出：[0,0,1,1,2,2]
+
+示例 2：
+
+> 输入：nums = [2,0,1]
+> 输出：[0,1,2]
+
+
+提示：
+
+* n == nums.length
+* 1 <= n <= 300
+* nums[i] 为 0、1 或 2
+
+
+进阶：
+
+* 你可以不使用代码库中的排序函数来解决这道题吗？
+* 你能想出一个仅使用常数空间的一趟扫描算法吗？
+
+```c
+void Swap(int *a, int *b)
+{
+    int tmp = *a;
+    *a = *b;
+    *b = tmp;
+}
+
+void sortColors(int* nums, int numsSize){
+    int i = 0;
+    int j = 0;
+    int k = numsSize - 1;
+    
+    while (j <= k) {
+        if (nums[j] == 0) {
+            Swap(&nums[j], &nums[i]);
+            i++;
+            j++;
+        } else if (nums[j] == 2) {
+            Swap(&nums[j], &nums[k]);
+            k--;
+        } else {
+            j++;
+        }
+
+    }
+    
+    return nums;
+}
+```
+
+#### [76. 最小覆盖子串](https://leetcode.cn/problems/minimum-window-substring/)
+
+给你一个字符串 s 、一个字符串 t 。返回 s 中涵盖 t 所有字符的最小子串。如果 s 中不存在涵盖 t 所有字符的子串，则返回空字符串 "" 。
+
+ 注意：
+
+对于 t 中重复字符，我们寻找的子字符串中该字符数量必须不少于 t 中该字符数量。
+如果 s 中存在这样的子串，我们保证它是唯一的答案。
+
+
+示例 1：
+
+> 输入：s = "ADOBECODEBANC", t = "ABC"
+> 输出："BANC"
+
+示例 2：
+
+> 输入：s = "a", t = "a"
+> 输出："a"
+
+示例 3:
+
+> 输入: s = "a", t = "aa"
+> 输出: ""
+> 解释: t 中两个字符 'a' 均应包含在 s 的子串中，
+> 因此没有符合条件的子字符串，返回空字符串。
+
+
+提示：
+
+* 1 <= s.length, t.length <= 105
+* s 和 t 由英文字母组成
+
+
+进阶：你能设计一个在 o(n) 时间内解决此问题的算法吗？
+
+```c
+#define CHAR_SIZE 128
+char * minWindow(char * s, char * t)
+{
+    int lenOfS = strlen(s);
+    int lenOfT = strlen(t);
+ 
+    int countT[CHAR_SIZE];
+    memset(countT, 0, CHAR_SIZE * sizeof(int));
+    for (int i = 0; i < lenOfT; i++) {
+        countT[t[i]]++;
+    }
+
+    char *minSubStr = (char *)malloc((lenOfS + 1) * sizeof(char));
+    int size = lenOfS + 1;
+
+    int countCur[CHAR_SIZE];
+    memset(countCur, 0, CHAR_SIZE * sizeof(int));
+
+    int i = 0;
+    int count = 0;  // count表示匹配了多少个t中的字符
+    for (int j = 0; j < lenOfS; j++) {
+        countCur[s[j]]++;
+        if (countCur[s[j]] <= countT[s[j]]) {
+            count++;
+        }
+         
+        while (i <= j && countCur[s[i]] > countT[s[i]]) {
+            countCur[s[i]]--;
+            i++;
+        }
+           
+        if (count == lenOfT && size > j - i + 1) {            
+            char *tmp = (char *)malloc((j - i + 2) * sizeof(char));
+            for (int k = i; k <= j; k++) {
+                tmp[k - i] = s[k];
+            }
+            tmp[j - i + 1] = '\0';
+            minSubStr = tmp;
+            size = j - i + 1;
+        }
+    }
+    
+    if (size == lenOfS + 1) {
+        return "";
+    }
+    return minSubStr;
+}
+```
+
+#### [77. 组合](https://leetcode.cn/problems/combinations/)
+
+给定两个整数 n 和 k，返回范围 [1, n] 中所有可能的 k 个数的组合。
+
+你可以按 任何顺序 返回答案。
+
+ 示例 1：
+
+> 输入：n = 4, k = 2
+> 输出：
+> [
+>   [2,4],
+>   [3,4],
+>   [2,3],
+>   [1,2],
+>   [1,3],
+>   [1,4],
+> ]
+
+示例 2：
+
+> 输入：n = 1, k = 1
+> 输出：[[1]]
+
+
+提示：
+
+* 1 <= n <= 20
+* 1 <= k <= n
+
+```c
+void BackTrack(int n, int k, int *curArr,int curNum, int idx, int **res, int *sizeOfRes)
+{
+    if (idx > k || curNum > n + 1) {
+        return;
+    }
+    if (idx == k) {
+        int *tmp = (int *)malloc(k * sizeof(int));
+        for (int i = 0; i < k; i++) {
+            tmp[i] = curArr[i];
+        }
+        res[(*sizeOfRes)++] = tmp;
+        return;
+    }
+    BackTrack(n, k, curArr, curNum + 1, idx, res, sizeOfRes);
+    curArr[idx] = curNum; 
+    BackTrack(n, k, curArr, curNum + 1, idx + 1, res, sizeOfRes);
+} 
+int** combine(int n, int k, int* returnSize, int** returnColumnSizes){
+    long long sizeOfRes = 1;
+    for (int i = 0; i < k; i++) {
+        sizeOfRes *= (n - i);
+    }
+    for (int i = 1; i <= k; i++) {
+        sizeOfRes /= i;
+    }
+    int ** res = (int **)malloc(sizeOfRes * sizeof(int *));
+    sizeOfRes = 0;
+    
+    int *curArr = (int *)malloc(k * sizeof(int));
+    BackTrack(n, k, curArr, 1, 0, res, &sizeOfRes);
+
+    *returnSize = sizeOfRes;
+    *returnColumnSizes = (int *)malloc(sizeOfRes * sizeof(int));
+    for (int i = 0; i < sizeOfRes; i++) {
+        (*returnColumnSizes)[i] = k;
+    }
+    return res;
+}
+```
+
+```c
+void BackTrack(int n, int k, int start, int *curArr, int idx, int **res, int *sizeOfRes)
+{
+    if (idx == k) {
+        int *tmp = (int *)malloc(k * sizeof(int));
+        for (int i = 0; i < k; i++) {
+            tmp[i] = curArr[i];
+        }
+        res[(*sizeOfRes)++] = tmp;
+        return;
+    }
+
+    for (int i = start; i <= n; i++) {
+        curArr[idx++] = i;
+        BackTrack(n, k, i + 1, curArr, idx, res, sizeOfRes);
+        idx--;
+    }
+} 
+int** combine(int n, int k, int* returnSize, int** returnColumnSizes){
+    long long sizeOfRes = 1;
+    for (int i = 0; i < k; i++) {
+        sizeOfRes *= (n - i);
+    }
+    for (int i = 1; i <= k; i++) {
+        sizeOfRes /= i;
+    }
+    int ** res = (int **)malloc(sizeOfRes * sizeof(int *));
+    sizeOfRes = 0;
+    
+    int *curArr = (int *)malloc(k * sizeof(int));
+    BackTrack(n, k, 1, curArr, 0, res, &sizeOfRes);
+
+    *returnSize = sizeOfRes;
+    *returnColumnSizes = (int *)malloc(sizeOfRes * sizeof(int));
+    for (int i = 0; i < sizeOfRes; i++) {
+        (*returnColumnSizes)[i] = k;
+    }
+    return res;
+}
+```
+
+#### [78. 子集](https://leetcode.cn/problems/subsets/)
+
+给你一个整数数组 nums ，数组中的元素 互不相同 。返回该数组所有可能的子集（幂集）。
+
+解集 不能 包含重复的子集。你可以按 任意顺序 返回解集。
+
+ 示例 1：
+
+> 输入：nums = [1,2,3]
+> 输出：[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
+
+示例 2：
+
+> 输入：nums = [0]
+> 输出：[[],[0]]
+
+
+提示：
+
+* 1 <= nums.length <= 10
+* -10 <= nums[i] <= 10
+* nums 中的所有元素 互不相同
+
+```c
+void BackTrack(int *nums, int numsSize, int start, int *curArr, int idx, 
+    int **res, int *sizeOfRes, int *returnColumnSizes)
+{
+    if (idx > numsSize) {
+        return;
+    }
+    if (idx >= 0) {
+        int *tmp = (int *)malloc(idx * sizeof(int));
+        for (int i = 0; i < idx; i++) {
+            tmp[i] = curArr[i];
+        }
+        res[(*sizeOfRes)] = tmp;
+        returnColumnSizes[(*sizeOfRes)++] = idx;
+    }
+
+    for (int i = start; i < numsSize; i++) {
+        curArr[idx++] = nums[i];
+        BackTrack(nums, numsSize, i + 1, curArr, idx, res, sizeOfRes, returnColumnSizes);
+        idx--;
+    }
+} 
+
+int** subsets(int* nums, int numsSize, int* returnSize, int** returnColumnSizes){
+    int sizeOfRes = (int)pow(2, numsSize);
+    int **res = (int **)malloc(sizeOfRes * sizeof(int *));
+    memset(res, 0, sizeOfRes * sizeof(int *));
+    int *curArr = (int *)malloc(sizeOfRes * sizeof(int));
+    *returnColumnSizes = (int *)malloc(sizeOfRes * sizeof(int));
+    sizeOfRes = 0;
+    BackTrack(nums, numsSize, 0, curArr, 0, res, &sizeOfRes, *returnColumnSizes);
+
+    *returnSize = sizeOfRes;
+    return res;
+}
+```
+
+#### [79. 单词搜索](https://leetcode.cn/problems/word-search/)
+
+给定一个 m x n 二维字符网格 board 和一个字符串单词 word 。如果 word 存在于网格中，返回 true ；否则，返回 false 。
+
+单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。同一个单元格内的字母不允许被重复使用。
+
+ 示例 1：
+
+![](img/word2.jpg)
+
+> 输入：board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCCED"
+> 输出：true
+
+示例 2：
+
+![](img/word-1.jpg)
+
+> 输入：board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "SEE"
+> 输出：true
+
+示例 3：
+
+![](img/word3.jpg)
+
+> 输入：board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCB"
+> 输出：false
+
+
+提示：
+
+* m == board.length
+* n = board[i].length
+* 1 <= m, n <= 6
+* 1 <= word.length <= 15
+* board 和 word 仅由大小写英文字母组成
+
+
+进阶：你可以使用搜索剪枝的技术来优化解决方案，使其在 board 更大的情况下可以更快解决问题？
+
+```c
+bool BackTrack(char** board, int m, int n, char * word, int idx, int x, int y)
+{
+    if (x < 0 || y < 0 || x >= m || y >= n || 
+        board[x][y] != word[idx] || board[x][y] == '/') {
+        return false;
+    }
+
+    if (idx == strlen(word) - 1) {
+        return true;
+    }
+
+    board[x][y] = '/';
+    bool isTrue = BackTrack(board, m, n, word, idx + 1, x + 1, y) ||
+                    BackTrack(board, m, n, word, idx + 1, x - 1, y) || 
+                    BackTrack(board, m, n, word, idx + 1, x , y + 1) ||
+                    BackTrack(board, m, n, word, idx + 1, x, y - 1);
+    board[x][y] = word[idx];
+    return isTrue;
+}
+
+bool exist(char** board, int boardSize, int* boardColSize, char * word){
+    
+    for (int i = 0; i < boardSize; i++) {
+        for (int j = 0; j < boardColSize[0]; j++) {
+            if (board[i][j] != word[0]) {
+                continue;
+            }
+            if (BackTrack(board, boardSize, boardColSize[0], word, 0, i, j)) {
+                return true;
+            }
+        }
+    }
+    
+    return false;
+}
+```
+
+#### [80. 删除有序数组中的重复项 II](https://leetcode.cn/problems/remove-duplicates-from-sorted-array-ii/)
+
+给你一个有序数组 nums ，请你 原地 删除重复出现的元素，使每个元素 最多出现两次 ，返回删除后数组的新长度。
+
+不要使用额外的数组空间，你必须在 原地 修改输入数组 并在使用 O(1) 额外空间的条件下完成。
+
+ 说明：
+
+为什么返回数值是整数，但输出的答案是数组呢？
+
+请注意，输入数组是以「引用」方式传递的，这意味着在函数里修改输入数组对于调用者是可见的。
+
+你可以想象内部操作如下:
+
+> // nums 是以“引用”方式传递的。也就是说，不对实参做任何拷贝
+> int len = removeDuplicates(nums);
+>
+> // 在函数里修改输入数组对于调用者是可见的。
+> // 根据你的函数返回的长度, 它会打印出数组中 该长度范围内 的所有元素。
+> for (int i = 0; i < len; i++) {
+>     print(nums[i]);
+> }
+
+
+示例 1：
+
+> 输入：nums = [1,1,1,2,2,3]
+> 输出：5, nums = [1,1,2,2,3]
+> 解释：函数应返回新长度 length = 5, 并且原数组的前五个元素被修改为 1, 1, 2, 2, 3 。 不需要考虑数组中超出新长度后面的元素。
+
+示例 2：
+
+> 输入：nums = [0,0,1,1,1,1,2,3,3]
+> 输出：7, nums = [0,0,1,1,2,3,3]
+> 解释：函数应返回新长度 length = 7, 并且原数组的前五个元素被修改为 0, 0, 1, 1, 2, 3, 3 。 不需要考虑数组中超出新长度后面的元素。
+
+
+提示：
+
+* 1 <= nums.length <= 3 * 104
+* -104 <= nums[i] <= 104
+* nums 已按升序排列
+
+```c
+int removeDuplicates(int* nums, int numsSize){
+    if (numsSize <= 2) {
+        return numsSize;
+    }
+
+    int l = 2;
+    for (int i = 2; i < numsSize; i++) {
+        if (nums[i] == nums[l - 2]) {
+            continue;
+        }
+        nums[l] = nums[i];
+        l++;
+    }
+    
+    return l;
+}
+```
+
+#### [81. 搜索旋转排序数组 II](https://leetcode.cn/problems/search-in-rotated-sorted-array-ii/)
+
+已知存在一个按非降序排列的整数数组 nums ，数组中的值不必互不相同。
+
+在传递给函数之前，nums 在预先未知的某个下标 k（0 <= k < nums.length）上进行了 旋转 ，使数组变为 [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]]（下标 从 0 开始 计数）。例如， [0,1,2,4,4,4,5,6,6,7] 在下标 5 处经旋转后可能变为 [4,5,6,6,7,0,1,2,4,4] 。
+
+给你 旋转后 的数组 nums 和一个整数 target ，请你编写一个函数来判断给定的目标值是否存在于数组中。如果 nums 中存在这个目标值 target ，则返回 true ，否则返回 false 。
+
+你必须尽可能减少整个操作步骤。
+
+ 示例 1：
+
+> 输入：nums = [2,5,6,0,0,1,2], target = 0
+> 输出：true
+
+示例 2：
+
+> 输入：nums = [2,5,6,0,0,1,2], target = 3
+> 输出：false
+
+
+提示：
+
+* 1 <= nums.length <= 5000
+* -104 <= nums[i] <= 104
+* 题目数据保证 nums 在预先未知的某个下标上进行了旋转
+* -104 <= target <= 104
+
+
+进阶：
+
+* 这是 搜索旋转排序数组 的延伸题目，本题中的 nums  可能包含重复元素。
+* 这会影响到程序的时间复杂度吗？会有怎样的影响，为什么？
+
+```c
+bool search(int* nums, int numsSize, int target){
+    int l = 0;
+    int r = numsSize - 1;
+
+    while (l <= r) {
+        int mid = l + (r - l) / 2;
+
+        if (nums[mid] == target) {
+            return true;
+        } else if (nums[mid] > nums[l]) {
+            if (nums[mid] > target && target >= nums[l]) {                
+                r = mid - 1;          
+            } else {
+                l = mid + 1;
+            }
+        } else if (nums[mid] < nums[l]) {
+            if (nums[mid] < target && target < nums[l]) { 
+                l = mid + 1;
+            } else {
+                r = mid - 1;
+            }
+        } else {
+            l++;
+        }
+    }
+
+    return false;
+}
+```
 
 
 
