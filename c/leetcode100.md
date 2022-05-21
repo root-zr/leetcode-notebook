@@ -6041,6 +6041,285 @@ bool search(int* nums, int numsSize, int target){
 }
 ```
 
+#### [82. 删除排序链表中的重复元素 II](https://leetcode.cn/problems/remove-duplicates-from-sorted-list-ii/)
+
+给定一个已排序的链表的头 head ， 删除原始链表中所有重复数字的节点，只留下不同的数字 。返回 已排序的链表 。
+
+ 示例 1：
+
+![](img/linkedlist1.jpg)
+
+> 输入：head = [1,2,3,3,4,4,5]
+> 输出：[1,2,5]
+
+示例 2：
+
+![](img/linkedlist2.jpg)
+
+> 输入：head = [1,1,1,2,3]
+> 输出：[2,3]
+
+
+提示：
+
+* 链表中节点数目在范围 [0, 300] 内
+* -100 <= Node.val <= 100
+* 题目数据保证链表已经按升序 排列
+
+```c
+struct ListNode* deleteDuplicates(struct ListNode* head){
+    if (head == NULL || head->next == NULL) {
+        return head;
+    }
+    struct ListNode *dummy = (struct ListNode *)malloc(sizeof(struct ListNode));
+    dummy->next = head;
+    struct ListNode *p = dummy;
+    while (p->next != NULL) {
+        struct ListNode *q = p->next;
+        while (q->next != NULL && q->val == q->next->val) {
+            q = q->next;
+        }
+        if (p->next == q) {
+            p = p->next;
+        } else {
+            p->next = q->next;      
+        } 
+    }
+
+    return dummy->next;
+}
+```
+
+#### [83. 删除排序链表中的重复元素](https://leetcode.cn/problems/remove-duplicates-from-sorted-list/)
+
+给定一个已排序的链表的头 head ， 删除所有重复的元素，使每个元素只出现一次 。返回 已排序的链表 。
+
+ 示例 1：
+
+![](img/list1.jpg)
+
+> 输入：head = [1,1,2]
+> 输出：[1,2]
+
+示例 2：
+
+![](img/list2.jpg)
+
+> 输入：head = [1,1,2,3,3]
+> 输出：[1,2,3]
+
+
+提示：
+
+* 链表中节点数目在范围 [0, 300] 内
+* -100 <= Node.val <= 100
+* 题目数据保证链表已经按升序 排列
+
+```c
+struct ListNode* deleteDuplicates(struct ListNode* head){
+    if (head == NULL || head->next == NULL) {
+        return head;
+    }
+    struct ListNode *p = head;
+    while (p->next != NULL) {
+        if (p->val == p->next->val) {
+            p->next = p->next->next;
+        } else {
+            p = p->next;
+        }
+    }
+    return head;
+}
+```
+
+#### [84. 柱状图中最大的矩形](https://leetcode.cn/problems/largest-rectangle-in-histogram/)
+
+给定 n 个非负整数，用来表示柱状图中各个柱子的高度。每个柱子彼此相邻，且宽度为 1 。
+
+求在该柱状图中，能够勾勒出来的矩形的最大面积。
+
+ 示例 1:
+
+![](img/histogram.jpg)
+
+> 输入：heights = [2,1,5,6,2,3]
+> 输出：10
+> 解释：最大的矩形为图中红色区域，面积为 10
+
+示例 2：
+
+![](img/histogram-1.jpg)
+
+> 输入： heights = [2,4]
+> 输出： 4
+
+
+提示：
+
+* 1 <= heights.length <=105
+* 0 <= heights[i] <= 104
+
+```c
+#define MAX_SIZE 100001
+
+int largestRectangleArea(int* heights, int heightsSize){
+    int stack[MAX_SIZE];
+    int size = 0;
+    int maxSize = 0;
+    
+    int val;
+    for (int i = 0; i <= heightsSize; i++) {
+        if (i == heightsSize) {
+            val = -1;   // 为了防止出现heights是单调递增的情况，需要在最后加一个-1来判断
+        } else {
+            val = heights[i];
+        }
+        while (size > 0 && val < heights[stack[size - 1]]) {
+            int idx = stack[size - 1];
+            size--;
+            int left = size == 0 ? -1 : stack[size - 1];
+            maxSize = fmax(maxSize, (i - left - 1) * heights[idx]);
+        }
+        stack[size++] = i;
+    }
+    return maxSize;
+}
+```
+
+#### [85. 最大矩形](https://leetcode.cn/problems/maximal-rectangle/)
+
+给定一个仅包含 0 和 1 、大小为 rows x cols 的二维二进制矩阵，找出只包含 1 的最大矩形，并返回其面积。
+
+ 示例 1：
+
+> 输入：matrix = [["1","0","1","0","0"],["1","0","1","1","1"],["1","1","1","1","1"],["1","0","0","1","0"]]
+> 输出：6
+> 解释：最大矩形如上图所示。
+
+示例 2：
+
+> 输入：matrix = []
+> 输出：0
+
+示例 3：
+
+> 输入：matrix = [["0"]]
+> 输出：0
+
+示例 4：
+
+> 输入：matrix = [["1"]]
+> 输出：1
+
+示例 5：
+
+> 输入：matrix = [["0","0"]]
+> 输出：0
+
+
+提示：
+
+* rows == matrix.length
+* cols == matrix[0].length
+* 1 <= row, cols <= 200
+* matrix[i][j] 为 '0' 或 '1'
+
+```c
+#define MAX_SIZE 100001
+
+int largestRectangleArea(int* heights, int heightsSize){
+    int stack[MAX_SIZE];
+    int size = 0;
+    int maxSize = 0;
+    
+    int val;
+    for (int i = 0; i <= heightsSize; i++) {
+        if (i == heightsSize) {
+            val = -1;   // 为了防止出现heights是单调递增的情况，需要在最后加一个-1来判断
+        } else {
+            val = heights[i];
+        }
+        while (size > 0 && val < heights[stack[size - 1]]) {
+            int idx = stack[size - 1];
+            size--;
+            int left = size == 0 ? -1 : stack[size - 1];
+            maxSize = fmax(maxSize, (i - left - 1) * heights[idx]);
+        }
+        stack[size++] = i;
+    }
+    return maxSize;
+}
+
+int maximalRectangle(char** matrix, int matrixSize, int* matrixColSize){
+    int ans = 0;
+    int heights[matrixColSize[0]];
+    memset(heights, 0, matrixColSize[0] * sizeof(int));
+
+    for (int i = 0; i < matrixSize; i++) {
+        for (int j = 0; j < matrixColSize[0]; j++) {
+            if (matrix[i][j] == '1') {
+                heights[j] += 1;
+            } else {
+                heights[j] = 0;
+            }
+        }
+        ans = fmax(ans, largestRectangleArea(heights, matrixColSize[0]));
+    }
+    return ans;
+}
+```
+
+#### [86. 分隔链表](https://leetcode.cn/problems/partition-list/)
+
+给你一个链表的头节点 head 和一个特定值 x ，请你对链表进行分隔，使得所有 小于 x 的节点都出现在 大于或等于 x 的节点之前。
+
+你应当 保留 两个分区中每个节点的初始相对位置。
+
+ 示例 1：
+
+![](img/partition.jpg)
+
+> 输入：head = [1,4,3,2,5,2], x = 3
+> 输出：[1,2,2,4,3,5]
+
+示例 2：
+
+> 输入：head = [2,1], x = 2
+> 输出：[1,2]
+
+
+提示：
+
+* 链表中节点的数目在范围 [0, 200] 内
+* -100 <= Node.val <= 100
+* -200 <= x <= 200
+
+```c
+struct ListNode* partition(struct ListNode* head, int x){
+    struct ListNode *left = (struct ListNode *)malloc(sizeof(struct ListNode));
+    struct ListNode *p = left;
+    struct ListNode *right = (struct ListNode *)malloc(sizeof(struct ListNode));
+    struct ListNode *q = right;
+    while (head != NULL) {
+        if (head->val < x) {
+            p->next = head;
+            p = p->next;
+        } else {
+            q->next = head;
+            q = q->next;
+        }
+        head = head->next;
+    }
+    q->next = NULL;
+    p->next = right->next;
+    return left->next;
+}
+```
+
+
+
+
+
 
 
 #### [122. 买卖股票的最佳时机 II](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-ii/)
