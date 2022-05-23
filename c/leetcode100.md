@@ -6316,6 +6316,257 @@ struct ListNode* partition(struct ListNode* head, int x){
 }
 ```
 
+#### [87. 扰乱字符串](https://leetcode.cn/problems/scramble-string/)
+
+使用下面描述的算法可以扰乱字符串 s 得到字符串 t ：
+
+* 如果字符串的长度为 1 ，算法停止
+* 如果字符串的长度 > 1 ，执行下述步骤：
+  * 在一个随机下标处将字符串分割成两个非空的子字符串。即，如果已知字符串 s ，则可以将其分成两个子字符串 x 和 y ，且满足 s = x + y 。
+  * 随机 决定是要「交换两个子字符串」还是要「保持这两个子字符串的顺序不变」。即，在执行这一步骤之后，s 可能是 s = x + y 或者 s = y + x 。
+  * 在 x 和 y 这两个子字符串上继续从步骤 1 开始递归执行此算法。
+
+给你两个 长度相等 的字符串 s1 和 s2，判断 s2 是否是 s1 的扰乱字符串。如果是，返回 true ；否则，返回 false 。
+
+示例 1：
+
+> 输入：s1 = "great", s2 = "rgeat"
+> 输出：true
+> 解释：s1 上可能发生的一种情形是：
+> "great" --> "gr/eat" // 在一个随机下标处分割得到两个子字符串
+> "gr/eat" --> "gr/eat" // 随机决定：「保持这两个子字符串的顺序不变」
+> "gr/eat" --> "g/r / e/at" // 在子字符串上递归执行此算法。两个子字符串分别在随机下标处进行一轮分割
+> "g/r / e/at" --> "r/g / e/at" // 随机决定：第一组「交换两个子字符串」，第二组「保持这两个子字符串的顺序不变」
+> "r/g / e/at" --> "r/g / e/ a/t" // 继续递归执行此算法，将 "at" 分割得到 "a/t"
+> "r/g / e/ a/t" --> "r/g / e/ a/t" // 随机决定：「保持这两个子字符串的顺序不变」
+> 算法终止，结果字符串和 s2 相同，都是 "rgeat"
+> 这是一种能够扰乱 s1 得到 s2 的情形，可以认为 s2 是 s1 的扰乱字符串，返回 true
+
+示例 2：
+
+> 输入：s1 = "abcde", s2 = "caebd"
+> 输出：false
+
+示例 3：
+
+> 输入：s1 = "a", s2 = "a"
+> 输出：true
+
+
+提示：
+
+* s1.length == s2.length
+* 1 <= s1.length <= 30
+* s1 和 s2 由小写英文字母组成
+
+```c
+bool isScramble(char * s1, char * s2){
+    int len = strlen(s1);
+
+    bool dp[len + 1][len + 1][len + 1];
+    memset(dp, false, (len + 1) * (len + 1) * (len + 1) * sizeof(bool));
+    for (int k = 1; k <= len; k++) {
+        for (int i = 0; i + k - 1 < len; i++) {
+            for (int j = 0; j + k - 1 < len; j++) {
+                if (k == 1) {
+                    dp[i][j][k] = s1[i] == s2[j];
+                    continue;
+                }
+
+                for (int u = 1; u < k; u++) {
+                    bool isMatchL = dp[i][j][u] && dp[i + u][j + u][k - u];
+                    bool isMatchR = dp[i][j + k - u][u] && dp[i + u][j][k - u];
+                    if (isMatchL || isMatchR) {
+                        dp[i][j][k] = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    return dp[0][0][len];
+}
+```
+
+#### [88. 合并两个有序数组](https://leetcode.cn/problems/merge-sorted-array/)
+
+给你两个按 非递减顺序 排列的整数数组 nums1 和 nums2，另有两个整数 m 和 n ，分别表示 nums1 和 nums2 中的元素数目。
+
+请你 合并 nums2 到 nums1 中，使合并后的数组同样按 非递减顺序 排列。
+
+注意：最终，合并后数组不应由函数返回，而是存储在数组 nums1 中。为了应对这种情况，nums1 的初始长度为 m + n，其中前 m 个元素表示应合并的元素，后 n 个元素为 0 ，应忽略。nums2 的长度为 n 。
+
+ 示例 1：
+
+> 输入：nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3
+> 输出：[1,2,2,3,5,6]
+> 解释：需要合并 [1,2,3] 和 [2,5,6] 。
+> 合并结果是 [1,2,2,3,5,6] ，其中斜体加粗标注的为 nums1 中的元素。
+
+示例 2：
+
+> 输入：nums1 = [1], m = 1, nums2 = [], n = 0
+> 输出：[1]
+> 解释：需要合并 [1] 和 [] 。
+> 合并结果是 [1] 。
+
+示例 3：
+
+> 输入：nums1 = [0], m = 0, nums2 = [1], n = 1
+> 输出：[1]
+> 解释：需要合并的数组是 [] 和 [1] 。
+> 合并结果是 [1] 。
+> 注意，因为 m = 0 ，所以 nums1 中没有元素。nums1 中仅存的 0 仅仅是为了确保合并结果可以顺利存放到 nums1 中。
+
+
+提示：
+
+* nums1.length == m + n
+* nums2.length == n
+* 0 <= m, n <= 200
+* 1 <= m + n <= 200
+* -109 <= nums1[i], nums2[j] <= 109
+
+
+进阶：你可以设计实现一个时间复杂度为 O(m + n) 的算法解决此问题吗？
+
+```c
+void merge(int* nums1, int nums1Size, int m, int* nums2, int nums2Size, int n){
+    int a = m - 1;
+    int b = n - 1;
+
+    int size = m + n - 1;
+    while (a >= 0 && b >= 0) {
+        if (nums1[a] > nums2[b]) {
+            nums1[size--] = nums1[a--];
+        } else {
+            nums1[size--] = nums2[b--];
+        }
+    }
+
+    while (a >= 0) {
+        nums1[size--] = nums1[a--];
+    }
+    while (b >= 0) {
+        nums1[size--] = nums2[b--];
+    }
+    return nums1;
+}
+```
+
+#### [89. 格雷编码](https://leetcode.cn/problems/gray-code/)
+
+n 位格雷码序列 是一个由 2n 个整数组成的序列，其中：
+
+* 每个整数都在范围 [0, 2n - 1] 内（含 0 和 2n - 1）
+* 第一个整数是 0
+* 一个整数在序列中出现 不超过一次
+* 每对 相邻 整数的二进制表示 恰好一位不同 ，且
+* 第一个 和 最后一个 整数的二进制表示 恰好一位不同
+
+给你一个整数 n ，返回任一有效的 n 位格雷码序列 。
+
+ 示例 1：
+
+> 输入：n = 2
+> 输出：[0,1,3,2]
+> 解释：
+> [0,1,3,2] 的二进制表示是 [00,01,11,10] 。
+>
+> - 00 和 01 有一位不同
+> - 01 和 11 有一位不同
+> - 11 和 10 有一位不同
+> - 10 和 00 有一位不同
+> [0,2,3,1] 也是一个有效的格雷码序列，其二进制表示是 [00,10,11,01] 。
+> - 00 和 10 有一位不同
+> - 10 和 11 有一位不同
+> - 11 和 01 有一位不同
+> - 01 和 00 有一位不同
+>
+
+示例 2：
+
+> 输入：n = 1
+> 输出：[0,1]
+
+
+提示：
+
+1 <= n <= 16
+
+```c
+int* grayCode(int n, int* returnSize){
+    *returnSize = (int)pow(2, n);
+    int *ans = (int *)malloc(*returnSize * sizeof(int));
+    int size = 0;
+
+    ans[size++] = 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = size - 1; j >= 0; j--) {
+            ans[j] <<= 1;
+            ans[size++] = ans[j] + 1;
+        }
+    }
+    return ans;
+}
+```
+
+#### [90. 子集 II](https://leetcode.cn/problems/subsets-ii/)
+
+给你一个整数数组 nums ，其中可能包含重复元素，请你返回该数组所有可能的子集（幂集）。
+
+解集 不能 包含重复的子集。返回的解集中，子集可以按 任意顺序 排列。
+
+ 示例 1：
+
+> 输入：nums = [1,2,2]
+> 输出：[[],[1],[1,2],[1,2,2],[2],[2,2]]
+
+示例 2：
+
+> 输入：nums = [0]
+> 输出：[[],[0]]
+
+
+提示：
+
+* 1 <= nums.length <= 10
+* -10 <= nums[i] <= 10
+
+```c
+int Cmp(const void *a, const void *b)
+{
+    return *(int *)a - *(int *)b;
+}
+void BackTrack(int *nums, int numsSize, int start, int *curArr, int idx, 
+    int **res, int *sizeOfRes, int *returnColumnSizes)
+{
+    if (idx > numsSize) {
+        return;
+    }
+    if (idx >= 0) {
+        int *tmp = (int *)malloc(idx * sizeof(int));
+        for (int i = 0; i < idx; i++) {
+            tmp[i] = curArr[i];
+        }
+        res[(*sizeOfRes)] = tmp;
+        returnColumnSizes[(*sizeOfRes)++] = idx;
+    }
+
+    for (int i = start; i < numsSize; i++) {
+        if (i > start && nums[i] == nums[i - 1]) {
+            continue;
+        }
+        curArr[idx++] = nums[i];
+        BackTrack(nums, numsSize, i + 1, curArr, idx, res, sizeOfRes, returnColumnSizes);
+        idx--;
+    }
+} 
+```
+
+
+
 
 
 
