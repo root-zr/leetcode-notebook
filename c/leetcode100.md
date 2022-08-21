@@ -6565,7 +6565,539 @@ void BackTrack(int *nums, int numsSize, int start, int *curArr, int idx,
 } 
 ```
 
+#### [91. 解码方法](https://leetcode.cn/problems/decode-ways/)
 
+一条包含字母 A-Z 的消息通过以下映射进行了 编码 ：
+
+> 'A' -> "1"
+> 'B' -> "2"
+> ...
+> 'Z' -> "26"
+
+要 解码 已编码的消息，所有数字必须基于上述映射的方法，反向映射回字母（可能有多种方法）。例如，"11106" 可以映射为：
+
+* "AAJF" ，将消息分组为 (1 1 10 6)
+* "KJF" ，将消息分组为 (11 10 6)
+
+注意，消息不能分组为  (1 11 06) ，因为 "06" 不能映射为 "F" ，这是由于 "6" 和 "06" 在映射中并不等价。
+
+给你一个只含数字的 非空 字符串 s ，请计算并返回 解码 方法的 总数 。
+
+题目数据保证答案肯定是一个 32 位 的整数。
+
+ 示例 1：
+
+> 输入：s = "12"
+> 输出：2
+> 解释：它可以解码为 "AB"（1 2）或者 "L"（12）。
+
+示例 2：
+
+> 输入：s = "226"
+> 输出：3
+> 解释：它可以解码为 "BZ" (2 26), "VF" (22 6), 或者 "BBF" (2 2 6) 。
+
+示例 3：
+
+> 输入：s = "0"
+> 输出：0
+> 解释：没有字符映射到以 0 开头的数字。
+> 含有 0 的有效映射是 'J' -> "10" 和 'T'-> "20" 。
+> 由于没有字符，因此没有有效的方法对此进行解码，因为所有数字都需要映射。
+
+
+提示：
+
+* 1 <= s.length <= 100
+* s 只包含数字，并且可能包含前导零。
+
+```c
+int numDecodings(char * s){
+    int len = strlen(s);
+    int dp[len + 1];
+    memset(dp, 0, (len + 1) * sizeof(int));
+
+    dp[0] = 1;
+    for (int i = 1; i <= len; i++) {   
+        if (s[i - 1] > '0') {
+            dp[i] += dp[i - 1];
+        }
+        
+        if (i >= 2 && s[i - 2] != '0' && ((s[i - 2] - '0') * 10 + (s[i - 1] - '0') <= 26)) {  
+            dp[i] += dp[i - 2];        
+        }
+    }
+   
+    return dp[len];
+}
+```
+
+#### [92. 反转链表 II](https://leetcode.cn/problems/reverse-linked-list-ii/)
+
+给你单链表的头指针 head 和两个整数 left 和 right ，其中 left <= right 。请你反转从位置 left 到位置 right 的链表节点，返回 反转后的链表 。
+
+
+示例 1：
+
+> 输入：head = [1,2,3,4,5], left = 2, right = 4
+> 输出：[1,4,3,2,5]
+
+示例 2：
+
+> 输入：head = [5], left = 1, right = 1
+> 输出：[5]
+
+
+提示：
+
+* 链表中节点数目为 n
+* 1 <= n <= 500
+* -500 <= Node.val <= 500
+* 1 <= left <= right <= n
+
+
+进阶： 你可以使用一趟扫描完成反转吗？
+
+```c
+struct ListNode * ReverseLinkedList(struct ListNode* head)
+{
+    struct ListNode *pre = NULL;
+    struct ListNode *cur = head;
+    while (cur != NULL) {
+        struct ListNode *tmp = cur->next;
+        cur->next = pre;
+        pre = cur;
+        cur = tmp;
+    }
+    return pre;
+}
+
+struct ListNode* reverseBetween(struct ListNode* head, int left, int right){
+    struct ListNode *dummy = malloc(sizeof(struct ListNode));
+    dummy->next = head;
+
+    struct ListNode *pre = dummy;
+    for (int i = 0; i < left - 1; i++) {
+        pre = pre->next;
+    }
+    struct ListNode *cur = pre->next;
+    for (int i = 0; i < right - left; i++) {
+        struct ListNode *tmp = cur->next;
+        cur->next = tmp->next;
+        tmp->next = pre->next;
+        pre->next = tmp;
+    }
+    return dummy->next;
+}
+```
+
+#### [93. 复原 IP 地址](https://leetcode.cn/problems/restore-ip-addresses/)
+
+有效 IP 地址 正好由四个整数（每个整数位于 0 到 255 之间组成，且不能含有前导 0），整数之间用 '.' 分隔。
+
+例如："0.1.2.201" 和 "192.168.1.1" 是 有效 IP 地址，但是 "0.011.255.245"、"192.168.1.312" 和 "192.168@1.1" 是 无效 IP 地址。
+给定一个只包含数字的字符串 s ，用以表示一个 IP 地址，返回所有可能的有效 IP 地址，这些地址可以通过在 s 中插入 '.' 来形成。你 不能 重新排序或删除 s 中的任何数字。你可以按 任何 顺序返回答案。
+
+ 示例 1：
+
+> 输入：s = "25525511135"
+> 输出：["255.255.11.135","255.255.111.35"]
+
+示例 2：
+
+> 输入：s = "0000"
+> 输出：["0.0.0.0"]
+
+示例 3：
+
+> 输入：s = "101023"
+> 输出：["1.0.10.23","1.0.102.3","10.1.0.23","10.10.2.3","101.0.2.3"]
+
+
+提示：
+
+* 1 <= s.length <= 20
+* s 仅由数字组成
+
+```c
+#define MAX_SIZE 5001
+
+void Dfs(char *s, int idx, int start, int *arr, int sizeOfArr, char **res, int *sizeOfRes)
+{
+    if (idx > 4 || start > strlen(s)) {
+        return;
+    }
+
+    if (idx == 4 && start == strlen(s)) {
+        char *tmp = (char *)malloc(20 * sizeof(char));
+        int size = 0;
+        for (int i = 0; i < sizeOfArr; i++) {
+            char *c = (char *)malloc(4 * sizeof(char));
+            sprintf(c, "%d", arr[i]);
+            for (int j = 0; j < strlen(c); j++) {
+                tmp[j + size] = c[j];
+            }
+            size += strlen(c);
+            free(c);
+            tmp[size++] = '.';
+        }
+        tmp[size - 1] = '\0';
+        res[(*sizeOfRes)++] = tmp;
+        return;
+    }
+
+    int num = 0;
+    for (int i = start; i < strlen(s); i++) {
+        num = num * 10 + (s[i] - '0');
+        if (num > 255) {
+            break;
+        }
+        arr[sizeOfArr++] = num;
+        Dfs(s, idx + 1, i + 1, arr, sizeOfArr, res, sizeOfRes);
+        sizeOfArr--;
+        if (num == 0) {
+            break;
+        }
+    }
+}
+char ** restoreIpAddresses(char * s, int* returnSize){
+    char **res = (char **)malloc(MAX_SIZE * sizeof(char *));
+    int sizeOfRes = 0;
+
+    int *arr = (int *)malloc(20 * sizeof(int));
+    Dfs(s, 0, 0, arr, 0, res, &sizeOfRes);
+
+    *returnSize = sizeOfRes;
+    return res;
+}
+```
+
+#### [94. 二叉树的中序遍历](https://leetcode.cn/problems/binary-tree-inorder-traversal/)
+
+给定一个二叉树的根节点 root ，返回 它的 中序 遍历 。
+
+ 示例 1：
+
+> 输入：root = [1,null,2,3]
+> 输出：[1,3,2]
+
+示例 2：
+
+> 输入：root = []
+> 输出：[]
+
+示例 3：
+
+> 输入：root = [1]
+> 输出：[1]
+
+
+提示：
+
+* 树中节点数目在范围 [0, 100] 内
+* -100 <= Node.val <= 100
+
+
+进阶: 递归算法很简单，你可以通过迭代算法完成吗？
+
+```c
+#define MAX_SIZE 101
+void Dfs(struct TreeNode *root, int *arr, int *arrSize)
+{
+    if (root == NULL) {
+        return;
+    }
+    Dfs(root->left, arr, arrSize);
+    arr[(*arrSize)++] = root->val;
+    Dfs(root->right, arr, arrSize);
+}
+int* inorderTraversal(struct TreeNode* root, int* returnSize){
+    int *arr = (int *)malloc(MAX_SIZE * sizeof(int));
+    *returnSize = 0;
+    Dfs(root, arr, returnSize);
+    return arr;
+}
+```
+
+```c
+#define MAX_SIZE 101
+
+int* inorderTraversal(struct TreeNode* root, int* returnSize){
+    int *arr = (int *)malloc(MAX_SIZE * sizeof(int));
+    *returnSize = 0;
+    
+    struct TreeNode *stack[MAX_SIZE];
+    int sizeOfStack = 0;
+    while (root != NULL || sizeOfStack > 0) {
+        while (root != NULL) {
+            stack[sizeOfStack++] = root;
+            root = root->left;
+        }
+        root = stack[sizeOfStack - 1];
+        sizeOfStack--;
+        arr[(*returnSize)++] = root->val;
+        root = root->right;
+    }
+    return arr;
+}
+```
+
+#### [95. 不同的二叉搜索树 II](https://leetcode.cn/problems/unique-binary-search-trees-ii/)
+
+给你一个整数 n ，请你生成并返回所有由 n 个节点组成且节点值从 1 到 n 互不相同的不同 二叉搜索树 。可以按 任意顺序 返回答案。
+
+ 示例 1：
+
+![](img/uniquebstn3.jpg)
+
+> 输入：n = 3
+> 输出：[[1,null,2,null,3],[1,null,3,2],[2,1,3],[3,1,null,null,2],[3,2,null,1]]
+
+示例 2：
+
+> 输入：n = 1
+> 输出：[[1]]
+
+
+提示：
+
+* 1 <= n <= 8
+
+```c
+struct TreeNode** Build(int l, int r, int *returnSize){
+    if (l > r) {
+        *returnSize = 1;
+        struct TreeNode** ret = malloc(sizeof(struct TreeNode*));
+        ret[0] = NULL;
+        return ret;
+    }
+
+    struct TreeNode **res = (struct TreeNode **)malloc(1500 * sizeof(struct TreeNode *));
+    *returnSize = 0;
+    for (int i = l; i <= r; i++) {
+        int lSize;
+        int rSize;
+        struct TreeNode **lnodes = Build(l, i - 1, &lSize);
+        struct TreeNode **rnodes = Build(i + 1, r, &rSize);
+        for (int j = 0; j < lSize; j++) {
+            for (int k = 0; k < rSize; k++) {
+                struct TreeNode *root = (struct TreeNode *)malloc(sizeof(struct TreeNode));
+                root->val = i;
+                root->left = lnodes[j];
+                root->right = rnodes[k];
+                res[(*returnSize)++] = root;
+            }
+        }
+    }
+    return res;
+}
+
+struct TreeNode** generateTrees(int n, int* returnSize){
+    return Build(1, n, returnSize);
+}
+```
+
+#### [96. 不同的二叉搜索树](https://leetcode.cn/problems/unique-binary-search-trees/)
+
+给你一个整数 n ，求恰由 n 个节点组成且节点值从 1 到 n 互不相同的 二叉搜索树 有多少种？返回满足题意的二叉搜索树的种数。
+
+ 示例 1：
+
+> 输入：n = 3
+> 输出：5
+
+示例 2：
+
+> 输入：n = 1
+> 输出：1
+
+
+提示：
+
+* 1 <= n <= 19
+
+```c
+int numTrees(int n){
+    int dp[n + 1];
+    memset(dp, 0, (n + 1) * sizeof(int));
+    dp[0] = 1;
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= i; j++) {
+            dp[i] += dp[j - 1] * dp[i - j];
+        }
+    }
+    return dp[n];
+}
+```
+
+#### [97. 交错字符串](https://leetcode.cn/problems/interleaving-string/)
+
+给定三个字符串 s1、s2、s3，请你帮忙验证 s3 是否是由 s1 和 s2 交错 组成的。
+
+两个字符串 s 和 t 交错 的定义与过程如下，其中每个字符串都会被分割成若干 非空 子字符串：
+
+s = s1 + s2 + ... + sn
+t = t1 + t2 + ... + tm
+|n - m| <= 1
+交错 是 s1 + t1 + s2 + t2 + s3 + t3 + ... 或者 t1 + s1 + t2 + s2 + t3 + s3 + ...
+注意：a + b 意味着字符串 a 和 b 连接。
+
+ 示例 1：
+
+![](img/interleave.jpg)
+
+> 输入：s1 = "aabcc", s2 = "dbbca", s3 = "aadbbcbcac"
+> 输出：true
+
+示例 2：
+
+> 输入：s1 = "aabcc", s2 = "dbbca", s3 = "aadbbbaccc"
+> 输出：false
+
+示例 3：
+
+> 输入：s1 = "", s2 = "", s3 = ""
+> 输出：true
+
+
+提示：
+
+* 0 <= s1.length, s2.length <= 100
+* 0 <= s3.length <= 200
+* s1、s2、和 s3 都由小写英文字母组成
+
+
+进阶：您能否仅使用 O(s2.length) 额外的内存空间来解决它?
+
+```c
+bool isInterleave(char * s1, char * s2, char * s3){
+    int len1 = strlen(s1);
+    int len2 = strlen(s2);
+
+    if (len1 + len2 != strlen(s3)) {
+        return false;
+    }
+
+    bool dp[len1 + 1][len2 + 1];
+    memset(dp, 0, sizeof(dp));
+    dp[0][0] = true;
+    for (int i = 0; i <= len1; i++) {
+        for (int j = 0; j <= len2; j++) {
+            if (i > 0) {
+                dp[i][j] |= (dp[i - 1][j] && s1[i - 1] == s3[i + j - 1]);
+            }
+            if (j > 0) {
+                dp[i][j] |= (dp[i][j - 1] && s2[j - 1] == s3[i + j - 1]);
+            }          
+        }
+    }
+    return dp[len1][len2];
+}
+```
+
+#### [98. 验证二叉搜索树](https://leetcode.cn/problems/validate-binary-search-tree/)
+
+给你一个二叉树的根节点 root ，判断其是否是一个有效的二叉搜索树。
+
+有效 二叉搜索树定义如下：
+
+节点的左子树只包含 小于 当前节点的数。
+节点的右子树只包含 大于 当前节点的数。
+所有左子树和右子树自身必须也是二叉搜索树。
+
+示例 1：
+
+![](img/tree1.jpg)
+
+> 输入：root = [2,1,3]
+> 输出：true
+
+示例 2：
+
+![](img/tree2.jpg)
+
+> 输入：root = [5,1,4,null,null,3,6]
+> 输出：false
+> 解释：根节点的值是 5 ，但是右子节点的值是 4 。
+
+
+提示：
+
+* 树中节点数目范围在[1, 104] 内
+* -231 <= Node.val <= 231 - 1
+
+```c
+bool MidOrder(struct TreeNode* root, long *pre)
+{
+    if (root == NULL) {
+        return true;
+    }
+
+    bool l = MidOrder(root->left, pre);
+
+    if (root->val <= *pre) {
+        return false;
+    }
+   
+    *pre = root->val;
+    bool r = MidOrder(root->right, pre);
+    return l && r;
+}
+
+bool isValidBST(struct TreeNode* root){
+    long pre = LONG_MIN;
+    return MidOrder(root, &pre);
+}
+```
+
+
+
+
+
+#### [100. 相同的树](https://leetcode.cn/problems/same-tree/)
+
+给你两棵二叉树的根节点 p 和 q ，编写一个函数来检验这两棵树是否相同。
+
+如果两个树在结构上相同，并且节点具有相同的值，则认为它们是相同的。
+
+ 示例 1：
+
+![](img/ex1.jpg)
+
+> 输入：p = [1,2,3], q = [1,2,3]
+> 输出：true
+
+示例 2：
+
+![](img/ex2.jpg)
+
+> 输入：p = [1,2], q = [1,null,2]
+> 输出：false
+
+示例 3：
+
+![](img/ex3.jpg)
+
+> 输入：p = [1,2,1], q = [1,1,2]
+> 输出：false
+
+
+提示：
+
+* 两棵树上的节点数目都在范围 [0, 100] 内
+* -104 <= Node.val <= 104
+
+```c
+bool isSameTree(struct TreeNode* p, struct TreeNode* q){
+    if (p == NULL && q == NULL) {
+        return true;
+    }
+    if (p == NULL || q == NULL) {
+        return false;
+    }
+    return p->val == q->val && isSameTree(p->left, q->left) && isSameTree(p->right, q->right);
+}
+```
 
 
 
