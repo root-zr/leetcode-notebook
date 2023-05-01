@@ -6931,3 +6931,92 @@ int canCompleteCircuit(int* gas, int gasSize, int* cost, int costSize){
 }
 ```
 
+#### [437. 路径总和 III](https://leetcode.cn/problems/path-sum-iii/)
+
+给定一个二叉树的根节点 `root` ，和一个整数 `targetSum` ，求该二叉树里节点值之和等于 `targetSum` 的 **路径** 的数目。
+
+**路径** 不需要从根节点开始，也不需要在叶子节点结束，但是路径方向必须是向下的（只能从父节点到子节点）。
+
+ 
+
+**示例 1：**
+
+![img](https://assets.leetcode.com/uploads/2021/04/09/pathsum3-1-tree.jpg)
+
+> 输入：root = [10,5,-3,3,2,null,11,3,-2,null,1], targetSum = 8
+> 输出：3
+> 解释：和等于 8 的路径有 3 条，如图所示。
+
+**示例 2：**
+
+> 输入：root = [5,4,8,11,null,13,4,7,2,null,null,5,1], targetSum = 22
+> 输出：3
+
+ 
+
+**提示:**
+
+- 二叉树的节点个数的范围是 `[0,1000]`
+- `-109 <= Node.val <= 109` 
+- `-1000 <= targetSum <= 1000` 
+
+```
+class Solution {
+    public int pathSum(TreeNode root, int targetSum) {
+        if (root == null) {
+            return 0;
+        }
+
+        return rootPath(root, targetSum) + pathSum(root.left, targetSum) + pathSum(root.right, targetSum);
+    }
+
+    // targetSum 不用 long 1000000000,1000000000,null,294967296,null,1000000000,null,1000000000,null,1000000000] 0 这个用例会出错
+    public int rootPath(TreeNode root, long targetSum) {
+        if (root == null) {
+            return 0;
+        }
+
+        if (root.val == targetSum) { // 因为后续的结点可能有小于0的，所以即便是已经找到了一条路径，还是要继续向下递归，防止漏掉
+            // System.out.println(root.val + " " + targetSum);
+            return rootPath(root.left, 0) +  rootPath(root.right, 0) + 1;
+        }
+        return rootPath(root.left, targetSum - root.val) + rootPath(root.right, targetSum - root.val);
+    }
+}
+```
+
+**复杂度分析**
+
+时间复杂度：O(N^2 )。空间复杂度：O(N)
+
+```java
+class Solution {
+    private int ans;
+  
+    public int pathSum(TreeNode root, int targetSum) {
+        ans = 0;
+        Map<Long, Integer> sum = new HashMap<>();
+        sum.put(0l, 1);  // 初始化
+        dfs(root, 0l, sum, targetSum);
+        return ans;
+    }
+
+    public void dfs(TreeNode node, long pre, Map<Long, Integer> sum, int targetSum){
+        if (null == node) {
+            return;
+        }
+        pre += node.val;    // 当前路径上的前缀和
+        ans += sum.getOrDefault(pre - targetSum, 0); 
+        // 得到与之对应的起点的个数，当前点到起点的距离就是target
+        sum.put(pre, sum.getOrDefault(pre, 0) + 1);   // 更新路径上当前节点前缀和的个数
+        dfs(node.left, pre, sum, targetSum);
+        dfs(node.right, pre, sum, targetSum);
+        sum.put(pre, sum.get(pre) - 1);   // 哈希表删除当前前缀和（复原）
+    }
+}
+```
+
+**复杂度分析**
+
+- 时间复杂度：O(N)
+- 空间复杂度：O(N)
