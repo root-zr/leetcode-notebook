@@ -225,35 +225,33 @@ class Solution:
     *   最多会对 appendTail、deleteHead 进行 10000 次调用
 
 ```java
-class CQueue {
-    Deque<Integer> stack1;
-    Deque<Integer> stack2;
-    
-    public CQueue() {
-        stack1 = new LinkedList<Integer>();
-        stack2 = new LinkedList<Integer>();
-    }
-    
-    public void appendTail(int value) {
-        stack1.push(value);
-    }
-    
-    public int deleteHead() {
-        // 如果第二个栈为空
-        if (stack2.isEmpty()) {
-            while (!stack1.isEmpty()) {
-                stack2.push(stack1.pop());
-            }
-        } 
-        if (stack2.isEmpty()) {
-            return -1;
-        } else {
-            int deleteItem = stack2.pop();
-            return deleteItem;
-        }
-    }
-}
+class CQueue:
 
+    def __init__(self):
+        self.st1 = []
+        self.st2 = []
+        
+
+    def appendTail(self, value: int) -> None:
+        self.st1.append(value)
+        
+
+    def deleteHead(self) -> int:
+        if (len(self.st2) != 0):
+            return self.st2.pop(0)
+        while len(self.st1) != 0:
+            self.st2.append(self.st1.pop(0))
+        
+        if len(self.st2) != 0:
+            return self.st2.pop(0)
+        
+        return -1
+
+
+# Your CQueue object will be instantiated and called as such:
+# obj = CQueue()
+# obj.appendTail(value)
+# param_2 = obj.deleteHead()
 ```
 
 #### [剑指 Offer 10- I. 斐波那契数列](https://leetcode-cn.com/problems/fei-bo-na-qi-shu-lie-lcof/)
@@ -289,18 +287,20 @@ F(N) = F(N - 1) + F(N - 2), 其中 N > 1.
     *   0 <= n <= 100
 
 ```java
-class Solution {
-    public int fib(int n) {
-        int a = 0, b = 1, sum;
-        for(int i = 0; i < n; i++){
-            sum = (a + b) % 1000000007;
-            a = b;
-            b = sum;
-        }
-        return a;
-    }
-}
+class Solution:
+    def fib(self, n: int) -> int:
+        if (n == 0):
+            return 0
+        if n == 1:
+            return 1
 
+        dp = [0] * (n + 1)
+        dp[0] = 0
+        dp[1] = 1
+        for i in range(2, n + 1):
+            dp[i] = (dp[i - 1] + dp[i - 2]) % 1000000007
+            
+        return dp[n]
 ```
 
 #### [剑指 Offer 10- II. 青蛙跳台阶问题](https://leetcode-cn.com/problems/qing-wa-tiao-tai-jie-wen-ti-lcof/)
@@ -335,18 +335,18 @@ class Solution {
     *   0 <= n <= 100
 
 ```java
-class Solution {
-    public int numWays(int n) {
-        int a = 1; int b = 1; int sum = 0;
-       for(int i = 0; i < n; i ++){
-           sum = (a +b ) %1000000007;
-           a = b;
-           b = sum;
-        }
+class Solution:
+    def trainWays(self, num: int) -> int:
+        if num == 0 or num == 1:
+            return 1
+        dp = [0] * (num + 1)
+        dp[0] = 1
+        dp[1] = 1
 
-        return a;
-    }
-}
+        for i in range(2, num + 1):
+            dp[i] = (dp[i - 1] + dp[i - 2]) % 1000000007
+        
+        return dp[num]
 ```
 
 #### [剑指 Offer 11. 旋转数组的最小数字](https://leetcode-cn.com/problems/xuan-zhuan-shu-zu-de-zui-xiao-shu-zi-lcof/)
