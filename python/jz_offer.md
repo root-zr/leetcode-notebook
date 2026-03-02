@@ -368,23 +368,23 @@ class Solution:
 ```
 
 ```java
-class Solution {
-    public int minArray(int[] numbers) {
-        int low = 0;
-        int high = numbers.length - 1;
-        while (low < high) {
-            int pivot = low + (high - low) / 2;
-            if (numbers[pivot] < numbers[high]) {
-                high = pivot;
-            } else if (numbers[pivot] > numbers[high]) {
-                low = pivot + 1;
-            } else {
-                high -= 1;
-            }
-        }
-        return numbers[low];
-    }
-}
+class Solution:
+    def inventoryManagement(self, stock: List[int]) -> int:
+        l = 0
+        r = len(stock) - 1
+        
+        while (l <= r):
+            mid = l + (r - l) // 2
+            if (stock[mid] < stock[r]):
+                r = mid
+            elif stock[mid] > stock[r]:
+                l = mid + 1
+            else:
+                r -= 1
+
+        return stock[l]
+
+
 ```
 
 #### [剑指 Offer 12. 矩阵中的路径](https://leetcode-cn.com/problems/ju-zhen-zhong-de-lu-jing-lcof/)
@@ -416,71 +416,50 @@ class Solution {
 * 1 <= board.length <= 200
 * 1 <= board[i].length <= 200
 
-```java
-class Solution {
-    int[] dx = {-1, 1, 0, 0};
-    int[] dy = {0, 0, -1, 1};
-    int m, n; 
+```python
+class Solution:
+    def __init__(self):
+        self.matrix = None
+        self.rows = 0
+        self.cols = 0
 
-    public boolean exist(char[][] board, String word) {
-        m = board.length;
-        n = board[0].length;
-        char[] chars = word.toCharArray();
-        for(int i = 0; i < m; i++){
-            for(int j = 0; j < n; j++){
-                if(board[i][j] == chars[0]){
-                    board[i][j] = '/';
-                    if(dfs(i, j, 1, board, chars)){
-                        return true;
-                    }
-                    board[i][j] = chars[0];
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean dfs(int x, int y, int index, char[][] board, char[] chars){
-        if(index == chars.length){
-            return true;
-        }
+    def backtrack(self, grid: List[List[str]], target: str, i: int, j: int, idx: int) -> bool:
+        if idx == len(target):
+            return True
         
-        for(int i = 0; i < 4; i++){
-            int nx = x + dx[i], ny = y + dy[i];
-            if(nx >= 0 && nx < m && ny >= 0 && ny < n && board[nx][ny] == chars[index]){
-                board[nx][ny] = '/';
-                if(dfs(nx, ny, index + 1, board, chars)){
-                    return true;
-                }
-                board[nx][ny] = chars[index];
-            }
-        }
-        return false;
-    }
-}
-```
+        if (i < 0 or i >= self.rows or 
+            j < 0 or j >= self.cols or 
+            self.matrix[i][j] == 1):
+            return False
+        
+        if grid[i][j] != target[idx]:
+            return False
+        
+        self.matrix[i][j] = 1
+        
+        ret = (self.backtrack(grid, target, i + 1, j, idx + 1) or
+               self.backtrack(grid, target, i - 1, j, idx + 1) or
+               self.backtrack(grid, target, i, j + 1, idx + 1) or
+               self.backtrack(grid, target, i, j - 1, idx + 1))
+        
+        self.matrix[i][j] = 0
+        return ret
 
-```java
-class Solution {
-    public boolean exist(char[][] board, String word) {
-        char[] words = word.toCharArray();
-        for(int i = 0; i < board.length; i++) {
-            for(int j = 0; j < board[0].length; j++) {
-                if(dfs(board, words, i, j, 0)) return true;
-            }
-        }
-        return false;
-    }
-    boolean dfs(char[][] board, char[] word, int i, int j, int k) {
-        if(i >= board.length || i < 0 || j >= board[0].length || j < 0 || board[i][j] != word[k]) return false;
-        if(k == word.length - 1) return true;
-        board[i][j] = '\0';
-        boolean res = dfs(board, word, i + 1, j, k + 1) || dfs(board, word, i - 1, j, k + 1) || 
-                      dfs(board, word, i, j + 1, k + 1) || dfs(board, word, i , j - 1, k + 1);
-        board[i][j] = word[k];
-        return res;
-    }
-}
+    def wordPuzzle(self, grid: List[List[str]], target: str) -> bool:
+        if not grid or not grid[0]:
+            return False
+        
+        self.rows = len(grid)
+        self.cols = len(grid[0])
+        
+        self.matrix = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
+        
+        for i in range(self.rows):
+            for j in range(self.cols):
+                if self.backtrack(grid, target, i, j, 0):
+                    return True
+        
+        return False
 ```
 
 #### [剑指 Offer 13. 机器人的运动范围](https://leetcode-cn.com/problems/ji-qi-ren-de-yun-dong-fan-wei-lcof/)
@@ -507,45 +486,77 @@ class Solution {
 *  0 <= k <= 20
 
 ```java
-class Solution {
-    public int movingCount(int m, int n, int k) {
-        if (k == 0) {
-            return 1;
-        }
-        Queue<int[]> queue = new LinkedList<int[]>();
-        // 向右和向下的方向数组
-        int[] dx = {0, 1};
-        int[] dy = {1, 0};
-        boolean[][] vis = new boolean[m][n];
-        queue.offer(new int[]{0, 0});
-        vis[0][0] = true;
-        int ans = 1;
-        while (!queue.isEmpty()) {
-            int[] cell = queue.poll();
-            int x = cell[0], y = cell[1];
-            for (int i = 0; i < 2; ++i) {
-                int tx = dx[i] + x;
-                int ty = dy[i] + y;
-                if (tx < 0 || tx >= m || ty < 0 || ty >= n || vis[tx][ty] || get(tx) + get(ty) > k) {
-                    continue;
-                }
-                queue.offer(new int[]{tx, ty});
-                vis[tx][ty] = true;
-                ans++;
-            }
-        }
-        return ans;
-    }
+class Node:
+    def __init__(self, x: int = 0, y: int = 0):
+        self.x = x
+        self.y = y
 
-    private int get(int x) {
-        int res = 0;
-        while (x != 0) {
-            res += x % 10;
-            x /= 10;
-        }
-        return res;
-    }
-}
+class Solution:
+    def __init__(self):
+        self.is_visit = None
+        self.m = 0
+        self.n = 0
+        self.cnt = 0
+        self.directions = [(0, 1), (1, 0)]  # 右和下两个方向
+
+    def getBitCount(self, num: int) -> int:
+        """计算数字的各位数之和"""
+        cnt = 0
+        while num > 0:
+            cnt += num % 10
+            num //= 10
+        return cnt
+    
+    def isValid(self, node: Node) -> bool:
+        """检查节点是否有效"""
+        # 检查边界
+        if node.x < 0 or node.x >= self.m or node.y < 0 or node.y >= self.n:
+            return False
+        
+        # 检查是否已访问
+        if self.is_visit[node.x][node.y]:
+            return False
+        
+        # 检查数位和是否满足条件
+        if self.getBitCount(node.x) + self.getBitCount(node.y) > self.cnt:
+            return False
+        
+        return True
+
+    def wardrobeFinishing(self, m: int, n: int, cnt: int) -> int:
+        if m <= 0 or n <= 0 or cnt < 0:
+            return 0
+            
+        # 初始化
+        self.is_visit = [[0] * n for _ in range(m)]
+        self.m = m
+        self.n = n
+        self.cnt = cnt
+        
+        que = list()
+        start_node = Node(0, 0)
+        
+        # 检查起点是否有效
+        if not self.isValid(start_node):
+            return 0
+            
+        que.append(start_node)
+        self.is_visit[0][0] = 1
+        ans = 1  # 起点已计入
+        
+        while que:
+            current = que.pop(0)
+            
+            # 尝试向右和向下移动
+            for dx, dy in self.directions:
+                next_node = Node(current.x + dx, current.y + dy)
+                
+                if self.isValid(next_node):
+                    self.is_visit[next_node.x][next_node.y] = 1
+                    que.append(next_node)
+                    ans += 1
+        
+        return ans
 ```
 
 #### [剑指 Offer 14- I. 剪绳子](https://leetcode-cn.com/problems/jian-sheng-zi-lcof/)
@@ -573,18 +584,15 @@ class Solution {
 *  2 <= n <= 58
 
 ```java
-class Solution {
-    public int cuttingRope(int n) {
-        int[] dp = new int[n + 1];
-        dp[2] = 1;
-        for(int i = 3; i < n + 1; i++){  //动态规划，长度从3开始，逐步判断直到n
-            for(int j = 2; j < i; j++){  //先把绳子减去j，剩下（i-j）部分再决定减不减
-                dp[i] = Math.max(dp[i], Math.max(j * (i - j), j * dp[i - j]));
-            }
-        }
-        return dp[n];
-    }
-}
+class Solution:
+    def cuttingBamboo(self, bamboo_len: int) -> int:
+        dp = [1] * (bamboo_len + 1)
+        for i in range(3, bamboo_len + 1):
+            for j in range(2, i):
+                dp[i] = max(dp[i], max(j * (i - j), dp[i - j] * j))
+        
+        return dp[bamboo_len]
+        
 ```
 
 #### [剑指 Offer 14- II. 剪绳子 II](https://leetcode-cn.com/problems/jian-sheng-zi-ii-lcof/)
@@ -626,19 +634,21 @@ class Solution {
 4. 以上2和3可以合并
 
 ```java
-class Solution {
-    public int cuttingRope(int n) {
-        if(n < 4){
-            return n - 1;
-        }
-        long res = 1;
-        while(n > 4){
-            res  = res * 3 % 1000000007;
-            n -= 3;
-        }
-        return (int) (res * n % 1000000007);
-    }
-}
+class Solution:
+    def cuttingBamboo(self, bamboo_len: int) -> int:
+        if bamboo_len < 4:
+            return bamboo_len - 1
+        if bamboo_len == 4:
+            return 4
+        
+        ans = 1
+        while (bamboo_len > 4):
+            ans = (ans * 3) % 1000000007
+            bamboo_len -= 3
+        ans = (ans * bamboo_len) % 1000000007
+            
+        return ans
+        
 ```
 
 #### [剑指 Offer 15. 二进制中1的个数](https://leetcode-cn.com/problems/er-jin-zhi-zhong-1de-ge-shu-lcof/)
@@ -674,37 +684,15 @@ class Solution {
 * 输入必须是长度为 32 的 二进制串 。
 
 ```java
-//通过最后一位做相与运算的方式
-public class Solution {
-    public int hammingWeight(int n) {
-        int res = 0;
-        while(n != 0) {
-            res += n & 1;
-            n >>>= 1;  //无符号右移
-        }
-        return res;
-    }
-}
-```
-
-```java
-//Java语言的特点
-public class Solution {
-    public int hammingWeight(int n) {
-       return Integer.bitCount(n);
-    }
-}
-
-//其中bitCount函数的实现源代码如下：
-public static int bitCount(int i) {
-    // HD, Figure 5-2
-    i = i - ((i >>> 1) & 0x55555555);
-    i = (i & 0x33333333) + ((i >>> 2) & 0x33333333);
-    i = (i + (i >>> 4)) & 0x0f0f0f0f;
-    i = i + (i >>> 8);
-    i = i + (i >>> 16);
-    return i & 0x3f;
-}
+class Solution:
+    def hammingWeight(self, n: int) -> int:
+        ans = 0
+        while (n != 0):
+            if (n % 2 != 0):
+                ans += 1
+            n = n // 2
+        return ans
+        
 ```
 
 #### [剑指 Offer 16. 数值的整数次方](https://leetcode-cn.com/problems/shu-zhi-de-zheng-shu-ci-fang-lcof/)
@@ -758,40 +746,20 @@ public static int bitCount(int i) {
 ![](E:\大三下\leetcode\leetcode\img_jz\2021-04-09 150907.jpg)
 
 ```java
-class Solution {
-    public double myPow(double x, int n) {
-        if(x == 0) return 0;
-        long b = n;
-        double res = 1.0;
-        if(b < 0) {
-            x = 1 / x;
-            b = -b;
-        }
-        while(b > 0) {
-            if((b & 1) == 1) res *= x;
-            x *= x;
-            b >>= 1;  //在本题中可理解为删除最后一位
-           //使用 >>= 运算符和使用下面的语句是等效的：
-           //result = result >> expression
-           // >>= 运算符把 result 的所有位向右移 expression 指定的位数。result 的符号位被用来填充右移后左边空出的位。从右边移出去的位被丢弃。例如，下面的代码被求值后，temp 的值是 -4：-14 （即二进制的 11110010）右移两位等于 -4 （即二进制的 11111100）。
-        }
-        return res;
-    }
-}
-```
+class Solution:
+    def recur(self, x: float, n: int) -> float:
+        if (n == 1):
+            return x
+        if n == -1:
+            return 1 / x
+        if n == 0:
+            return 1
+        return pow(self.recur(x, n // 2), 2) * self.recur(x, n % 2)
 
-```java
-//递归的方式
-class Solution {
-    public double myPow(double x, int n) {
-        if(n == 0) return 1;
-        if(n == 1) return x;
-        if(n == -1) return 1 / x;
-        double half = myPow(x, n / 2);
-        double mod = myPow(x, n % 2);
-        return half * half * mod;
-    }
-}
+    def myPow(self, x: float, n: int) -> float:
+         
+        return self.recur(x, n)
+
 ```
 
 #### [剑指 Offer 17. 打印从1到最大的n位数](https://leetcode-cn.com/problems/da-yin-cong-1dao-zui-da-de-nwei-shu-lcof/)
@@ -812,33 +780,14 @@ class Solution {
 *  n 为正整数
 
 ```java
-class Solution {
-    int[] res;
-    int count = 0;
-
-    public int[] printNumbers(int n) {
-        res = new int[(int)Math.pow(10, n) - 1];
-        for(int digit = 1; digit < n + 1; digit++){
-            for(char first = '1'; first <= '9'; first++){
-                char[] num = new char[digit];
-                num[0] = first;
-                dfs(1, num, digit);
-            }
-        }
-        return res;
-    }
-
-    private void dfs(int index, char[] num, int digit){
-        if(index == digit){
-            res[count++] = Integer.parseInt(String.valueOf(num));
-            return;
-        }
-        for(char i = '0'; i <= '9'; i++){
-            num[index] = i;
-            dfs(index + 1, num, digit);
-        }
-    }
-}
+class Solution:
+    def countNumbers(self, cnt: int) -> List[int]:
+        max_num = int(pow(10, cnt))
+        ans = list()
+        for i in range(1, max_num):
+            ans.append(i)
+        return ans
+        
 ```
 
 #### [剑指 Offer 18. 删除链表的节点](https://leetcode-cn.com/problems/shan-chu-lian-biao-de-jie-dian-lcof/)
@@ -872,18 +821,29 @@ class Solution {
 * 若使用 C 或 C++ 语言，你不需要 free 或 delete 被删除的节点
 
 ```java
-class Solution {
-    public ListNode deleteNode(ListNode head, int val) {
-        if (head == null) return null;
-        if (head.val == val) return head.next;
-        ListNode cur = head;
-        while (cur.next != null && cur.next.val != val)
-            cur = cur.next;
-        if (cur.next != null)
-            cur.next = cur.next.next;
-        return head;
-    }
-}
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def deleteNode(self, head: Optional[ListNode], val: int) -> Optional[ListNode]:
+        if (head.val == val):
+            return head.next
+
+        dummy = ListNode()
+        dummy.next = head
+
+        while dummy.next.val != val and dummy.next != None:
+            dummy = dummy.next
+        
+        if (dummy.next == None):
+            return head
+        
+        dummy.next = dummy.next.next
+
+        return head
+        
 ```
 
 #### [剑指 Offer 19. 正则表达式匹配](https://leetcode-cn.com/problems/zheng-ze-biao-da-shi-pi-pei-lcof/)
@@ -943,44 +903,61 @@ p = "mis*is*p*."
 *  p 可能为空，且只包含从 a-z 的小写字母以及字符 . 和 *，无连续的 '*'。
 
 ```java
-class Solution {
-    public boolean isMatch(String s, String p) {
-        int m = s.length();
-        int n = p.length();
-        boolean f[][] = new boolean[m + 1][n + 1];
-        f[0][0] = true;
-        //f[0][0]代表s和p均为空字符串，f[1][1]代表s和p的第一个字符（即在s和p中下标为0的字符）
-        for(int i = 0; i <= m ; ++i) {
-            for(int j = 1; j <= n; ++j) {
-                if(p.charAt(j - 1) == '*') {//p的第j个字符为*
-                    if(matches(s, p, i, j - 1)) {//匹配s的第i个字符和p的第j-1个字符
-                        f[i][j] = f[i - 1][j] || f[i][j - 2];
-                        //p中*前面的字符在s中出现多次或者在s中只出现1次
-                    }
-                    else {
-                        f[i][j] = f[i][j - 2];//p中*前面的在s中字符出现0次
-                    }
-                }
-                else {//p的第j个字符不为*
-                   if(matches(s, p, i, j)) {//匹配s的第i个字符和p的第j个字符
-                       f[i][j] = f[i - 1][j - 1];//匹配成功，状态转移；匹配不成功，默认是false
-                   } 
-                }
-            }
-        }
-        return f[m][n];
-    }
-
-    private boolean matches(String s, String p, int i, int j) {//注意在字符串中的下标变换
-        if(i == 0) { //代表是空字符，直接返回
-            return false;
-        }
-        if(p.charAt(j - 1) == '.') {
-            return true;
-        }
-        return s.charAt(i - 1) == p.charAt(j - 1);
-    }
-}
+class Solution:
+    def articleMatch(self, s: str, p: str) -> bool:
+        """
+        正则表达式匹配，支持 '.' 和 '*'
+        s: 待匹配的字符串
+        p: 模式串
+        """
+        m, n = len(s), len(p)
+        
+        # dp[i][j] 表示 s 的前 i 个字符 能否被 p 的前 j 个字符匹配
+        # 注意：i 和 j 都是长度，不是索引
+        dp = [[False] * (n + 1) for _ in range(m + 1)]
+        
+        # 空字符串匹配空模式
+        dp[0][0] = True
+        
+        # 处理 s 为空，但 p 不为空的情况（比如 p = "a*" 可以匹配空串）
+        for j in range(2, n + 1):
+            if p[j - 1] == '*':  # 如果当前字符是 *
+                dp[0][j] = dp[0][j - 2]  # 忽略 x*，看前面的模式
+        
+        # 填充 dp 表
+        for i in range(1, m + 1):        # i 表示 s 的长度（从1到m）
+            for j in range(1, n + 1):    # j 表示 p 的长度（从1到n）
+                
+                # 当前待比较的字符
+                s_char = s[i - 1]        # s 的第 i 个字符
+                p_char = p[j - 1]         # p 的第 j 个字符
+                
+                # 情况1：当前模式字符是普通字符或 '.'
+                if p_char != '*':
+                    # 字符匹配（相同 或 p_char是'.'）
+                    if p_char == '.' or p_char == s_char:
+                        dp[i][j] = dp[i - 1][j - 1]  # 两个字符串都向前移动一位
+                    # 不匹配的情况，dp[i][j] 保持 False（默认值）
+                
+                # 情况2：当前模式字符是 '*'
+                else:  # p_char == '*'
+                    # '*' 前面的字符（用来匹配的字符）
+                    prev_p_char = p[j - 2]
+                    
+                    # 2.1 情况：* 匹配 0 个前面的字符
+                    # 直接忽略 "x*" 这两个字符，看前面 j-2 的模式
+                    dp[i][j] = dp[i][j - 2]
+                    
+                    # 2.2 情况：* 匹配 1个或多个前面的字符
+                    # 条件：* 前的字符必须能匹配 s 的当前字符
+                    if prev_p_char == '.' or prev_p_char == s_char:
+                        # dp[i-1][j] 的含义：
+                        # 如果 s 的前 i-1 个字符能被当前模式匹配
+                        # 那么加上当前字符（因为当前字符也匹配）也能被匹配
+                        # 这里用 dp[i-1][j] 而不是 dp[i-1][j-1] 是因为 * 可以匹配多个
+                        dp[i][j] = dp[i][j] or dp[i - 1][j]
+        
+        return dp[m][n]
 ```
 
 #### [剑指 Offer 20. 表示数值的字符串](https://leetcode-cn.com/problems/biao-shi-shu-zhi-de-zi-fu-chuan-lcof/)
@@ -988,51 +965,70 @@ class Solution {
 请实现一个函数用来判断字符串是否表示数值（包括整数和小数）。例如，字符串"+100"、"5e2"、"-123"、"3.1416"、"-1E-16"、"0123"都表示数值，但"12e"、"1a3.14"、"1.2.3"、"+-5"及"12e+5.4"都不是。
 
 ```java
-class Solution {
-    public boolean isNumber(String s) {
-        int n = s.length();
-        int index = 0;
-        boolean hasNum = false, hasE = false;
-        boolean hasSign = false, hasDot = false;
-        while(index < n && s.charAt(index) == ' ')
-            index++;
-        while(index < n){
-            while(index < n && s.charAt(index) >= '0' && s.charAt(index) <= '9'){
-                index++;
-                hasNum = true;
-            }
-            if(index == n){
-                break;
-            }
-            char c = s.charAt(index);
-            if(c == 'e' || c == 'E'){
-                if(hasE || !hasNum){
-                    return false;
-                }
-                hasE = true;
-                hasNum = false; hasSign = false; hasDot = false;
-            }else if(c == '+' || c == '-'){
-                if(hasSign || hasNum || hasDot){
-                    return false;
-                }
-                hasSign = true;
-            }else if(c == '.'){
-                if(hasDot || hasE){
-                    return false;
-                }
-                hasDot = true;
-            }else if(c == ' '){
-                break;
-            }else{
-                return false;
-            }
-            index++;
-        }
-        while(index < n && s.charAt(index) == ' ')
-            index++;
-        return hasNum && index == n;
-    }
-}
+class Solution:
+    def validNumber(self, s: str) -> bool:
+        if not s:
+            return False
+        
+        index = 0
+        n = len(s)
+        
+        # 跳过开头的空格
+        while index < n and s[index] == ' ':
+            index += 1
+        
+        # 扫描整数部分（包括可能的符号）
+        numeric = self.scanInteger(s, index)
+        index = numeric[1]  # 更新index
+        numeric = numeric[0]
+        
+        # 如果出现'.'，接下来是数字的小数部分
+        if index < n and s[index] == '.':
+            index += 1
+            
+            # 扫描无符号整数部分（小数部分）
+            unsigned_result = self.scanUnsignedInteger(s, index)
+            # 小数部分可以有数字，也可以没有，所以用or
+            numeric = unsigned_result[0] or numeric
+            index = unsigned_result[1]
+        
+        # 如果出现'e'或者'E'，接下来跟着的是数字的指数部分
+        if index < n and (s[index] == 'e' or s[index] == 'E'):
+            index += 1
+            
+            # 扫描指数部分（必须是一个整数，可以有符号）
+            integer_result = self.scanInteger(s, index)
+            # 指数部分必须存在，所以用and
+            numeric = numeric and integer_result[0]
+            index = integer_result[1]
+        
+        # 跳过结尾的空格
+        while index < n and s[index] == ' ':
+            index += 1
+        
+        return numeric and index == n
+    
+    def scanInteger(self, s: str, index: int):
+        """扫描整数（可以有正负号）"""
+        n = len(s)
+        
+        # 处理可能的正负号
+        if index < n and (s[index] == '+' or s[index] == '-'):
+            index += 1
+        
+        # 扫描无符号整数部分
+        return self.scanUnsignedInteger(s, index)
+    
+    def scanUnsignedInteger(self, s: str, index: int):
+        """扫描无符号整数"""
+        n = len(s)
+        before = index
+        
+        while index < n and s[index].isdigit():
+            index += 1
+        
+        # 返回是否扫描到数字和新的索引位置
+        return (index > before, index)
 ```
 
 #### [剑指 Offer 21. 调整数组顺序使奇数位于偶数前面](https://leetcode-cn.com/problems/diao-zheng-shu-zu-shun-xu-shi-qi-shu-wei-yu-ou-shu-qian-mian-lcof/)
@@ -1053,24 +1049,21 @@ class Solution {
 *  1 <= nums[i] <= 10000
 
 ```java
-class Solution {
-    public int[] exchange(int[] nums) {
-        int left = 0, right = nums.length - 1;
-        while(left <= right){
-            while(left <= right && nums[left] % 2 == 1)
-                left++;
-            while(left <= right && nums[right] % 2 == 0)
-                right--;
-            if(left > right)
-                break;
-            int tmp = nums[left];
-            nums[left] = nums[right];
-            nums[right] = tmp;
-        }
-        return nums;
-    }
-}
+class Solution:
+    def trainingPlan(self, actions: List[int]) -> List[int]:
+        l = 0
+        r = len(actions) - 1
 
+        while (l < r):
+            while(actions[l] % 2 != 0 and l < r):
+                l += 1
+            while (actions[r] % 2 == 0 and l < r):
+                r -= 1
+            
+            tmp = actions[l]
+            actions[l] = actions[r]
+            actions[r] = tmp
+        return actions
 ```
 
 #### [剑指 Offer 22. 链表中倒数第k个节点](https://leetcode-cn.com/problems/lian-biao-zhong-dao-shu-di-kge-jie-dian-lcof/)
@@ -1088,19 +1081,24 @@ class Solution {
 ```
 
 ```java
-class Solution {
-    public ListNode getKthFromEnd(ListNode head, int k) {
-        ListNode slow = head, fast = head;
-        for(int i = 0; i < k; i++){
-            fast = fast.next;
-        }
-        while(fast != null){
-            fast = fast.next;
-            slow = slow.next;
-        }
-        return slow;
-    }
-}
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def trainingPlan(self, head: Optional[ListNode], cnt: int) -> Optional[ListNode]:
+        head1 = head
+        head2 = head
+
+        for i in range(cnt):
+            head1 = head1.next
+        
+        while (head1 != None):
+            head1 = head1.next
+            head2 = head2.next
+        return head2
+        
 ```
 
 #### [剑指 Offer 24. 反转链表](https://leetcode-cn.com/problems/fan-zhuan-lian-biao-lcof/)
@@ -1118,27 +1116,23 @@ class Solution {
 你可以迭代或递归地反转链表。你能否用两种方法解决这道题？
 
 ```java
-class Solution {
-    public ListNode reverseList(ListNode head) {
-         //单链表为空或只有一个节点，直接返回原单链表
-        if (head == null || head.next == null){
-            return head;
-        }
-        //前一个节点指针
-        ListNode preNode = null;
-        //当前节点指针
-        ListNode curNode = head;
-        //下一个节点指针
-        ListNode nextNode = null;
-        while (curNode != null){
-            nextNode = curNode.next;//nextNode 指向下一个节点,保存当前节点后面的链表。
-            curNode.next=preNode;//将当前节点next域指向前一个节点   null<-1<-2<-3<-4
-            preNode = curNode;//preNode 指针向后移动。preNode指向当前节点。
-            curNode = nextNode;//curNode指针向后移动。下一个节点变成当前节点
-        }
-        return preNode;
-    }
-}
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def trainningPlan(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        pre = None
+        while (head != None):
+            tmp = head.next
+            head.next = pre
+            pre = head
+            head = tmp
+
+        return pre
+        
+        
 ```
 
 #### [剑指 Offer 25. 合并两个排序的链表](https://leetcode-cn.com/problems/he-bing-liang-ge-pai-xu-de-lian-biao-lcof/)
