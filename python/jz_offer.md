@@ -1151,24 +1151,33 @@ class Solution:
 0 <= 链表长度 <= 1000
 
 ```java
-class Solution {
-    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
-        if(l1 == null) {
-            return l2;
-        }
-        if(l2 == null) {
-            return l1;
-        }
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def trainningPlan(self, l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
+        res = ListNode()
+        dummy = res
 
-        if(l1.val < l2.val) {
-            l1.next = mergeTwoLists(l1.next, l2);
-            return l1;
-        } else {
-            l2.next = mergeTwoLists(l1, l2.next);
-            return l2;
-        }
-    }
-}
+        while (l1 != None and l2 != None):
+            if (l1.val < l2.val):
+                dummy.next = l1
+                l1 = l1.next
+            else:
+                dummy.next = l2
+                l2 = l2.next
+            dummy = dummy.next
+    
+        if l1 != None:
+            dummy.next = l1
+        if l2 != None:
+            dummy.next = l2
+        
+        return res.next
+
+        
 ```
 
 #### [剑指 Offer 26. 树的子结构](https://leetcode-cn.com/problems/shu-de-zi-jie-gou-lcof/)
@@ -1218,94 +1227,43 @@ B是A的子结构， 即 A中有出现和B相同的结构和节点值。
 0 <= 节点个数 <= 10000
 
 ```java
-class Solution {
-    public boolean isSubStructure(TreeNode A, TreeNode B) {
-        return (A != null && B != null) && (recur(A, B) || isSubStructure(A.left, B) || isSubStructure(A.right, B));
-    }
-    boolean recur(TreeNode A, TreeNode B) {
-        if(B == null) return true;
-        if(A == null || A.val != B.val) return false;
-        return recur(A.left, B.left) && recur(A.right, B.right);
-    }
-}
-```
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def __init__(self):
+        self.ans = False
 
-```java
-class Solution {
-    public boolean isSubStructure(TreeNode A, TreeNode B) {
-        if(B == null) return false;
-        Queue<TreeNode> queue = new LinkedList<>();
-        queue.offer(A);
-        while(!queue.isEmpty()){
-            TreeNode node = queue.poll();
-            if(node.val == B.val){
-                if(helper(node, B)){
-                    return true;
-                }
-            }
-            if(node.left != null){
-                queue.offer(node.left);
-            }
-            if(node.right != null){
-                queue.offer(node.right);
-            }
-        }
-        return false;
-    }
+    def isSame(self, A: Optional[TreeNode], B: Optional[TreeNode]) -> bool:
+        if (A == None and B != None):
+            return False
+        if (A != None and B == None):
+            return True
+        if (A == None and B == None):
+            return True
+        if (A.val != B.val):
+            return False
+        
+        return self.isSame(A.left, B.left) and self.isSame(A.right, B.right)
 
-    private boolean helper(TreeNode nodeA, TreeNode nodeB){
-        Queue<TreeNode> queueA = new LinkedList<>();
-        Queue<TreeNode> queueB = new LinkedList<>();
-        queueA.offer(nodeA);
-        queueB.offer(nodeB);
+    def dfs(self, A: Optional[TreeNode], B: Optional[TreeNode]):
+        if A == None:
+            return
+        if self.isSame(A, B):
+            self.ans = True
+            return
+        self.dfs(A.left, B)
+        self.dfs(A.right, B)
 
-        while(!queueB.isEmpty()){
-            nodeA = queueA.poll();
-            nodeB = queueB.poll();
-            if(nodeA == null || nodeA.val != nodeB.val){
-                return false;
-            }
-            if(nodeB.left != null){
-                queueA.offer(nodeA.left);
-                queueB.offer(nodeB.left);
-            }
-            if(nodeB.right != null){
-                queueA.offer(nodeA.right);
-                queueB.offer(nodeB.right);
-            }
-        }
-        return true;
-    }
+    def isSubStructure(self, A: Optional[TreeNode], B: Optional[TreeNode]) -> bool:
+        if (B == None):
+            return False
+        self.dfs(A, B)
 
-}
-```
-
-```java
-class Solution {
-    private TreeNode B;
-    public boolean isSubStructure(TreeNode A, TreeNode B) {
-        if(B == null) return false;
-        this.B = B;
-        return dfs(A);
-    }
-
-    private boolean dfs(TreeNode nodeA){
-        if(nodeA == null)
-            return false;
-        if(nodeA.val == B.val)
-            if(helper(nodeA, B))
-                return true;
-        return dfs(nodeA.left) || dfs(nodeA.right);
-    }
-
-    private boolean helper(TreeNode nodeA, TreeNode nodeB){
-        if(nodeB == null)
-            return true;
-        if(nodeA == null || nodeA.val != nodeB.val)
-            return false;
-        return helper(nodeA.left, nodeB.left) && helper(nodeA.right, nodeB.right);
-    }
-}
+        return self.ans
 ```
 
 #### [剑指 Offer 27. 二叉树的镜像](https://leetcode-cn.com/problems/er-cha-shu-de-jing-xiang-lcof/)
@@ -1340,33 +1298,27 @@ class Solution {
 0 <= 节点个数 <= 1000
 
 ```java
-class Solution {
-    public TreeNode mirrorTree(TreeNode root) {
-        if(root == null) return null;
-        Stack<TreeNode> stack = new Stack<>() {{ add(root); }};
-        while(!stack.isEmpty()) {
-            TreeNode node = stack.pop();
-            if(node.left != null) stack.add(node.left);
-            if(node.right != null) stack.add(node.right);
-            TreeNode tmp = node.left;
-            node.left = node.right;
-            node.right = tmp;
-        }
-        return root;
-    }
-}
-```
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def revereseBinTree(self, root: Optional[TreeNode]):
+        if (root == None):
+            return None
+        
+        tmp = root.left
+        root.left = self.revereseBinTree(root.right)
+        root.right = self.revereseBinTree(tmp)
 
-```java
-class Solution {
-    public TreeNode mirrorTree(TreeNode root) {
-        if(root == null) return null;
-        TreeNode tmp = root.left;
-        root.left = mirrorTree(root.right);
-        root.right = mirrorTree(tmp);
-        return root;
-    }
-}
+        return root
+
+    def flipTree(self, root: Optional[TreeNode]) -> Optional[TreeNode]:
+        self.revereseBinTree(root)
+        return root
+        
 ```
 
 #### [剑指 Offer 28. 对称的二叉树](https://leetcode-cn.com/problems/dui-cheng-de-er-cha-shu-lcof/)
@@ -1409,17 +1361,29 @@ class Solution {
 * 0 <= 节点个数 <= 1000
 
 ```java
-class Solution {
-    public boolean isSymmetric(TreeNode root) {
-        return root == null ? true : recur(root.left, root.right);
-    }
-    boolean recur(TreeNode L, TreeNode R) {
-        if(L == null && R == null) return true;
-        if(L == null || R == null || L.val != R.val) return false;
-        return recur(L.left, R.right) && recur(L.right, R.left);
-    }
-}
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def recur(self, a: Optional[TreeNode], b: Optional[TreeNode]) -> bool:
+        if (a == None and b == None):
+            return True
+        if a == None:
+            return False
+        if b == None:
+            return False
+        if a.val != b.val:
+            return False
+        return self.recur(a.left, b.right) and self.recur(a.right, b.left)
 
+    def checkSymmetricTree(self, root: Optional[TreeNode]) -> bool:
+        if root == None:
+            return True
+        
+        return self.recur(root.left, root.right)
 ```
 
 #### [剑指 Offer 29. 顺时针打印矩阵](https://leetcode-cn.com/problems/shun-shi-zhen-da-yin-ju-zhen-lcof/)
@@ -1447,25 +1411,52 @@ class Solution {
 *   0 <= matrix[i].length <= 100
 
 ```java
-class Solution {
-    public int[] spiralOrder(int[][] matrix) {
-        if(matrix.length == 0) return new int[0];
-        int l = 0, r = matrix[0].length - 1, t = 0, b = matrix.length - 1, x = 0;
-        int[] res = new int[(r + 1) * (b + 1)];
-        while(true) {
-            for(int i = l; i <= r; i++) res[x++] = matrix[t][i]; // left to right.
-            if(++t > b) break;
-            for(int i = t; i <= b; i++) res[x++] = matrix[i][r]; // top to bottom.
-            if(l > --r) break;
-            for(int i = r; i >= l; i--) res[x++] = matrix[b][i]; // right to left.
-            if(t > --b) break;
-            for(int i = b; i >= t; i--) res[x++] = matrix[i][l]; // bottom to top.
-            if(++l > r) break;
-        }
-        return res;
-    }
-}
+class Solution:
+    def is_end(self, left, right, row, col):
+        if left > right or row > col:
+            return True
+        return False
+    def spiralArray(self, array: List[List[int]]) -> List[int]:
+        if len(array) == 0:
+            return []
+        left = 0
+        right = len(array[0]) - 1
+        row = 0
+        col = len(array) - 1
 
+        step = 0
+        res = []
+
+        while (True):
+            if step == 0:
+                for i in range(left, right + 1):
+                    res.append(array[row][i])
+                step = 1
+                row += 1
+                if self.is_end(left, right, row, col):
+                    break
+            elif step == 1:
+                for i in range(row, col + 1):
+                    res.append(array[i][right])
+                step = 2
+                right -= 1
+                if self.is_end(left, right, row, col):
+                    break
+            elif step == 2:
+                for i in range(right, left - 1, -1):
+                    res.append(array[col][i])
+                step = 3
+                col -= 1
+                if self.is_end(left, right, row, col):
+                    break
+            else:
+                for i in range(col, row - 1, -1):
+                    res.append(array[i][left])
+                step = 0
+                left += 1
+                if self.is_end(left, right, row, col):
+                    break
+        return res
 ```
 
 #### [剑指 Offer 30. 包含min函数的栈](https://leetcode-cn.com/problems/bao-han-minhan-shu-de-zhan-lcof/)
@@ -1490,29 +1481,39 @@ minStack.min();   --> 返回 -2.
 各函数的调用总次数不超过 20000 次
 
 ```java
-class MinStack {
-    Stack<Integer> A, B;
-    public MinStack() {
-        A = new Stack<>();
-        B = new Stack<>();
-    }
-    public void push(int x) {
-        A.add(x);
-        if(B.empty() || B.peek() >= x)
-            B.add(x);
-    }
-    public void pop() {
-        if(A.pop().equals(B.peek()))
-            B.pop();
-    }
-    public int top() {
-        return A.peek();
-    }
-    public int min() {
-        return B.peek();
-    }
-}
+class MinStack:
 
+    def __init__(self):
+        """
+        initialize your data structure here.
+        """
+        self.a = []
+        self.b = []    
+
+    def push(self, x: int) -> None:
+        self.a.append(x)
+        if (len(self.b) == 0 or self.b[-1] >= x):
+            self.b.append(x)  
+
+    def pop(self) -> None:
+        x = self.a.pop()
+        if (x == self.b[-1]):
+            self.b.pop()
+
+    def top(self) -> int:
+        return self.a[-1]  
+
+    def getMin(self) -> int:
+        return self.b[-1]
+        
+
+
+# Your MinStack object will be instantiated and called as such:
+# obj = MinStack()
+# obj.push(x)
+# obj.pop()
+# param_3 = obj.top()
+# param_4 = obj.getMin()
 ```
 
 #### [剑指 Offer 31. 栈的压入、弹出序列](https://leetcode-cn.com/problems/zhan-de-ya-ru-dan-chu-xu-lie-lcof/)
@@ -1544,20 +1545,17 @@ push(5), pop() -> 5, pop() -> 3, pop() -> 2, pop() -> 1
 *  pushed 是 popped 的排列。
 
 ```java
-class Solution {
-    public boolean validateStackSequences(int[] pushed, int[] popped) {
-        Stack<Integer> stack = new Stack<>();
-        int i = 0;
-        for(int num : pushed) {
-            stack.push(num); // num 入栈
-            while(!stack.isEmpty() && stack.peek() == popped[i]) { // 循环判断与出栈
-                stack.pop();
-                i++;
-            }
-        }
-        return stack.isEmpty();
-    }
-}
+class Solution:
+    def validateBookSequences(self, putIn: List[int], takeOut: List[int]) -> bool:
+        a = []
+        idx = 0
+    
+        for i in putIn:
+            a.append(i)
+            while (len(a) != 0 and idx < len(takeOut) and a[-1] == takeOut[idx]):
+                a.pop()
+                idx += 1
+        return len(a) == 0
 ```
 
 #### [剑指 Offer 32 - I. 从上到下打印二叉树](https://leetcode-cn.com/problems/cong-shang-dao-xia-da-yin-er-cha-shu-lcof/)
@@ -1582,23 +1580,32 @@ class Solution {
 节点总数 <= 1000
 
 ```java
-class Solution {
-    public int[] levelOrder(TreeNode root) {
-        if(root == null) return new int[0];
-        Queue<TreeNode> queue = new LinkedList<>(){{ add(root); }};
-        ArrayList<Integer> ans = new ArrayList<>();
-        while(!queue.isEmpty()) {
-            TreeNode node = queue.poll();
-            ans.add(node.val);
-            if(node.left != null) queue.add(node.left);
-            if(node.right != null) queue.add(node.right);
-        }
-        int[] res = new int[ans.size()];
-        for(int i = 0; i < ans.size(); i++)
-            res[i] = ans.get(i);
-        return res;
-    }
-}
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def decorateRecord(self, root: Optional[TreeNode]) -> List[int]:
+        ans = []
+        if root == None:
+            return ans
+
+        st = []
+        st.append(root)
+
+        while len(st) != 0:
+            length = len(st)
+            for i in range(length):
+                node = st.pop(0)
+                ans.append(node.val)
+                if node.left != None:
+                    st.append(node.left)
+                if node.right != None:
+                    st.append(node.right)
+        return ans
+        
 ```
 
 #### [剑指 Offer 32 - II. 从上到下打印二叉树 II](https://leetcode-cn.com/problems/cong-shang-dao-xia-da-yin-er-cha-shu-ii-lcof/)
@@ -1629,25 +1636,34 @@ class Solution {
 节点总数 <= 1000
 
 ```java
-class Solution {
-    public List<List<Integer>> levelOrder(TreeNode root) {
-        Queue<TreeNode> queue = new LinkedList<>();
-        List<List<Integer>> res = new ArrayList<>();
-        if(root != null) queue.add(root);
-        while(!queue.isEmpty()) {
-            List<Integer> tmp = new ArrayList<>();
-            for(int i = queue.size(); i > 0; i--) { //这里一定要从高到低，不然队列的元素数量变化就会出错
-                TreeNode node = queue.poll();
-                tmp.add(node.val);
-                if(node.left != null) queue.add(node.left);
-                if(node.right != null) queue.add(node.right);
-            }
-            res.add(tmp);
-        }
-        return res;
-    }
-}
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def decorateRecord(self, root: Optional[TreeNode]) -> List[List[int]]:
+        ans = []
+        if root == None:
+            return ans
 
+        st = []
+        st.append(root)
+
+        while len(st) != 0:
+            length = len(st)
+            sub_ans = []
+            for i in range(length):
+                node = st.pop(0)
+                sub_ans.append(node.val)
+                if node.left != None:
+                    st.append(node.left)
+                if node.right != None:
+                    st.append(node.right)
+    
+            ans.append(sub_ans)
+        return ans
 ```
 
 #### [剑指 Offer 32 - III. 从上到下打印二叉树 III](https://leetcode-cn.com/problems/cong-shang-dao-xia-da-yin-er-cha-shu-iii-lcof/)
@@ -1678,25 +1694,41 @@ class Solution {
 节点总数 <= 1000
 
 ```java
-class Solution {
-    public List<List<Integer>> levelOrder(TreeNode root) {
-        Queue<TreeNode> queue = new LinkedList<>();
-        List<List<Integer>> res = new ArrayList<>();
-        if(root != null) queue.add(root);
-        while(!queue.isEmpty()) {
-            LinkedList<Integer> tmp = new LinkedList<>();
-            for(int i = queue.size(); i > 0; i--) {
-                TreeNode node = queue.poll();
-                if(res.size() % 2 == 0) tmp.addLast(node.val); // 偶数层 -> 队列头部
-                else tmp.addFirst(node.val); // 奇数层 -> 队列尾部
-                if(node.left != null) queue.add(node.left);
-                if(node.right != null) queue.add(node.right);
-            }
-            res.add(tmp);
-        }
-        return res;
-    }
-}
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+from collections import deque
+
+class Solution:
+    def decorateRecord(self, root: Optional[TreeNode]) -> List[List[int]]:
+        ans = []
+        if root == None:
+            return ans
+
+        st = []
+        st.append(root)
+
+        while len(st) != 0:
+            length = len(st)
+            sub_ans = deque()
+
+            for i in range(length):
+                node = st.pop(0)
+                if (len(ans) % 2 != 0):
+                    sub_ans.appendleft(node.val)
+                else:
+                    sub_ans.append(node.val)
+                if node.left != None:
+                    st.append(node.left)
+                if node.right != None:
+                    st.append(node.right)
+
+            ans.append(list(sub_ans))
+        return ans
+        
 ```
 
 #### [剑指 Offer 33. 二叉搜索树的后序遍历序列](https://leetcode-cn.com/problems/er-cha-sou-suo-shu-de-hou-xu-bian-li-xu-lie-lcof/)
@@ -1730,36 +1762,28 @@ class Solution {
 数组长度 <= 1000
 
 ```java
-class Solution {
-    public boolean verifyPostorder(int[] postorder) {
-        return recur(postorder, 0, postorder.length - 1);
-    }
-    boolean recur(int[] postorder, int i, int j) {
-        if(i >= j) return true;
-        int p = i;
-        while(postorder[p] < postorder[j]) p++;
-        int m = p;
-        while(postorder[p] > postorder[j]) p++;
-        return p == j && recur(postorder, i, m - 1) && recur(postorder, m, j - 1);
-    }
-}
+class Solution:
+    def recur(self, postorder: List[int], left: int, right: int) -> bool:
+        if (left >= right):
+            return True
+        
+        tmp = left
+        while postorder[tmp] < postorder[right]:
+            tmp += 1
+        mid = tmp
 
-```
+        while postorder[tmp] > postorder[right]:
+            tmp += 1
+        
+        if tmp != right:
+            return False
+        
+        return (self.recur(postorder, left, mid - 1) and 
+                self.recur(postorder, mid, right - 1))
 
-```java
-class Solution {
-    public boolean verifyPostorder(int[] postorder) {
-        Stack<Integer> stack = new Stack<>();
-        int root = Integer.MAX_VALUE;
-        for(int i = postorder.length - 1; i >= 0; i--) {
-            if(postorder[i] > root) return false;
-            while(!stack.isEmpty() && stack.peek() > postorder[i])
-            	root = stack.pop();
-            stack.add(postorder[i]);
-        }
-        return true;
-    }
-}
+    def verifyTreeOrder(self, postorder: List[int]) -> bool:
+        return self.recur(postorder, 0, len(postorder) - 1)
+        
 ```
 
 #### [剑指 Offer 34. 二叉树中和为某一值的路径](https://leetcode-cn.com/problems/er-cha-shu-zhong-he-wei-mou-yi-zhi-de-lu-jing-lcof/)
@@ -1791,24 +1815,37 @@ class Solution {
 节点总数 <= 10000
 
 ```java
-class Solution {
-    LinkedList<List<Integer>> res = new LinkedList<>();
-    LinkedList<Integer> path = new LinkedList<>(); 
-    public List<List<Integer>> pathSum(TreeNode root, int sum) {
-        recur(root, sum);
-        return res;
-    }
-    void recur(TreeNode root, int tar) {
-        if(root == null) return;
-        path.add(root.val);
-        tar -= root.val;
-        if(tar == 0 && root.left == null && root.right == null)
-            res.add(new LinkedList(path));
-        recur(root.left, tar);
-        recur(root.right, tar);
-        path.removeLast();
-    }
-}
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def __init__(self):
+        self.ans = []
+    def backtrack(self, root: Optional[TreeNode], target: int, sum:int, sub_ans: List[int]):
+        if root == None:
+            return
+
+        sub_ans.append(root.val)
+        sum += root.val
+
+        if (root.left == None and root.right == None):
+            if sum == target:
+                self.ans.append(list(sub_ans))
+
+        self.backtrack(root.left, target, sum, sub_ans)
+        self.backtrack(root.right, target, sum, sub_ans)  
+
+        sub_ans.pop()
+
+    def pathTarget(self, root: Optional[TreeNode], target: int) -> List[List[int]]:
+        sub_ans = []
+        self.backtrack(root, target, 0, sub_ans)
+
+        return self.ans
+        
 ```
 
 #### [剑指 Offer 35. 复杂链表的复制](https://leetcode-cn.com/problems/fu-za-lian-biao-de-fu-zhi-lcof/)
@@ -1857,61 +1894,33 @@ class Solution {
 * 节点数目不超过 1000 。
 
 ```java
-class Solution {
-    public Node copyRandomList(Node head) {
-        if(head == null) return null;
-        Node cur = head;
-        Map<Node, Node> map = new HashMap<>();
-        // 3. 复制各节点，并建立 “原节点 -> 新节点” 的 Map 映射
-        while(cur != null) {
-            map.put(cur, new Node(cur.val));
-            cur = cur.next;
-        }
-        cur = head;
-        // 4. 构建新链表的 next 和 random 指向
-        while(cur != null) {
-            map.get(cur).next = map.get(cur.next);
-            map.get(cur).random = map.get(cur.random);
-            cur = cur.next;
-        }
-        // 5. 返回新链表的头节点
-        return map.get(head);
-    }
-}
-```
+"""
+# Definition for a Node.
+class Node:
+    def __init__(self, x: int, next: 'Node' = None, random: 'Node' = None):
+        self.val = int(x)
+        self.next = next
+        self.random = random
+"""
+class Solution:
+    def copyRandomList(self, head: 'Node') -> 'Node':
+        tmp = head
+        dt = {}
 
-```java
-class Solution {
-    public Node copyRandomList(Node head) {
-        if(head == null) return null;
-        Node cur = head;
-        // 1. 复制各节点，并构建拼接链表
-        while(cur != null) {
-            Node tmp = new Node(cur.val);
-            tmp.next = cur.next;
-            cur.next = tmp;
-            cur = tmp.next;
-        }
-        // 2. 构建各新节点的 random 指向
-        cur = head;
-        while(cur != null) {
-            if(cur.random != null)
-                cur.next.random = cur.random.next;
-            cur = cur.next.next;
-        }
-        // 3. 拆分两链表
-        cur = head.next;
-        Node pre = head, res = head.next;
-        while(cur.next != null) {
-            pre.next = pre.next.next;
-            cur.next = cur.next.next;
-            pre = pre.next;
-            cur = cur.next;
-        }
-        pre.next = null; // 单独处理原链表尾节点
-        return res;      // 返回新链表头节点
-    }
-}
+        while tmp != None:
+            node = Node(tmp.val)
+            dt[tmp] = node
+            tmp = tmp.next
+        
+        tmp = head
+        while tmp != None:
+            node = dt[tmp]
+            node.next = dt.get(tmp.next)
+            node.random = dt.get(tmp.random)
+            tmp = tmp.next
+        
+        return dt.get(head)
+        
 ```
 
 #### [剑指 Offer 36. 二叉搜索树与双向链表](https://leetcode-cn.com/problems/er-cha-sou-suo-shu-yu-shuang-xiang-lian-biao-lcof/)
@@ -1931,25 +1940,45 @@ class Solution {
 特别地，我们希望可以就地完成转换操作。当转化完成以后，树中节点的左指针需要指向前驱，树中节点的右指针需要指向后继。还需要返回链表中的第一个节点的指针。
 
 ```java
-class Solution {
-    Node pre, head;
-    public Node treeToDoublyList(Node root) {
-        if(root == null) return null;
-        dfs(root);
-        head.left = pre;
-        pre.right = head;
-        return head;
-    }
-    void dfs(Node cur) {
-        if(cur == null) return;
-        dfs(cur.left);
-        if(pre != null) pre.right = cur;
-        else head = cur;
-        cur.left = pre;
-        pre = cur;
-        dfs(cur.right);
-    }
-}
+"""
+# Definition for a Node.
+class Node:
+    def __init__(self, val, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+"""
+class Solution:
+    def __init__(self):
+        self.pre = None
+        self.head = None
+
+    def dfs(self, root: 'Node'):
+        if (root == None):
+            return
+        
+        self.dfs(root.left)
+
+        if self.pre != None:
+            self.pre.right = root
+        else:
+            self.head = root
+        
+        root.left = self.pre
+        self.pre = root
+
+        self.dfs(root.right)
+
+    def treeToDoublyList(self, root: 'Node') -> 'Node':
+        if root is None:
+            return None
+            
+        self.dfs(root)
+
+        self.pre.right = self.head
+        self.head.left = self.pre
+
+        return self.head
 ```
 
 #### [剑指 Offer 37. 序列化二叉树](https://leetcode-cn.com/problems/xu-lie-hua-er-cha-shu-lcof/)
@@ -1971,48 +2000,74 @@ class Solution {
 ```
 
 ```java
-public class Codec {
-    public String serialize(TreeNode root) {
-        if(root == null) return "[]";
-        StringBuilder res = new StringBuilder("[");
-        Queue<TreeNode> queue = new LinkedList<>() {{ add(root); }};
-        while(!queue.isEmpty()) {
-            TreeNode node = queue.poll();
-            if(node != null) {
-                res.append(node.val + ",");
-                queue.add(node.left);
-                queue.add(node.right);
-            }
-            else res.append("null,");
-        }
-        res.deleteCharAt(res.length() - 1);
-        res.append("]");
-        return res.toString();
-    }
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
 
-    public TreeNode deserialize(String data) {
-        if(data.equals("[]")) return null;
-        String[] vals = data.substring(1, data.length() - 1).split(",");
-        TreeNode root = new TreeNode(Integer.parseInt(vals[0]));
-        Queue<TreeNode> queue = new LinkedList<>() {{ add(root); }};
-        int i = 1;
-        while(!queue.isEmpty()) {
-            TreeNode node = queue.poll();
-            if(!vals[i].equals("null")) {
-                node.left = new TreeNode(Integer.parseInt(vals[i]));
-                queue.add(node.left);
-            }
-            i++;
-            if(!vals[i].equals("null")) {
-                node.right = new TreeNode(Integer.parseInt(vals[i]));
-                queue.add(node.right);
-            }
-            i++;
-        }
-        return root;
-    }
-}
+class Codec:
 
+    def serialize(self, root):
+        """Encodes a tree to a single string.
+        
+        :type root: TreeNode
+        :rtype: str
+        """
+        if not root:
+            return "[]"
+        
+        queue = collections.deque()
+        res = []
+        queue.append(root)
+
+        while queue:
+            node = queue.popleft()
+            if node:
+                res.append(str(node.val))
+                queue.append(node.left)
+                queue.append(node.right)
+            else:
+                res.append("null")
+        
+        return '[' + ','.join(res) + ']'
+        
+
+    def deserialize(self, data):
+        """Decodes your encoded data to tree.
+        
+        :type data: str
+        :rtype: TreeNode
+        """
+        if data == "[]":
+            return None
+        
+        vals = data[1:-1].split(',')
+        i = 1
+
+        root = TreeNode(int(vals[0]))
+
+        queue = collections.deque()
+        queue.append(root)
+
+        while queue:
+            node = queue.popleft()
+            if vals[i] != "null":
+                node.left = TreeNode(int(vals[i]))
+                queue.append(node.left)
+            i += 1
+            if vals[i] != "null":
+                node.right = TreeNode(int(vals[i]))
+                queue.append(node.right)
+            i += 1
+        
+        return root
+        
+
+# Your Codec object will be instantiated and called as such:
+# codec = Codec()
+# codec.deserialize(codec.serialize(root))
 ```
 
 #### [剑指 Offer 38. 字符串的排列](https://leetcode-cn.com/problems/zi-fu-chuan-de-pai-lie-lcof/)
@@ -2033,34 +2088,39 @@ public class Codec {
 1 <= s 的长度 <= 8
 
 ```java
-class Solution {
-    List<String> res = new LinkedList<>();
-    char[] c;
-    public String[] permutation(String s) {
-        c = s.toCharArray();
-        dfs(0);
-        return res.toArray(new String[res.size()]);
-    }
-    void dfs(int x) {
-        if(x == c.length - 1) {
-            res.add(String.valueOf(c));      // 添加排列方案
-            return;
-        }
-        HashSet<Character> set = new HashSet<>();
-        for(int i = x; i < c.length; i++) {
-            if(set.contains(c[i])) continue; // 重复，因此剪枝
-            set.add(c[i]);
-            swap(i, x);                      // 交换，将 c[i] 固定在第 x 位
-            dfs(x + 1);                      // 开启固定第 x + 1 位字符
-            swap(i, x);                      // 恢复交换
-        }
-    }
-    void swap(int a, int b) {
-        char tmp = c[a];
-        c[a] = c[b];
-        c[b] = tmp;
-    }
-}
+class Solution:
+
+    def __init__(self):
+        self.ans = []
+
+    def backtrack(self, goods: List[char], idx: int):
+        if (idx >= len(goods) - 1):
+            self.ans.append(''.join(goods))
+            return
+        
+        dumpSet = set()
+        for i in range(idx, len(goods)):
+            if goods[i] in dumpSet:
+                continue
+            dumpSet.add(goods[i])
+            tmp = goods[idx]
+            goods[idx] = goods[i]
+            goods[i] = tmp
+
+            self.backtrack(goods, idx + 1)
+
+            tmp = goods[idx]
+            goods[idx] = goods[i]
+            goods[i] = tmp       
+
+
+    def goodsOrder(self, goods: str) -> List[str]:
+
+        self.backtrack(list(goods), 0)
+
+        return self.ans
+
+        
 ```
 
 #### [剑指 Offer 39. 数组中出现次数超过一半的数字](https://leetcode-cn.com/problems/shu-zu-zhong-chu-xian-ci-shu-chao-guo-yi-ban-de-shu-zi-lcof/)
@@ -2081,29 +2141,21 @@ class Solution {
 1 <= 数组长度 <= 50000
 
 ```java
-class Solution {
-    public int majorityElement(int[] nums) {
-    
-        int key = nums[0];
-        int count = 1 ;
+class Solution:
+    def inventoryManagement(self, stock: List[int]) -> int:
+        key = stock[0]
+        count = 1
 
-        for(int i = 1 ; i < nums.length; i++){
-            if(key != nums[i] && count > 0){
-                count--;
-            }
-            else if(key != nums[i] && count == 0){
-                key = nums[i];
-            }
+        for i in range(1, len(stock)):
+            if (key != stock[i]):
+                if count > 0:
+                    count -= 1
+                else:
+                    key = stock[i]
+            else:
+                count += 1
 
-            else{
-                count++;
-            }
-
-        }
-
-        return key;
-    }
-}
+        return key
 ```
 
 #### [剑指 Offer 40. 最小的k个数](https://leetcode-cn.com/problems/zui-xiao-de-kge-shu-lcof/)
@@ -2130,105 +2182,21 @@ class Solution {
 * 0 <= arr[i] <= 10000
 
 ```java
-//堆
-class Solution {
-    public int[] getLeastNumbers(int[] arr, int k) {
-        int[] vec = new int[k];
-        if (k == 0) { // 排除 0 的情况
-            return vec;
-        }
-        PriorityQueue<Integer> queue = new PriorityQueue<Integer>(new Comparator<Integer>() {
-            public int compare(Integer num1, Integer num2) {
-                return num2 - num1;
-            }
-        });
-        for (int i = 0; i < k; ++i) {
-            queue.offer(arr[i]);
-        }
-        for (int i = k; i < arr.length; ++i) {
-            if (queue.peek() > arr[i]) {
-                queue.poll();
-                queue.offer(arr[i]);
-            }
-        }
-        for (int i = 0; i < k; ++i) {
-            vec[i] = queue.poll();
-        }
-        return vec;
-    }
-}
-```
+class Solution:
+    def inventoryManagement(self, stock: List[int], cnt: int) -> List[int]:
+        if cnt == 0:
+            return list()
 
-```java
-//快排的变形
-class Solution {
-	public int[] getLeastNumbers(int[] arr, int k) {
-		if (k == 0) {
-			return new int[0];
-		} else if (arr.length <= k) {
-			return arr;
-		}
+        # python 的堆是小顶堆，得取相反数
+        hp = [-x for x in stock[:cnt]]
+        heapq.heapify(hp)
+        for i in range(cnt, len(stock)):
+            if -hp[0] > stock[i]:
+                heapq.heappop(hp)
+                heapq.heappush(hp, -stock[i])
 
-		// 原地不断划分数组
-		partitionArray(arr, 0, arr.length - 1, k);
-
-		// 数组的前 k 个数此时就是最小的 k 个数，将其存入结果
-		int[] res = new int[k];
-		for (int i = 0; i < k; i++) {
-			res[i] = arr[i];
-		}
-		return res;
-	}
-
-	void partitionArray(int[] arr, int lo, int hi, int k) {
-		// 做一次 partition 操作
-		int m = partition(arr, lo, hi);
-		// 此时数组前 m 个数，就是最小的 m 个数
-		if (k == m) {
-			// 正好找到最小的 k(m) 个数
-			return;
-		} else if (k < m) {
-			// 最小的 k 个数一定在前 m 个数中，递归划分
-			partitionArray(arr, lo, m - 1, k);
-		} else {
-			// 在右侧数组中寻找最小的 k-m 个数
-			partitionArray(arr, m + 1, hi, k);
-		}
-	}
-
-	public int partition(int[] list, int first, int last) {
-		int pivot = list[first];
-		int low = first + 1;
-		int high = last;
-
-		while (high > low) {
-
-			while (low <= high && list[low] <= pivot)
-				low++;
-
-			while (low <= high && list[high] > pivot)
-				high--;
-
-			if (high > low) {
-				int temp = list[high];
-				list[high] = list[low];
-				list[low] = temp;
-			}
-		}
-
-		while (high > first && list[high] >= pivot)
-			high--;
-
-		if (pivot > list[high]) {
-			list[first] = list[high];
-			list[high] = pivot;
-			return high;
-		} else {
-			return first;
-		}
-	}
-
-}
+        ans = [-x for x in hp]
+        return ans
 ```
 
 #### [剑指 Offer 41. 数据流中的中位数](https://leetcode-cn.com/problems/shu-ju-liu-zhong-de-zhong-wei-shu-lcof/)
@@ -2269,26 +2237,35 @@ class Solution {
 * 最多会对 addNum、findMedian 进行 50000 次调用。
 
 ```java
-class MedianFinder {
-    Queue<Integer> A, B;
-    public MedianFinder() {
-        A = new PriorityQueue<>(); // 小顶堆，保存较大的一半
-        B = new PriorityQueue<>((x, y) -> (y - x)); // 大顶堆，保存较小的一半
-    }
-    public void addNum(int num) {
-        if(A.size() != B.size()) {
-            A.add(num);
-            B.add(A.poll());
-        } else {
-            B.add(num);
-            A.add(B.poll());
-        }
-    }
-    public double findMedian() {
-        return A.size() != B.size() ? A.peek() : (A.peek() + B.peek()) / 2.0;
-    }
-}
+class MedianFinder:
 
+    def __init__(self):
+        """
+        initialize your data structure here.
+        """
+        self.smallHp = []
+        self.bigHp = []
+ 
+    def addNum(self, num: int) -> None:
+        if len(self.smallHp) != len(self.bigHp):
+            heappush(self.smallHp, num)
+            heappush(self.bigHp, -heappop(self.smallHp))
+        else:
+            heappush(self.bigHp, -num)
+            heappush(self.smallHp, -heappop(self.bigHp))
+        
+
+    def findMedian(self) -> float:
+        if len(self.smallHp) != len(self.bigHp):
+            return self.smallHp[0]
+        
+        return (self.smallHp[0] - self.bigHp[0]) / 2
+
+
+# Your MedianFinder object will be instantiated and called as such:
+# obj = MedianFinder()
+# obj.addNum(num)
+# param_2 = obj.findMedian()
 ```
 
 #### [剑指 Offer 42. 连续子数组的最大和](https://leetcode-cn.com/problems/lian-xu-zi-shu-zu-de-zui-da-he-lcof/)
@@ -2311,20 +2288,16 @@ class MedianFinder {
 * -100 <= arr[i] <= 100
 
 ```java
-class Solution {
-    public int maxSubArray(int[] nums) {
-        int max = nums[0];
-        int former = 0;//用于记录dp[i-1]的值，对于dp[0]而言，其前面的dp[-1]=0
-        int cur = nums[0];//用于记录dp[i]的值
-        for(int num:nums){
-            cur = num;
-            if(former>0) cur +=former;
-            if(cur>max) max = cur;
-            former=cur;
-        }
-        return max;
-    }
-}
+class Solution:
+    def maxSales(self, sales: List[int]) -> int:
+        dp = [0] * len(sales)
+        dp[0] = sales[0]
+
+        ans = dp[0]
+        for i in range(1, len(sales)):
+            dp[i] = max(dp[i - 1], 0) + sales[i]
+            ans = max(ans, dp[i])
+        return ans
 ```
 
 #### [剑指 Offer 43. 1～n 整数中 1 出现的次数](https://leetcode-cn.com/problems/1nzheng-shu-zhong-1chu-xian-de-ci-shu-lcof/)
@@ -2366,48 +2339,40 @@ f(n))函数的意思是1～n这n个整数的十进制表示中1出现的次数�
 
 所以全部加起来是f(pow-1) + last + 1 + f(last);
 
-```java
-class Solution {
-    public int countDigitOne(int n) {
-        int digit = 1, res = 0;
-        int high = n / 10, cur = n % 10, low = 0;
-        while(high != 0 || cur != 0) {
-            if(cur == 0) res += high * digit;
-            else if(cur == 1) res += high * digit + low + 1;
-            else res += (high + 1) * digit;
-            low += cur * digit;
-            cur = high % 10;
-            high /= 10;
-            digit *= 10;
-        }
-        return res;
-    }
-}
-```
+例子如3234，high=3, pow=1000, last=234
+
+可以将数字范围分成两部分1999，10001999，20002999和30003234
+
+1~999这个范围1的个数是f(pow-1)
+1000~1999这个范围1的个数需要分为两部分：
+千分位是1的个数：千分位为1的个数刚好就是pow，注意，这儿只看千分位，不看其他位
+其他位是1的个数：即是999中出现1的个数，为f(pow-1)
+2000~2999这个范围1的个数是f(pow-1)
+3000~3234这个范围1的个数是f(last)
+所以全部加起来是pow + high*f(pow-1) + f(last);
 
 ```java
-//递归
-class Solution {
-    public int countDigitOne(int n) {
-        return f(n);
-    }
-    
-    private int f(int n ) {
-        if (n <= 0)
-            return 0;
-        String s = String.valueOf(n);
-        int high = s.charAt(0) - '0';
-        int pow = (int) Math.pow(10, s.length()-1);
-        int last = n - high*pow;
-        if (high == 1) {
-            return f(pow-1) + last + 1 + f(last);
-        } else {
-            return pow + high*f(pow-1) + f(last);
-        }
-    }
-}
+class Solution:
+    def recur(self, n: int)-> int:
+        if (n <= 0):
+            return 0
 
+        tmp = str(n)
+        high = int(tmp[0])
+        powFlag = int(pow(10, len(tmp) - 1))
+        last = n - high * powFlag
+
+        if (high == 1):
+            return self.recur(powFlag - 1) + last + 1 + self.recur(last)
+        
+        return high * self.recur(powFlag - 1) + powFlag + self.recur(last)
+
+    def digitOneInNumber(self, num: int) -> int:
+        return self.recur(num)
+        
 ```
+
+
 
 #### [剑指 Offer 44. 数字序列中某一位的数字](https://leetcode-cn.com/problems/shu-zi-xu-lie-zhong-mou-yi-wei-de-shu-zi-lcof/)
 
@@ -2435,27 +2400,22 @@ class Solution {
 * 0 <= n < 2^31
 
 ```java
-class Solution {
-    public int findNthDigit(int n) {
+class Solution:
+    def findKthNumber(self, k: int) -> int:
+        digit = 1 # 几位数
+        start = 1 # digit 位数是从哪个数开始的
+        count = 9 # digit 位数一共有多少个数字
+
+        while k > count:
+            k -= count
+            start *= 10
+            digit += 1
+            count = 9 * start * digit
         
-        int digital = 1; //几位数
-        long start = 1; //n位数是从哪个数开始的(2位数是从10开始的)
-        long count = 9; //n位数总共有多少个数字(2位数有2*90个数字)
-
-        while(n > count){ //确定第n位对应是几位数
-            n -= count;
-            digital += 1;
-            start *= 10;
-            count = 9 * start * digital;
-        }
-
-        //确定是哪个数
-        long sum = start + (n - 1)/digital; //因为start是从1开始的，所以要用n-1整除
-
-        //确定在这个数的哪一位
-        return Long.toString(sum).charAt((n - 1) % digital) - '0';
-    }
-}
+        num = start + (k - 1) // digit
+        bit = str(num)[(k - 1) % digit]
+        return int(bit)
+        
 ```
 
 #### [剑指 Offer 45. 把数组排成最小的数](https://leetcode-cn.com/problems/ba-shu-zu-pai-cheng-zui-xiao-de-shu-lcof/)
@@ -2486,67 +2446,40 @@ class Solution {
 * 拼接起来的数字可能会有前导 0，最后结果不需要去掉前导 0
 
 ```java
-class Solution {
-    public String minNumber(int[] nums) {
-        //把int数组转换成字符串的形式，用字符串进行比较
-        String[] str = new String[nums.length];
-        for(int i = 0 ; i < str.length; i++){
-            str[i] = String.valueOf(nums[i]);
-        }
-
-        //字符串排序
-        quickSort(str,0,str.length-1);
-
-        //拼接排序好的字符串
-        StringBuilder res = new StringBuilder();
-        for(int i = 0 ; i < str.length; i++){
-            res.append(str[i]);
-        }
-
-        return res.toString();
-    }
-
-    //用快排
-    public void quickSort(String[] strs, int low, int high) {
-        if (low < high) {
-            int pivotIndex = partition(strs, low, high);
-            quickSort(strs, low, pivotIndex - 1);
-            quickSort(strs, pivotIndex + 1, high);
-        }
-    }
-
-    public int partition(String[] strs, int l, int r) {
-        //数组的第一个数为基准元素
-        String pivot = strs[l];
-        int low = l + 1;
-        int high = r;
-        while (low < high) {
-            
-            while (low <= high && (strs[high] + pivot).compareTo(pivot + strs[high]) >= 0)
-                high--;
-            while (low <= high && (strs[low] + pivot).compareTo(pivot + strs[low]) <= 0)
-                low++;
-            
-            if(low < high){
-                String tmp = strs[high];
-                strs[high] = strs[low];
-                strs[low] = tmp;
-            }
-        }
+class Solution:
+    def partition(self, strs: List[str], left: int, right: int) -> int:
+        pivot = strs[left]
+        i, j = left, right
         
-        while(high > l && (strs[high] + pivot).compareTo(pivot + strs[high]) >= 0)
-            high--;
-        if((strs[high] + pivot).compareTo(pivot + strs[high]) < 0){
-            strs[l] = strs[high];
-            strs[high] = pivot;
-            return high;
-        }
-        else{
-            return l;
-        }
-    }
+        while i < j:
+            while i < j and strs[j] + pivot >= pivot + strs[j]:
+                j -= 1
+            
+            while i < j and strs[i] + pivot <= pivot + strs[i]:
+                i += 1
+            
+            # 交换
+            if i < j:
+                strs[i], strs[j] = strs[j], strs[i]
+        
+        # 将基准放到正确位置
+        strs[left], strs[i] = strs[i], strs[left]
+        return i
 
-}
+    def quickSort(self, strs: List(str), l: int, r: int):
+        if l >= r:
+            return;
+
+        mid = self.partition(strs, l, r)
+        self.quickSort(strs, l, mid - 1)
+        self.quickSort(strs, mid + 1, r)
+
+    def crackPassword(self, password: List[int]) -> str:
+        strs = [str(num) for num in password]
+        self.quickSort(strs, 0, len(strs) - 1)
+
+        return ''.join(strs)
+        
 ```
 
 #### [剑指 Offer 46. 把数字翻译成字符串](https://leetcode-cn.com/problems/ba-shu-zi-fan-yi-cheng-zi-fu-chuan-lcof/)
@@ -2566,24 +2499,22 @@ class Solution {
 * 0 <= num < 231
 
 ```java
-class Solution {
-    public int translateNum(int num) {
-        //相当于青蛙跳台阶的变式，如果num的一个长度为2的子串i在10-25之间，
-        //表示有两种表示成字母的方法（分开表示或合在一起表示）
+class Solution:
+    def crackNumber(self, ciphertext: int) -> int:
+        text = str(ciphertext)
+        dp = [0] * (len(text) + 1)
+        dp[0] = 1
+        dp[1] = 1
 
-       String str = String.valueOf(num);
-
-        int a = 1, b = 1; //a表示k-2, b 表示k-1
-        for(int i = 2; i <= str.length(); i++){
-            String tmp = str.substring(i-2,i); //不包括下标为i的子串
-            int sum = (tmp.compareTo("10") >= 0 &&  tmp.compareTo("25")<= 0) ? a+b : b;
-            a = b;
-            b = sum;
-        }
-
-        return b;
-    }
-}
+        for i in range(2, len(text) + 1):
+            dp[i] = dp[i - 1]
+            if text[i - 2] == '1':
+                dp[i] += dp[i - 2] 
+            if text[i - 2] == '2' and text[i - 1] <= '5':
+                dp[i] += dp[i - 2]
+        
+        return dp[len(text)]
+        
 ```
 
 #### [剑指 Offer 47. 礼物的最大价值](https://leetcode-cn.com/problems/li-wu-de-zui-da-jie-zhi-lcof/)
@@ -2609,24 +2540,27 @@ class Solution {
 * 0 < grid[0].length <= 200
 
 ```java
-class Solution {
-    
-    public int maxValue(int[][] grid) {
-        int[][] dp = new int[grid.length + 1 ][grid[0].length + 1];
-        
-        for(int i = 1 ; i < dp.length; i++ ){
-            for(int j = 1 ; j < dp[0].length; j++){
-                if(i == 1 && j == 1)  dp[i][j] = grid[0][0];
-                else dp[i][j] =  Math.max(dp[i-1][j], dp[i][j-1]) + grid[i-1][j-1];
-            }
-        }
+class Solution:
+    def jewelleryValue(self, frame: List[List[int]]) -> int:
+        m = len(frame)
+        n = len(frame[0])
+        dp = [[0] * n for _ in range(0, m)]
 
-        return dp[grid.length][grid[0].length];
-      
-    }
+        for i in range(0, m):
+            for j in range(0, n):
+                if i == 0 and j == 0:
+                    dp[i][j] = frame[0][0]
+                    continue
+                if i == 0:
+                    dp[i][j] = dp[i][j - 1] + frame[i][j]
+                    continue
+                if j == 0:
+                    dp[i][j] = dp[i - 1][j] + frame[i][j]
+                    continue
 
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]) + frame[i][j]
 
-}
+        return dp[m - 1][n - 1]
 ```
 
 #### [剑指 Offer 48. 最长不含重复字符的子字符串](https://leetcode-cn.com/problems/zui-chang-bu-han-zhong-fu-zi-fu-de-zi-zi-fu-chuan-lcof/)
@@ -2665,24 +2599,27 @@ class Solution {
 * s.length <= 40000
 
 ```java
-class Solution {
-    public int lengthOfLongestSubstring(String s) {
-        HashMap<Character,Integer> map = new HashMap<>();
-      
-        int res = 0, left = 0;
-        for(int i = 0 ; i < s.length(); i++){
-            if(map.containsKey(s.charAt(i))){
-               left = Math.max(left, map.get(s.charAt(i)) + 1 );   //防止出现"abba"的情形
-               
-            }
+class Solution:
+    def dismantlingAction(self, arr: str) -> int:
+        map = {}
 
-            map.put(s.charAt(i),i);
-            res = Math.max(res, i - left + 1);      
-        }
+        l = 0
+        ans = 0
+        for r in range(0, len(arr)):
+            if arr[r] in  map:
+                num = map[arr[r]]
+                ans = max(ans, r - l)
+                while l <= num:
+                    map.pop(arr[l])
+                    l += 1
+                
+                map[arr[r]] = r
+                continue
+            
+            map[arr[r]] = r
+            ans = max(ans, r - l + 1)
 
-        return  res;
-    }
-}
+        return ans
 ```
 
 #### [剑指 Offer 49. 丑数](https://leetcode-cn.com/problems/chou-shu-lcof/)
@@ -2750,25 +2687,18 @@ s = ""
 0 <= s 的长度 <= 50000
 
 ```java
-class Solution {
-    public char firstUniqChar(String s) {
-        HashMap<Character, Integer> dic = new HashMap<>();
-        char[] sc = s.toCharArray();
-        for(char c : sc){
-            if(!dic.containsKey(c))
-                dic.put(c, 1);  
-            else{
-                int value = dic.get(c);               
-                dic.put(c,++value);
-            }
-                
-        }
-            
-        for(char c : sc)
-            if(dic.get(c) == 1) return c;
-        return ' ';
-    }
-}
+class Solution:
+    def dismantlingAction(self, arr: str) -> str:
+        map = {}
+
+        for i in arr:
+            num = map.get(i, 0)
+            map[i] = num + 1
+        for i in arr:
+            if map.get(i) == 1:
+                return i
+        return " "
+        
 ```
 
 #### [剑指 Offer 51. 数组中的逆序对](https://leetcode-cn.com/problems/shu-zu-zhong-de-ni-xu-dui-lcof/)
